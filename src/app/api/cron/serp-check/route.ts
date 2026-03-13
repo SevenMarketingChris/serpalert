@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server'
+import { isCronRequest } from '@/lib/auth'
+import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
+import { checkSerpForBrand } from '@/lib/dataforseo'
+import { screenshotSerp } from '@/lib/puppeteer'
+import { uploadScreenshot } from '@/lib/supabase-storage'
+import { sendNewCompetitorAlert } from '@/lib/slack'
+
+export const maxDuration = 300
+
+export async function GET(request: Request) {
+  if (!isCronRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const allBrands = await getAllActiveBrands()
+  const results = []
+
+  for (const brand of allBrands) {
+    for (const keyword of brand.keywords) {
+      try {
+        const ads = await checkSerpForBrand(keyword, 'United Kingdom')
+        let screenshotUrl: string | undefined
+
+        if (ads.length > 0) {
+          const buffer = await screenshotSerp(keyword)
+          screenshotUrl = await uploadScreenshot(
+            buffer,
+            `${brand.id}/${Date.now()}-${encodeURIComponent(keyword)}.png`
+          )
+        }
+
+        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
+
+        if (ads.length > 0) {
+          const now = new Date()
+          const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
+          await insertCompetitorAds(ads.map(ad => ({
+            serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
+            headline: ad.headline ?? undefined, description: ad.description ?? undefined,
+            displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
+            position: ad.position, firstSeenAt: now,
+          })))
+          for (const ad of ads) {
+            if (!recentDomains.includes(ad.domain)) {
+              try {
+                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, domain: ad.domain, keyword })
+              } catch (alertErr) {
+                console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
+              }
+            }
+          }
+        }
+
+        results.push({ brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' })
+      } catch (err) {
+        console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
+        results.push({ brand: brand.name, keyword, status: 'error', error: String(err) })
+      }
+    }
+  }
+
+  return NextResponse.json({ results, timestamp: new Date().toISOString() })
+}
