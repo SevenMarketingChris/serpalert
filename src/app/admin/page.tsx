@@ -1,11 +1,14 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getAllActiveBrands } from '@/lib/db/queries'
+import { isAdminSession } from '@/lib/auth'
 import { NewBrandForm } from './new-brand-form'
 
 export default async function AdminPage() {
   const h = await headers()
-  if (h.get('authorization') !== `Bearer ${process.env.ADMIN_SECRET}`) redirect('/unauthorized')
+  const hasHeader = h.get('authorization') === `Bearer ${process.env.ADMIN_SECRET}`
+  const hasCookie = await isAdminSession()
+  if (!hasHeader && !hasCookie) redirect('/login')
   const brands = await getAllActiveBrands()
   return (
     <div className="container mx-auto p-6 max-w-4xl">
