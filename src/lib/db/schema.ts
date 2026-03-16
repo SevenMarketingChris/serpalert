@@ -9,28 +9,12 @@ export const brands = pgTable('brands', {
   keywords: text('keywords').array().notNull().default([]),
   active: boolean('active').notNull().default(true),
   slackWebhookUrl: text('slack_webhook_url'),
-  websiteUrl: text('website_url'),
-  monthlyBrandSpend: numeric('monthly_brand_spend'),
-  brandRoas: numeric('brand_roas'),
-  logoUrl: text('logo_url'),
-  description: text('description'),
-  phone: text('phone'),
-  // White-label
-  agencyName: text('agency_name'),
-  agencyLogoUrl: text('agency_logo_url'),
-  agencyPrimaryColor: text('agency_primary_color'),
-  // Reports
-  reportEmail: text('report_email'),
-  // Competitor spend estimator
-  avgBrandCpc: numeric('avg_brand_cpc'),
-  monthlyBrandSearches: integer('monthly_brand_searches'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 export const serpChecks = pgTable('serp_checks', {
   id: uuid('id').primaryKey().defaultRandom(),
   brandId: uuid('brand_id').notNull().references(() => brands.id),
-  scanGroupId: uuid('scan_group_id'),
   keyword: text('keyword').notNull(),
   checkedAt: timestamp('checked_at').notNull().defaultNow(),
   device: text('device').notNull().default('desktop'),
@@ -49,7 +33,6 @@ export const competitorAds = pgTable('competitor_ads', {
   displayUrl: text('display_url'),
   destinationUrl: text('destination_url'),
   position: integer('position'),
-  landingPageScreenshotUrl: text('landing_page_screenshot_url'),
   firstSeenAt: timestamp('first_seen_at').notNull().defaultNow(),
 })
 
@@ -63,18 +46,7 @@ export const auctionInsights = pgTable('auction_insights', {
   outrankingShare: numeric('outranking_share'),
 })
 
-export const pauseTests = pgTable('pause_tests', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  brandId: uuid('brand_id').notNull().references(() => brands.id),
-  startedAt: timestamp('started_at').notNull().defaultNow(),
-  endedAt: timestamp('ended_at'),
-  baselineExposureRate: numeric('baseline_exposure_rate'),
-  duringExposureRate: numeric('during_exposure_rate'),
-  notes: text('notes'),
-})
-
 export type Brand = typeof brands.$inferSelect
 export type SerpCheck = typeof serpChecks.$inferSelect
 export type CompetitorAd = typeof competitorAds.$inferSelect
 export type AuctionInsight = typeof auctionInsights.$inferSelect
-export type PauseTest = typeof pauseTests.$inferSelect

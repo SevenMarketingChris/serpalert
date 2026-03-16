@@ -116,52 +116,12 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* App theme tokens */
-:root {
-  --c-bg: #F2F2F7;
-  --c-card: #FFFFFF;
-  --c-card-secondary: #F7F7F8;
-  --c-border: #E5E5EA;
-  --c-border-muted: #F0F0F2;
-  --c-text: #1C1C1E;
-  --c-text-secondary: #3A3A3C;
-  --c-text-muted: #8E8E93;
-  --c-text-faint: #C7C7CC;
-  /* Floating shadow system — cards appear lifted off the page */
-  --c-shadow: 0 0 0 0.5px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.06);
-  --c-shadow-sm: 0 0 0 0.5px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.06);
-  --c-shadow-lg: 0 0 0 0.5px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07), 0 16px 48px rgba(0,0,0,0.1);
-}
-
-.dark {
-  --c-bg: #111113;
-  --c-card: #1C1C1E;
-  --c-card-secondary: #2C2C2E;
-  --c-border: #38383A;
-  --c-border-muted: #2C2C2E;
-  --c-text: #F5F5F7;
-  --c-text-secondary: #AEAEB2;
-  --c-text-muted: #636366;
-  --c-text-faint: #3A3A3C;
-  /* In dark mode, use a subtle ring instead of shadows */
-  --c-shadow: 0 0 0 1px rgba(255,255,255,0.06);
-  --c-shadow-sm: 0 0 0 1px rgba(255,255,255,0.05);
-  --c-shadow-lg: 0 0 0 1px rgba(255,255,255,0.06);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    background: var(--c-bg);
-    color: var(--c-text);
-    -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.01em;
-  }
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--c-border) var(--c-bg);
+    @apply bg-background text-foreground;
   }
   html {
     @apply font-sans;
