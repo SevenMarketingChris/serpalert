@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
-import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
+import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, getLastHeadlineForDomain } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
-import { screenshotSerp } from '@/lib/puppeteer'
+import { screenshotLandingPage } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
-import { sendNewCompetitorAlert } from '@/lib/slack'
+import { sendNewCompetitorAlert, sendCopyChangeAlert } from '@/lib/slack'
 
 export const maxDuration = 300
 
@@ -17,30 +17,63 @@ export async function GET(request: Request) {
   const results = []
 
   for (const brand of allBrands) {
+    const scanGroupId = crypto.randomUUID()
     for (const keyword of brand.keywords) {
       try {
         const ads = await checkSerpForBrand(keyword, 'United Kingdom')
-        let screenshotUrl: string | undefined
-
-        if (ads.length > 0) {
-          const buffer = await screenshotSerp(keyword)
-          screenshotUrl = await uploadScreenshot(
-            buffer,
-            `${brand.id}/${Date.now()}-${encodeURIComponent(keyword)}.png`
-          )
-        }
-
-        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
+        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, scanGroupId })
 
         if (ads.length > 0) {
           const now = new Date()
           const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
-          await insertCompetitorAds(ads.map(ad => ({
+
+          // Capture landing page screenshots for new competitors + detect copy changes
+          const adsWithScreenshots = await Promise.all(ads.map(async ad => {
+            let landingPageScreenshotUrl: string | undefined
+            const isNew = !recentDomains.includes(ad.domain)
+
+            if (isNew && ad.destinationUrl) {
+              try {
+                const buffer = await screenshotLandingPage(ad.destinationUrl)
+                landingPageScreenshotUrl = await uploadScreenshot(
+                  buffer,
+                  `landing-pages/${brand.id}/${ad.domain}/${Date.now()}.png`
+                )
+              } catch (lpErr) {
+                console.error(`Landing page screenshot failed for ${ad.domain}:`, lpErr)
+              }
+            }
+
+            // Detect copy changes for existing competitors
+            if (!isNew && ad.headline) {
+              try {
+                const lastHeadline = await getLastHeadlineForDomain(brand.id, ad.domain)
+                if (lastHeadline && lastHeadline !== ad.headline) {
+                  await sendCopyChangeAlert({
+                    webhookUrl: brand.slackWebhookUrl,
+                    brandName: brand.name,
+                    domain: ad.domain,
+                    keyword,
+                    oldHeadline: lastHeadline,
+                    newHeadline: ad.headline,
+                  })
+                }
+              } catch (copyErr) {
+                console.error(`Copy change check failed for ${ad.domain}:`, copyErr)
+              }
+            }
+
+            return { ...ad, landingPageScreenshotUrl }
+          }))
+
+          await insertCompetitorAds(adsWithScreenshots.map(ad => ({
             serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
             headline: ad.headline ?? undefined, description: ad.description ?? undefined,
             displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
-            position: ad.position, firstSeenAt: now,
+            position: ad.position, landingPageScreenshotUrl: ad.landingPageScreenshotUrl,
+            firstSeenAt: now,
           })))
+
           for (const ad of ads) {
             if (!recentDomains.includes(ad.domain)) {
               try {

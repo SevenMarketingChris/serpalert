@@ -16,9 +16,12 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
-  // Cron/API routes — allow bearer token
+  // API routes — allow only with a known valid bearer token (admin or cron secret)
   if (pathname.startsWith('/api/') && req.headers.get('authorization')?.startsWith('Bearer ')) {
-    return NextResponse.next()
+    const token = req.headers.get('authorization')!.slice(7)
+    const validTokens = [process.env.ADMIN_SECRET, process.env.CRON_SECRET].filter(Boolean)
+    if (validTokens.includes(token)) return NextResponse.next()
+    // Unknown bearer — fall through to session check below
   }
 
   // Everything else requires Google session
