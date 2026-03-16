@@ -1,17 +1,14 @@
 import { notFound, redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForCheck, getAuctionInsightsLast30Days } from '@/lib/db/queries'
-import { isAdminSession } from '@/lib/auth'
+import { auth } from '../../../../auth'
 import { CompetitorTimeline } from '@/components/competitor-timeline'
 import { AuctionChart } from '@/components/auction-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function DashboardPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
-  const h = await headers()
-  const hasHeader = h.get('authorization') === `Bearer ${process.env.ADMIN_SECRET}`
-  const hasCookie = await isAdminSession()
-  if (!hasHeader && !hasCookie) redirect('/login')
+  const session = await auth()
+  if (!session) redirect('/login')
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
