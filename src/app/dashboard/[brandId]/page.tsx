@@ -36,12 +36,12 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
   const allDomains = new Set(checksWithAds.flatMap(c => c.ads.map(a => a.domain))).size
 
   return (
-    <div className="min-h-screen bg-background dark:bg-dot-pattern">
+    <div className="min-h-screen bg-background bg-dot-pattern">
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
+      <div className="border-b border-border bg-card px-6 py-4">
         <div className="container mx-auto max-w-6xl flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gradient-neon">{brand.name}</h1>
+            <h1 className="text-2xl font-bold text-gradient-tech">{brand.name}</h1>
             <p className="text-xs uppercase tracking-widest text-muted-foreground mt-0.5">Admin — Brand Monitor</p>
           </div>
           <ThemeToggle />
@@ -51,7 +51,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
       <div className="container mx-auto p-6 max-w-6xl space-y-6">
         {/* No Google Ads Customer ID warning */}
         {!brand.googleAdsCustomerId && (
-          <Alert className="border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-neon-amber">
+          <Alert className="border-amber-500/30 bg-amber-500/5 text-amber-600">
             <AlertDescription>
               No Google Ads Customer ID configured — auction insights will not be collected for this brand.
             </AlertDescription>
@@ -61,41 +61,41 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
         {/* Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {/* Monthly Spend */}
-          <div className="rounded-lg border border-border bg-card p-4 neon-bar-pink card-neon-hover">
+          <div className="rounded-lg border border-border bg-card p-4 metric-stripe-blue tech-card-hover">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Monthly Spend</p>
-            <p className="font-mono text-2xl font-bold text-neon-pink">{formatGBP(brand.monthlyBrandSpend)}</p>
+            <p className="font-mono text-2xl font-bold text-tech-blue">{formatGBP(brand.monthlyBrandSpend)}</p>
           </div>
 
           {/* Brand ROAS */}
-          <div className="rounded-lg border border-border bg-card p-4 neon-bar-cyan card-neon-hover">
+          <div className="rounded-lg border border-border bg-card p-4 metric-stripe-cyan tech-card-hover">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Brand ROAS</p>
-            <p className="font-mono text-2xl font-bold text-neon-cyan">{formatRoas(brand.brandRoas)}</p>
+            <p className="font-mono text-2xl font-bold text-tech-cyan">{formatRoas(brand.brandRoas)}</p>
           </div>
 
           {/* Checks Today */}
-          <div className="rounded-lg border border-border bg-card p-4 neon-bar-purple card-neon-hover">
+          <div className="rounded-lg border border-border bg-card p-4 metric-stripe-purple tech-card-hover">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Checks Today</p>
-            <p className="font-mono text-2xl font-bold text-neon-purple">{todayChecks.length}</p>
+            <p className="font-mono text-2xl font-bold text-tech-purple">{todayChecks.length}</p>
           </div>
 
           {/* Competitors Today */}
-          <div className={`rounded-lg border border-border bg-card p-4 card-neon-hover ${competitorsToday === 0 ? 'neon-bar-green' : 'neon-bar-pink'}`}>
+          <div className={`rounded-lg border border-border bg-card p-4 tech-card-hover ${competitorsToday === 0 ? 'metric-stripe-green' : 'metric-stripe-blue'}`}>
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Competitors Today</p>
-            <p className={`font-mono text-2xl font-bold ${competitorsToday === 0 ? 'text-neon-green' : 'text-neon-pink'}`}>
+            <p className={`font-mono text-2xl font-bold ${competitorsToday === 0 ? 'text-tech-green' : 'text-tech-blue'}`}>
               {competitorsToday}
             </p>
           </div>
 
           {/* Total Keywords */}
-          <div className="rounded-lg border border-border bg-card p-4 neon-bar-amber card-neon-hover">
+          <div className="rounded-lg border border-border bg-card p-4 metric-stripe-orange tech-card-hover">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Total Keywords</p>
-            <p className="font-mono text-2xl font-bold text-neon-amber">{brand.keywords.length}</p>
+            <p className="font-mono text-2xl font-bold text-tech-orange">{brand.keywords.length}</p>
           </div>
         </div>
 
         {/* Unique competitors (all time) — secondary stat row */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-          <span className="text-neon-cyan">{allDomains}</span>
+          <span className="text-tech-cyan">{allDomains}</span>
           <span>unique competitor domains detected across all time</span>
         </div>
 
@@ -104,13 +104,13 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
           <TabsList variant="line" className="border-b border-border rounded-none w-full justify-start pb-0 mb-0 gap-4">
             <TabsTrigger
               value="timeline"
-              className="data-active:text-neon-pink data-active:after:bg-neon-pink pb-3"
+              className="pb-3"
             >
               SERP Timeline
             </TabsTrigger>
             <TabsTrigger
               value="auction"
-              className="data-active:text-neon-pink data-active:after:bg-neon-pink pb-3"
+              className="pb-3"
             >
               Auction Insights
             </TabsTrigger>
@@ -123,7 +123,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
           </TabsContent>
 
           <TabsContent value="auction">
-            <div className="rounded-lg border border-border bg-card neon-bar-cyan p-6">
+            <div className="rounded-lg border border-border bg-card metric-stripe-cyan p-6">
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">30-Day Auction Insights</p>
               <AuctionChart insights={insights} />
             </div>

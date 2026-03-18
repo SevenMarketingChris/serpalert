@@ -6,17 +6,17 @@ export function AdCopyCard({ ads }: { ads: CompetitorAd[] }) {
   return (
     <div className="space-y-2">
       {ads.map(ad => (
-        <div key={ad.id} className="bg-card border border-border rounded-lg p-3 neon-bar-cyan card-neon-hover">
+        <div key={ad.id} className="bg-card border border-border rounded-lg p-3 tech-card-hover border-l-2 border-l-primary/60">
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="destructive" className="text-xs shrink-0">Ad</Badge>
-            <span className="text-neon-pink text-xs font-mono truncate">{ad.displayUrl ?? ad.domain}</span>
+            <span className="text-muted-foreground text-xs font-mono truncate">{ad.displayUrl ?? ad.domain}</span>
             {ad.position != null && (
-              <span className="ml-auto font-mono text-xs text-neon-amber shrink-0">#{ad.position}</span>
+              <span className="ml-auto font-mono text-xs text-tech-orange shrink-0">#{ad.position}</span>
             )}
           </div>
-          <p className="text-neon-cyan font-semibold text-sm leading-snug">{ad.headline}</p>
+          <p className="text-primary font-semibold text-sm leading-snug">{ad.headline}</p>
           {ad.description && (
-            <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{ad.description}</p>
+            <p className="text-foreground/70 text-xs mt-1 leading-relaxed">{ad.description}</p>
           )}
         </div>
       ))}

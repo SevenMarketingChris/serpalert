@@ -2,8 +2,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AdminLoading() {
   return (
-    <div className="min-h-screen bg-background dark:bg-dot-pattern">
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
         <Skeleton className="h-7 w-40" />
         <Skeleton className="h-8 w-28" />
       </div>

@@ -31,12 +31,12 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
   ).size
 
   return (
-    <div className="min-h-screen bg-background dark:bg-dot-pattern">
+    <div className="min-h-screen bg-background bg-dot-pattern">
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
+      <div className="border-b border-border bg-card px-6 py-4">
         <div className="container mx-auto max-w-4xl flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gradient-neon">{brand.name} — Brand Monitor</h1>
+            <h1 className="text-2xl font-bold text-gradient-tech">{brand.name} — Brand Monitor</h1>
             {lastCheck && (
               <p className="text-xs font-mono text-muted-foreground mt-0.5">
                 Last checked: {new Date(lastCheck.checkedAt).toLocaleString('en-GB')}
@@ -45,7 +45,7 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
           </div>
           <div className="flex items-center gap-3">
             {competitorsToday === 0 ? (
-              <Badge className="font-mono text-xs bg-transparent border border-neon-green/40 text-neon-green">
+              <Badge className="font-mono text-xs bg-transparent border border-green-500/40 text-tech-green">
                 CLEAR
               </Badge>
             ) : (
@@ -61,8 +61,8 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
       <div className="container mx-auto p-6 max-w-4xl space-y-6">
         {/* All-clear banner */}
         {competitorsToday === 0 && (
-          <Alert className="border-neon-green/20 bg-neon-green/5">
-            <AlertDescription className="text-neon-green font-mono text-xs tracking-wide">
+          <Alert className="border-green-500/20 bg-green-500/5">
+            <AlertDescription className="text-tech-green font-mono text-xs tracking-wide">
               No competitors detected bidding on your brand keywords today.
             </AlertDescription>
           </Alert>
@@ -72,15 +72,15 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
         {(brand.monthlyBrandSpend || brand.brandRoas) && (
           <div className="grid grid-cols-2 gap-4">
             {brand.monthlyBrandSpend && (
-              <div className="rounded-lg border border-border bg-card p-4 neon-bar-pink card-neon-hover">
+              <div className="rounded-lg border border-border bg-card p-4 metric-stripe-blue tech-card-hover">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Monthly Brand Spend</p>
-                <p className="font-mono text-2xl font-bold text-neon-pink">{formatGBP(brand.monthlyBrandSpend)}</p>
+                <p className="font-mono text-2xl font-bold text-tech-blue">{formatGBP(brand.monthlyBrandSpend)}</p>
               </div>
             )}
             {brand.brandRoas && (
-              <div className="rounded-lg border border-border bg-card p-4 neon-bar-cyan card-neon-hover">
+              <div className="rounded-lg border border-border bg-card p-4 metric-stripe-cyan tech-card-hover">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Brand ROAS</p>
-                <p className="font-mono text-2xl font-bold text-neon-cyan">{formatRoas(brand.brandRoas)}</p>
+                <p className="font-mono text-2xl font-bold text-tech-cyan">{formatRoas(brand.brandRoas)}</p>
               </div>
             )}
           </div>
@@ -91,13 +91,13 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
           <TabsList variant="line" className="border-b border-border rounded-none w-full justify-start pb-0 mb-0 gap-4">
             <TabsTrigger
               value="timeline"
-              className="data-active:text-neon-pink data-active:after:bg-neon-pink pb-3"
+              className="pb-3"
             >
               SERP Timeline
             </TabsTrigger>
             <TabsTrigger
               value="auction"
-              className="data-active:text-neon-pink data-active:after:bg-neon-pink pb-3"
+              className="pb-3"
             >
               Auction Insights
             </TabsTrigger>
@@ -110,7 +110,7 @@ export default async function ClientPage({ params }: { params: Promise<{ token: 
           </TabsContent>
 
           <TabsContent value="auction">
-            <div className="rounded-lg border border-border bg-card neon-bar-cyan p-6">
+            <div className="rounded-lg border border-border bg-card metric-stripe-cyan p-6">
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">30-Day Auction Insights</p>
               <AuctionChart insights={insights} />
             </div>

@@ -15,12 +15,12 @@ export default async function AdminPage() {
   const brands = await getAllActiveBrands()
 
   return (
-    <div className="min-h-screen bg-background dark:bg-dot-pattern">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
+      <div className="border-b border-border bg-card px-6 py-4">
         <div className="container mx-auto max-w-4xl flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-black tracking-tight text-gradient-neon">Brand Monitor</h1>
+            <h1 className="text-xl font-black tracking-tight text-gradient-tech">Brand Monitor</h1>
             <Badge className="font-mono text-xs tracking-widest">ADMIN</Badge>
           </div>
           <ThemeToggle />
@@ -30,10 +30,10 @@ export default async function AdminPage() {
       <div className="container mx-auto p-6 max-w-4xl space-y-8">
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="neon-bar-pink card-neon-hover">
+          <Card className="metric-stripe-blue tech-card-hover">
             <CardContent className="p-4">
               <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Brands</p>
-              <p className="text-3xl font-black text-gradient-neon">{brands.length}</p>
+              <p className="text-3xl font-black text-gradient-tech">{brands.length}</p>
             </CardContent>
           </Card>
         </div>
@@ -59,7 +59,7 @@ export default async function AdminPage() {
                     >
                       {/* Active indicator + name */}
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="inline-block h-2 w-2 rounded-full bg-primary shrink-0 neon-glow" />
+                        <span className="status-dot-active" />
                         <span className="font-semibold truncate">{b.name}</span>
                         {b.domain && (
                           <span className="font-mono text-xs text-muted-foreground hidden sm:inline">
@@ -74,7 +74,7 @@ export default async function AdminPage() {
                           {b.keywords.slice(0, 3).map((kw: string) => (
                             <span
                               key={kw}
-                              className="inline-flex items-center rounded-full border border-border px-2 py-0.5 font-mono text-xs text-neon-cyan border-neon-cyan/30"
+                              className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 font-mono text-xs text-tech-blue"
                             >
                               {kw}
                             </span>

@@ -3,84 +3,84 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tokyo Neon Nightclub — Design System */
+/* ── Samsung/Anker Tech — Design System ── */
 
 :root {
-  /* Light mode: clean professional white */
-  --background: oklch(98% 0.005 280);
-  --foreground: oklch(12% 0.02 280);
+  /* Light (default): clean white, tech blue */
+  --background: oklch(99% 0.002 250);
+  --foreground: oklch(13% 0.015 250);
   --card: oklch(100% 0 0);
-  --card-foreground: oklch(12% 0.02 280);
+  --card-foreground: oklch(13% 0.015 250);
   --popover: oklch(100% 0 0);
-  --popover-foreground: oklch(12% 0.02 280);
-  --primary: oklch(52% 0.28 340);
-  --primary-foreground: oklch(98% 0 0);
-  --secondary: oklch(94% 0.01 280);
-  --secondary-foreground: oklch(12% 0.02 280);
-  --muted: oklch(94% 0.01 280);
-  --muted-foreground: oklch(46% 0.02 280);
-  --accent: oklch(94% 0.01 280);
-  --accent-foreground: oklch(12% 0.02 280);
+  --popover-foreground: oklch(13% 0.015 250);
+  --primary: oklch(44% 0.22 250);
+  --primary-foreground: oklch(99% 0 0);
+  --secondary: oklch(95% 0.005 250);
+  --secondary-foreground: oklch(13% 0.015 250);
+  --muted: oklch(95% 0.005 250);
+  --muted-foreground: oklch(48% 0.01 250);
+  --accent: oklch(93% 0.01 250);
+  --accent-foreground: oklch(13% 0.015 250);
   --destructive: oklch(52% 0.22 15);
-  --destructive-foreground: oklch(98% 0 0);
-  --border: oklch(88% 0.01 280);
-  --input: oklch(88% 0.01 280);
-  --ring: oklch(52% 0.28 340);
-  --chart-1: oklch(57% 0.28 340);
-  --chart-2: oklch(57% 0.22 200);
-  --chart-3: oklch(60% 0.28 130);
-  --chart-4: oklch(52% 0.28 280);
-  --chart-5: oklch(62% 0.22 80);
+  --destructive-foreground: oklch(99% 0 0);
+  --border: oklch(88% 0.006 250);
+  --input: oklch(93% 0.005 250);
+  --ring: oklch(44% 0.22 250);
+  --chart-1: oklch(50% 0.22 250);
+  --chart-2: oklch(58% 0.18 200);
+  --chart-3: oklch(55% 0.20 145);
+  --chart-4: oklch(53% 0.20 280);
+  --chart-5: oklch(63% 0.18 60);
   --radius: 0.5rem;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
-  --sidebar: oklch(95% 0.005 280);
-  --sidebar-foreground: oklch(12% 0.02 280);
-  --sidebar-primary: oklch(52% 0.28 340);
-  --sidebar-primary-foreground: oklch(98% 0 0);
-  --sidebar-accent: oklch(94% 0.01 280);
-  --sidebar-accent-foreground: oklch(12% 0.02 280);
-  --sidebar-border: oklch(88% 0.01 280);
-  --sidebar-ring: oklch(52% 0.28 340);
+  --sidebar: oklch(97% 0.004 250);
+  --sidebar-foreground: oklch(13% 0.015 250);
+  --sidebar-primary: oklch(44% 0.22 250);
+  --sidebar-primary-foreground: oklch(99% 0 0);
+  --sidebar-accent: oklch(93% 0.01 250);
+  --sidebar-accent-foreground: oklch(13% 0.015 250);
+  --sidebar-border: oklch(88% 0.006 250);
+  --sidebar-ring: oklch(44% 0.22 250);
 }
 
 .dark {
-  /* Tokyo Neon Nightclub — default signature theme */
-  --background: oklch(6% 0.02 280);
-  --foreground: oklch(96% 0.005 280);
-  --card: oklch(9% 0.025 280);
-  --card-foreground: oklch(96% 0.005 280);
-  --popover: oklch(9% 0.025 280);
-  --popover-foreground: oklch(96% 0.005 280);
-  --primary: oklch(62% 0.32 340);
-  --primary-foreground: oklch(98% 0 0);
-  --secondary: oklch(13% 0.03 280);
-  --secondary-foreground: oklch(96% 0.005 280);
-  --muted: oklch(13% 0.025 280);
-  --muted-foreground: oklch(58% 0.025 280);
-  --accent: oklch(58% 0.28 280);
-  --accent-foreground: oklch(98% 0 0);
-  --destructive: oklch(58% 0.22 15);
-  --destructive-foreground: oklch(98% 0 0);
-  --border: oklch(18% 0.04 280);
-  --input: oklch(12% 0.03 280);
-  --ring: oklch(62% 0.32 340);
-  --chart-1: oklch(62% 0.32 340);
-  --chart-2: oklch(72% 0.22 200);
-  --chart-3: oklch(78% 0.28 130);
-  --chart-4: oklch(58% 0.28 280);
-  --chart-5: oklch(78% 0.22 80);
-  --sidebar: oklch(8% 0.025 280);
-  --sidebar-foreground: oklch(96% 0.005 280);
-  --sidebar-primary: oklch(62% 0.32 340);
-  --sidebar-primary-foreground: oklch(98% 0 0);
-  --sidebar-accent: oklch(13% 0.03 280);
-  --sidebar-accent-foreground: oklch(96% 0.005 280);
-  --sidebar-border: oklch(18% 0.04 280);
-  --sidebar-ring: oklch(62% 0.32 340);
+  /* Dark: deep navy, not pitch-black */
+  --background: oklch(12% 0.02 250);
+  --foreground: oklch(94% 0.005 250);
+  --card: oklch(16% 0.025 250);
+  --card-foreground: oklch(94% 0.005 250);
+  --popover: oklch(16% 0.025 250);
+  --popover-foreground: oklch(94% 0.005 250);
+  --primary: oklch(62% 0.22 250);
+  --primary-foreground: oklch(99% 0 0);
+  --secondary: oklch(20% 0.03 250);
+  --secondary-foreground: oklch(94% 0.005 250);
+  --muted: oklch(20% 0.025 250);
+  --muted-foreground: oklch(60% 0.02 250);
+  --accent: oklch(57% 0.18 250);
+  --accent-foreground: oklch(99% 0 0);
+  --destructive: oklch(55% 0.22 15);
+  --destructive-foreground: oklch(99% 0 0);
+  --border: oklch(22% 0.03 250);
+  --input: oklch(18% 0.025 250);
+  --ring: oklch(62% 0.22 250);
+  --chart-1: oklch(62% 0.22 250);
+  --chart-2: oklch(65% 0.18 200);
+  --chart-3: oklch(65% 0.20 145);
+  --chart-4: oklch(60% 0.20 280);
+  --chart-5: oklch(70% 0.18 60);
+  --sidebar: oklch(14% 0.022 250);
+  --sidebar-foreground: oklch(94% 0.005 250);
+  --sidebar-primary: oklch(62% 0.22 250);
+  --sidebar-primary-foreground: oklch(99% 0 0);
+  --sidebar-accent: oklch(20% 0.03 250);
+  --sidebar-accent-foreground: oklch(94% 0.005 250);
+  --sidebar-border: oklch(22% 0.03 250);
+  --sidebar-ring: oklch(62% 0.22 250);
 }
 
 @theme inline {
@@ -136,60 +136,68 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
-/* ── Tokyo Neon Utilities ── */
+/* ── Samsung/Anker Tech Utilities ── */
 
-/* Neon glow effects */
-.neon-glow {
-  box-shadow: 0 0 15px -3px oklch(62% 0.32 340 / 0.6),
-              0 0 40px -8px oklch(62% 0.32 340 / 0.3);
+/* Tech card — clean shadow lift on hover */
+.tech-card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-.neon-glow-cyan {
-  box-shadow: 0 0 15px -3px oklch(72% 0.22 200 / 0.6),
-              0 0 40px -8px oklch(72% 0.22 200 / 0.3);
-}
-.neon-glow-purple {
-  box-shadow: 0 0 15px -3px oklch(58% 0.28 280 / 0.6),
-              0 0 40px -8px oklch(58% 0.28 280 / 0.3);
-}
-.neon-glow-green {
-  box-shadow: 0 0 15px -3px oklch(78% 0.28 130 / 0.6),
-              0 0 40px -8px oklch(78% 0.28 130 / 0.3);
+.tech-card-hover:hover {
+  box-shadow: 0 4px 16px oklch(13% 0.015 250 / 0.08), 0 1px 4px oklch(13% 0.015 250 / 0.05);
+  transform: translateY(-1px);
 }
 
-/* Card hover glow */
-.card-neon-hover {
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-}
-.dark .card-neon-hover:hover {
-  box-shadow: 0 0 30px -5px oklch(62% 0.32 340 / 0.2),
-              0 4px 24px oklch(0% 0 0 / 0.5);
-  border-color: oklch(62% 0.32 340 / 0.3);
-}
+/* Metric stripe — coloured top border for dashboard cards */
+.metric-stripe-blue   { border-top: 3px solid oklch(50% 0.22 250); }
+.metric-stripe-cyan   { border-top: 3px solid oklch(55% 0.18 200); }
+.metric-stripe-green  { border-top: 3px solid oklch(52% 0.20 145); }
+.metric-stripe-orange { border-top: 3px solid oklch(62% 0.22 55);  }
+.metric-stripe-purple { border-top: 3px solid oklch(52% 0.20 280); }
 
-/* Gradient text — pink → cyan */
-.text-gradient-neon {
-  background: linear-gradient(135deg, oklch(62% 0.32 340) 0%, oklch(72% 0.22 200) 100%);
+/* Tech text colours */
+.text-tech-blue   { color: oklch(44% 0.22 250); }
+.text-tech-cyan   { color: oklch(50% 0.18 200); }
+.text-tech-green  { color: oklch(46% 0.20 145); }
+.text-tech-orange { color: oklch(58% 0.22 55);  }
+.text-tech-purple { color: oklch(48% 0.20 280); }
+
+/* In dark mode, lighten the text colours for contrast */
+.dark .text-tech-blue   { color: oklch(70% 0.22 250); }
+.dark .text-tech-cyan   { color: oklch(68% 0.18 200); }
+.dark .text-tech-green  { color: oklch(68% 0.20 145); }
+.dark .text-tech-orange { color: oklch(72% 0.22 55);  }
+.dark .text-tech-purple { color: oklch(68% 0.20 280); }
+
+/* Subtle gradient text — blue to cyan */
+.text-gradient-tech {
+  background: linear-gradient(135deg, oklch(44% 0.22 250) 0%, oklch(52% 0.18 200) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark .text-gradient-tech {
+  background: linear-gradient(135deg, oklch(70% 0.22 250) 0%, oklch(68% 0.18 200) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Subtle dot grid background */
+/* Very subtle dot grid — works in both modes */
 .bg-dot-pattern {
-  background-image: radial-gradient(oklch(30% 0.04 280 / 0.6) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(oklch(60% 0.01 250 / 0.3) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.dark .bg-dot-pattern {
+  background-image: radial-gradient(oklch(40% 0.03 250 / 0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-/* Neon left accent bar on cards */
-.neon-bar-pink   { border-left: 2px solid oklch(62% 0.32 340); }
-.neon-bar-cyan   { border-left: 2px solid oklch(72% 0.22 200); }
-.neon-bar-purple { border-left: 2px solid oklch(58% 0.28 280); }
-.neon-bar-green  { border-left: 2px solid oklch(78% 0.28 130); }
-.neon-bar-amber  { border-left: 2px solid oklch(78% 0.22 80); }
-
-/* Neon text colours */
-.text-neon-pink   { color: oklch(62% 0.32 340); }
-.text-neon-cyan   { color: oklch(72% 0.22 200); }
-.text-neon-purple { color: oklch(58% 0.28 280); }
-.text-neon-green  { color: oklch(78% 0.28 130); }
-.text-neon-amber  { color: oklch(78% 0.22 80); }
+/* Status indicator dot */
+.status-dot-active {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: oklch(52% 0.20 145);
+  display: inline-block;
+  flex-shrink: 0;
+}

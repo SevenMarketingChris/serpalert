@@ -20,7 +20,7 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
       </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <p className="text-sm font-medium mb-2 font-mono">
-          SERP: <span className="text-neon-cyan">{keyword}</span>
+          SERP: <span className="text-primary">{keyword}</span>
         </p>
         <div className="rounded-lg overflow-hidden bg-muted">
           <Image

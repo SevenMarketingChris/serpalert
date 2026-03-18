@@ -2,13 +2,13 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import type { AuctionInsight } from '@/lib/db/schema'
 
-const NEON_COLORS = [
-  'oklch(62% 0.32 340)',  // pink
-  'oklch(72% 0.22 200)',  // cyan
-  'oklch(78% 0.28 130)',  // lime
-  'oklch(58% 0.28 280)',  // purple
-  'oklch(78% 0.22 80)',   // amber
-  'oklch(68% 0.25 160)',  // teal
+const TECH_COLORS = [
+  "oklch(50% 0.22 250)",   // tech blue
+  "oklch(55% 0.18 200)",   // cyan
+  "oklch(52% 0.20 145)",   // green
+  "oklch(52% 0.20 280)",   // purple
+  "oklch(62% 0.18 60)",    // amber
+  "oklch(55% 0.18 170)",   // teal
 ]
 
 export function AuctionChart({ insights }: { insights: AuctionInsight[] }) {
@@ -29,26 +29,27 @@ export function AuctionChart({ insights }: { insights: AuctionInsight[] }) {
       <LineChart data={data}>
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 11, fill: 'oklch(58% 0.025 280)' }}
-          axisLine={{ stroke: 'oklch(18% 0.04 280)' }}
+          tick={{ fontSize: 11, fill: 'oklch(45% 0.02 250)' }}
+          axisLine={{ stroke: 'oklch(88% 0.01 250)' }}
           tickLine={false}
         />
         <YAxis
           tickFormatter={v => `${v}%`}
-          tick={{ fontSize: 11, fill: 'oklch(58% 0.025 280)' }}
+          tick={{ fontSize: 11, fill: 'oklch(45% 0.02 250)' }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           formatter={(v) => `${Number(v).toFixed(1)}%`}
           contentStyle={{
-            background: 'oklch(9% 0.025 280)',
-            border: '1px solid oklch(18% 0.04 280)',
+            background: 'white',
+            border: '1px solid oklch(88% 0.01 250)',
             borderRadius: '0.5rem',
             fontSize: '12px',
-            color: 'oklch(96% 0.005 280)',
+            color: 'oklch(20% 0.02 250)',
+            boxShadow: '0 2px 8px oklch(0% 0 0 / 8%)',
           }}
-          labelStyle={{ color: 'oklch(72% 0.22 200)', fontFamily: 'monospace' }}
+          labelStyle={{ color: 'oklch(50% 0.22 250)', fontFamily: 'monospace' }}
         />
         <Legend
           wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace' }}
@@ -58,7 +59,7 @@ export function AuctionChart({ insights }: { insights: AuctionInsight[] }) {
             key={d}
             type="monotone"
             dataKey={d}
-            stroke={NEON_COLORS[i % NEON_COLORS.length]}
+            stroke={TECH_COLORS[i % TECH_COLORS.length]}
             dot={false}
             strokeWidth={2}
           />

@@ -17,7 +17,7 @@ export default function AdminError({
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-4 max-w-md px-6">
-        <p className="text-xs uppercase tracking-widest text-neon-pink font-mono">Admin Error</p>
+        <p className="text-xs uppercase tracking-widest text-tech-blue font-mono">Admin Error</p>
         <h1 className="text-2xl font-bold">Something went wrong</h1>
         <p className="text-muted-foreground text-sm">{error.message}</p>
         <Button onClick={reset} variant="outline">Try again</Button>

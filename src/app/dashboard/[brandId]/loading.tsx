@@ -2,8 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-background dark:bg-dot-pattern">
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-card px-6 py-4">
         <div className="container mx-auto max-w-6xl flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-8 w-8 rounded-md" />

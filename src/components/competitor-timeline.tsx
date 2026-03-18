@@ -15,13 +15,13 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
   }
 
   return (
-    <div className="divide-y divide-border">
+    <div className="space-y-0">
       {checks.map(check => {
         const hasCompetitors = check.competitorCount > 0
         return (
           <div
             key={check.id}
-            className={`p-4 card-neon-hover ${hasCompetitors ? 'neon-bar-pink' : 'neon-bar-green'}`}
+            className={`bg-card border border-border rounded-lg p-4 mb-3 tech-card-hover ${hasCompetitors ? 'border-l-2 border-l-destructive/50' : 'border-l-2 border-l-primary/40'}`}
           >
             <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
               {/* Timestamp */}
@@ -40,7 +40,7 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
               ) : (
                 <Badge
                   variant="outline"
-                  className="shrink-0 text-neon-green border-neon-green/40 bg-neon-green/5"
+                  className="shrink-0 text-tech-green border-primary/20"
                 >
                   None
                 </Badge>
@@ -58,7 +58,7 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
                 {[...new Set(check.ads.map(a => a.domain))].map(domain => (
                   <span
                     key={domain}
-                    className="bg-secondary text-neon-cyan border border-neon-cyan/20 font-mono text-xs rounded px-1.5 py-0.5"
+                    className="bg-primary/8 text-primary border border-primary/20 font-mono text-xs rounded px-2 py-0.5"
                   >
                     {domain}
                   </span>
