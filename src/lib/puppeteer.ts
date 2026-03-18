@@ -15,10 +15,19 @@ export async function screenshotSerp(keyword: string): Promise<Buffer> {
   try {
     const page = await browser.newPage()
     await page.setViewport({ width: 1280, height: 900 })
-    await page.goto(
-      `https://www.google.co.uk/search?q=${encodeURIComponent(keyword)}&gl=gb&hl=en`,
-      { waitUntil: 'networkidle2', timeout: 15000 }
-    )
+    try {
+      await page.goto(
+        `https://www.google.co.uk/search?q=${encodeURIComponent(keyword)}&gl=gb&hl=en`,
+        { waitUntil: 'networkidle2', timeout: 15000 }
+      )
+    } catch (err) {
+      if (err instanceof Error && err.name === 'TimeoutError') {
+        // Page loaded but networkidle2 timed out — screenshot what we have
+        console.warn(`page.goto timeout for keyword "${keyword}", screenshotting partial load`)
+      } else {
+        throw err
+      }
+    }
     return Buffer.from(await page.screenshot({ type: 'png', fullPage: false }))
   } finally {
     await browser.close()

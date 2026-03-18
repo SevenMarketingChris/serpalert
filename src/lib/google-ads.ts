@@ -7,6 +7,15 @@ export interface AuctionInsightRow {
   outrankingShare: number | null
 }
 
+interface GoogleAdsRow {
+  auction_insight?: { domain?: string }
+  metrics?: {
+    auction_insight_search_impression_share?: number | null
+    auction_insight_search_overlap_rate?: number | null
+    auction_insight_search_outranking_share?: number | null
+  }
+}
+
 export async function getAuctionInsights(customerId: string): Promise<AuctionInsightRow[]> {
   const client = new GoogleAdsApi({
     client_id: process.env.GOOGLE_ADS_CLIENT_ID!,
@@ -28,7 +37,7 @@ export async function getAuctionInsights(customerId: string): Promise<AuctionIns
     WHERE segments.date DURING LAST_7_DAYS
   `)
 
-  return rows.map((row: any) => ({
+  return (rows as GoogleAdsRow[]).map((row) => ({
     competitorDomain: row.auction_insight?.domain ?? '',
     impressionShare: row.metrics?.auction_insight_search_impression_share ?? null,
     overlapRate: row.metrics?.auction_insight_search_overlap_rate ?? null,

@@ -6,11 +6,12 @@ export async function sendNewCompetitorAlert(params: {
 }): Promise<void> {
   if (!params.webhookUrl) return
 
-  await fetch(params.webhookUrl, {
+  const response = await fetch(params.webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       text: `🚨 New competitor bidding on *${params.brandName}*\n*Domain:* ${params.domain}\n*Keyword:* ${params.keyword}`,
     }),
   })
+  if (!response.ok) throw new Error(`Slack webhook failed: ${response.status}`)
 }

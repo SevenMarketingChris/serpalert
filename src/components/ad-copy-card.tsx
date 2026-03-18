@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { CompetitorAd } from '@/lib/db/schema'
 
@@ -7,18 +6,19 @@ export function AdCopyCard({ ads }: { ads: CompetitorAd[] }) {
   return (
     <div className="space-y-2">
       {ads.map(ad => (
-        <Card key={ad.id} className="border-orange-200 bg-orange-50">
-          <CardHeader className="pb-1 pt-3 px-4">
-            <div className="flex items-center gap-2">
-              <Badge variant="destructive" className="text-xs">Ad</Badge>
-              <span className="text-xs text-muted-foreground">{ad.displayUrl ?? ad.domain}</span>
-            </div>
-            <p className="text-sm font-semibold text-blue-700">{ad.headline}</p>
-          </CardHeader>
-          <CardContent className="px-4 pb-3">
-            <p className="text-xs text-gray-600">{ad.description}</p>
-          </CardContent>
-        </Card>
+        <div key={ad.id} className="bg-card border border-border rounded-lg p-3 neon-bar-cyan card-neon-hover">
+          <div className="flex items-center gap-2 mb-1">
+            <Badge variant="destructive" className="text-xs shrink-0">Ad</Badge>
+            <span className="text-neon-pink text-xs font-mono truncate">{ad.displayUrl ?? ad.domain}</span>
+            {ad.position != null && (
+              <span className="ml-auto font-mono text-xs text-neon-amber shrink-0">#{ad.position}</span>
+            )}
+          </div>
+          <p className="text-neon-cyan font-semibold text-sm leading-snug">{ad.headline}</p>
+          {ad.description && (
+            <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{ad.description}</p>
+          )}
+        </div>
       ))}
     </div>
   )

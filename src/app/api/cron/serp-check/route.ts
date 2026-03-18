@@ -17,9 +17,12 @@ export async function GET(request: Request) {
   const results = []
 
   for (const brand of allBrands) {
+    const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
     for (const keyword of brand.keywords) {
       try {
-        const ads = await checkSerpForBrand(keyword, 'United Kingdom')
+        const ads = await checkSerpForBrand(keyword, 'United Kingdom', {
+          brandDomain: brand.domain ?? undefined,
+        })
         let screenshotUrl: string | undefined
 
         if (ads.length > 0) {
@@ -34,7 +37,6 @@ export async function GET(request: Request) {
 
         if (ads.length > 0) {
           const now = new Date()
-          const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
           await insertCompetitorAds(ads.map(ad => ({
             serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
             headline: ad.headline ?? undefined, description: ad.description ?? undefined,

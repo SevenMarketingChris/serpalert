@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, desc } from 'drizzle-orm'
+import { eq, and, gte, desc, inArray } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export async function getBrandById(id: string): Promise<Brand | null> {
@@ -23,8 +23,9 @@ export async function getRecentSerpChecks(brandId: string, limit = 50): Promise<
     .limit(limit)
 }
 
-export async function getCompetitorAdsForCheck(serpCheckId: string): Promise<CompetitorAd[]> {
-  return db.select().from(competitorAds).where(eq(competitorAds.serpCheckId, serpCheckId))
+export async function getCompetitorAdsForChecks(serpCheckIds: string[]): Promise<CompetitorAd[]> {
+  if (serpCheckIds.length === 0) return []
+  return db.select().from(competitorAds).where(inArray(competitorAds.serpCheckId, serpCheckIds))
 }
 
 export async function getCompetitorDomainsLastNDays(brandId: string, days: number): Promise<string[]> {
@@ -67,12 +68,14 @@ export async function insertAuctionInsights(insights: {
   impressionShare?: string; overlapRate?: string; outrankingShare?: string
 }[]): Promise<void> {
   if (insights.length === 0) return
-  await db.insert(auctionInsights).values(insights)
+  await db.insert(auctionInsights).values(insights).onConflictDoNothing()
 }
 
 export async function createBrand(data: {
   name: string; slug: string; keywords: string[]
+  domain?: string
   googleAdsCustomerId?: string; slackWebhookUrl?: string
+  monthlyBrandSpend?: string; brandRoas?: string
 }): Promise<Brand> {
   const rows = await db.insert(brands).values(data).returning()
   if (!rows[0]) throw new Error('Failed to create brand')

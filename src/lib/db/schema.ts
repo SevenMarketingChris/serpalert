@@ -1,16 +1,22 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, date, numeric } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, timestamp, integer, boolean, date, numeric, uniqueIndex, index } from 'drizzle-orm/pg-core'
 
 export const brands = pgTable('brands', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   clientToken: uuid('client_token').notNull().defaultRandom().unique(),
+  domain: text('domain'),
   googleAdsCustomerId: text('google_ads_customer_id'),
   keywords: text('keywords').array().notNull().default([]),
   active: boolean('active').notNull().default(true),
   slackWebhookUrl: text('slack_webhook_url'),
+  monthlyBrandSpend: numeric('monthly_brand_spend'),
+  brandRoas: numeric('brand_roas'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => [
+  index('brands_active_idx').on(table.active),
+])
 
 export const serpChecks = pgTable('serp_checks', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -21,7 +27,9 @@ export const serpChecks = pgTable('serp_checks', {
   location: text('location').notNull().default('United Kingdom'),
   competitorCount: integer('competitor_count').notNull().default(0),
   screenshotUrl: text('screenshot_url'),
-})
+}, (table) => [
+  index('serp_checks_brand_checked_at_idx').on(table.brandId, table.checkedAt),
+])
 
 export const competitorAds = pgTable('competitor_ads', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -34,7 +42,10 @@ export const competitorAds = pgTable('competitor_ads', {
   destinationUrl: text('destination_url'),
   position: integer('position'),
   firstSeenAt: timestamp('first_seen_at').notNull().defaultNow(),
-})
+}, (table) => [
+  index('competitor_ads_brand_first_seen_at_idx').on(table.brandId, table.firstSeenAt),
+  index('competitor_ads_domain_idx').on(table.domain),
+])
 
 export const auctionInsights = pgTable('auction_insights', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -44,7 +55,9 @@ export const auctionInsights = pgTable('auction_insights', {
   impressionShare: numeric('impression_share'),
   overlapRate: numeric('overlap_rate'),
   outrankingShare: numeric('outranking_share'),
-})
+}, (table) => [
+  uniqueIndex('auction_insights_brand_date_domain_idx').on(table.brandId, table.date, table.competitorDomain),
+])
 
 export type Brand = typeof brands.$inferSelect
 export type SerpCheck = typeof serpChecks.$inferSelect
