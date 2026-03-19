@@ -32,7 +32,7 @@ export function getServerEnv() {
     adminEmails: requireEnvList("ADMIN_EMAILS"),
     chromiumUrl: optionalEnv("CHROMIUM_URL"),
     authSecret: requireEnv("AUTH_SECRET"),
-    authGoogleId: optionalEnv("AUTH_GOOGLE_ID"),
-    authGoogleSecret: optionalEnv("AUTH_GOOGLE_SECRET"),
+    authGoogleId: requireEnv("AUTH_GOOGLE_ID"),
+    authGoogleSecret: requireEnv("AUTH_GOOGLE_SECRET"),
   };
 }
