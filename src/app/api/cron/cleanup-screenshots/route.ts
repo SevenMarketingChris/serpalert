@@ -20,14 +20,14 @@ export async function GET(request: Request) {
   const urls = old.map(r => r.screenshotUrl)
   const ids = old.map(r => r.id)
 
+  // Nullify DB references first so we don't retry broken URLs on failure
+  await nullifyScreenshotUrls(ids)
+
   try {
     await deleteScreenshotFiles(urls)
   } catch (err) {
-    console.error('Storage deletion failed:', err)
-    // Still null out the DB references so we don't retry broken URLs
+    console.error('Storage deletion failed (DB references already cleared):', err)
   }
-
-  await nullifyScreenshotUrls(ids)
 
   return NextResponse.json({
     deleted: ids.length,

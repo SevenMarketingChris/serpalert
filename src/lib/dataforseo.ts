@@ -36,10 +36,14 @@ export async function checkSerpForBrand(
       method: 'POST',
       headers: { Authorization: `Basic ${credentials}`, 'Content-Type': 'application/json' },
       body: JSON.stringify([{ keyword, location_name: location, language_name: 'English', device: 'desktop', depth: 10 }]),
+      signal: AbortSignal.timeout(30_000),
     }
   )
 
-  if (!response.ok) throw new Error(`DataForSEO ${response.status}`)
+  if (!response.ok) {
+    const text = await response.text().catch(() => '')
+    throw new Error(`DataForSEO ${response.status}: ${text.slice(0, 200)}`)
+  }
 
   const data = await response.json()
   const items = data?.tasks?.[0]?.result?.[0]?.items ?? []

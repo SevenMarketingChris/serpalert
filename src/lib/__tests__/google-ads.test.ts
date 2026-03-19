@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('google-ads-api', () => {
-  const mockQuery = vi.fn().mockResolvedValue([])
-  const mockCustomer = vi.fn().mockReturnValue({ query: mockQuery })
-  const GoogleAdsApi = vi.fn(function() {
-    this.Customer = mockCustomer
-  })
-  return { GoogleAdsApi }
-})
+const mockQuery = vi.fn().mockResolvedValue([])
+const mockCustomer = vi.fn().mockReturnValue({ query: mockQuery })
+
+vi.mock('google-ads-api', () => ({
+  GoogleAdsApi: vi.fn().mockImplementation(function () {
+    return { Customer: mockCustomer }
+  }),
+}))
 
 import { getAuctionInsights } from '@/lib/google-ads'
 

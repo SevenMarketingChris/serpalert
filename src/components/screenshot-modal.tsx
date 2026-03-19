@@ -9,13 +9,16 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
     <Dialog>
       <DialogTrigger
         render={
-          <Button
-            variant="outline"
-            size="sm"
-            aria-label={`View SERP screenshot for ${keyword}`}
-          >
-            Screenshot
-          </Button>
+          (props) => (
+            <Button
+              {...props}
+              variant="outline"
+              size="sm"
+              aria-label={`View SERP screenshot for ${keyword}`}
+            >
+              Screenshot
+            </Button>
+          )
         }
       />
       <DialogContent className="max-w-4xl">

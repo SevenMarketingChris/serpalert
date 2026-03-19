@@ -12,6 +12,7 @@ export async function sendNewCompetitorAlert(params: {
     body: JSON.stringify({
       text: `🚨 New competitor bidding on *${params.brandName}*\n*Domain:* ${params.domain}\n*Keyword:* ${params.keyword}`,
     }),
+    signal: AbortSignal.timeout(10_000),
   })
   if (!response.ok) throw new Error(`Slack webhook failed: ${response.status}`)
 }

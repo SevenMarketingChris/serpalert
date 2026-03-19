@@ -40,8 +40,9 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
     })
     return { clientToken: brand.clientToken }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to create brand'
+    const msg = err instanceof Error ? err.message : ''
     if (msg.includes('unique') || msg.includes('duplicate')) return { error: 'A brand with that name already exists' }
-    return { error: msg }
+    console.error('Brand creation failed:', err)
+    return { error: 'Failed to create brand' }
   }
 }
