@@ -28,7 +28,6 @@ export function getServerEnv() {
     googleAdsDeveloperToken: requireEnv("GOOGLE_ADS_DEVELOPER_TOKEN"),
     adminSecret: requireEnv("ADMIN_SECRET"),
     cronSecret: requireEnv("CRON_SECRET"),
-    allowedEmails: requireEnvList("ALLOWED_EMAILS"),
     adminEmails: requireEnvList("ADMIN_EMAILS"),
     chromiumUrl: optionalEnv("CHROMIUM_URL"),
     authSecret: requireEnv("AUTH_SECRET"),
