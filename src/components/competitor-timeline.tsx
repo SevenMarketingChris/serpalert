@@ -55,7 +55,10 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
             {/* Competitor domain pills */}
             {check.ads.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {[...new Set(check.ads.map(a => a.domain))].map(domain => (
+                {check.ads
+                  .map(a => a.domain)
+                  .filter((d, i, arr) => arr.indexOf(d) === i)
+                  .map(domain => (
                   <span
                     key={domain}
                     className="bg-primary/8 text-primary border border-primary/20 font-mono text-xs rounded px-2 py-0.5"

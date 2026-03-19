@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { MobileNav } from '@/components/mobile-nav'
 import { RoiCalculator } from '@/components/roi-calculator'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -165,7 +166,7 @@ export default function HomePage() {
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="container mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
+        <div className="relative container mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
               <ZapIcon className="h-4 w-4 text-primary" />
@@ -179,10 +180,11 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">Login</Link>
-            <Link href="/login" className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+            <Link href="/login" className="hidden md:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">Login</Link>
+            <Link href="/login" className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
               Start Free <ArrowRightIcon className="h-3.5 w-3.5" />
             </Link>
+            <MobileNav />
           </div>
         </div>
       </header>

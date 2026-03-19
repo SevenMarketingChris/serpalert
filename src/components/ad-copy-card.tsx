@@ -11,12 +11,12 @@ export function AdCopyCard({ ads }: { ads: CompetitorAd[] }) {
             <Badge variant="destructive" className="text-xs shrink-0">Ad</Badge>
             <span className="text-muted-foreground text-xs font-mono truncate">{ad.displayUrl ?? ad.domain}</span>
             {ad.position != null && (
-              <span className="ml-auto font-mono text-xs text-tech-orange shrink-0">#{ad.position}</span>
+              <span className="ml-auto font-mono text-xs text-tech-orange shrink-0">Pos {ad.position}</span>
             )}
           </div>
-          <p className="text-primary font-semibold text-sm leading-snug">{ad.headline}</p>
+          <p className="text-primary font-semibold text-sm leading-snug line-clamp-2">{ad.headline}</p>
           {ad.description && (
-            <p className="text-foreground/70 text-xs mt-1 leading-relaxed">{ad.description}</p>
+            <p className="text-foreground/70 text-xs mt-1 leading-relaxed line-clamp-3">{ad.description}</p>
           )}
         </div>
       ))}

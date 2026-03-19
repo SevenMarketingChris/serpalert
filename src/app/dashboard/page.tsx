@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '../../../auth'
+import { SearchIcon } from 'lucide-react'
 import { isAdminEmail } from '@/lib/auth'
 import { getBrandsForUser } from '@/lib/db/queries'
 import { Badge } from '@/components/ui/badge'
@@ -41,6 +42,7 @@ export default async function DashboardPage() {
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-24 space-y-6">
             <div className="text-center space-y-2">
+              <SearchIcon className="w-12 h-12 text-muted-foreground/40 mx-auto mb-2" />
               <h2 className="text-2xl font-black tracking-tight text-gradient-tech">No brands yet</h2>
               <p className="text-muted-foreground text-sm max-w-xs">
                 Add your first brand to start monitoring competitor ads on your branded keywords.

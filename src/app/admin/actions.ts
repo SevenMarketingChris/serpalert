@@ -13,7 +13,10 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
   if (!session) return { error: 'Unauthorized' }
 
   const name = formData.get('name') as string
-  const keywords = (formData.get('keywords') as string).split('\n').map(k => k.trim()).filter(Boolean)
+  const keywords = (formData.get('keywords') as string)
+    .split(/[\n,]/)
+    .map(k => k.trim())
+    .filter(Boolean)
   const domain = (formData.get('domain') as string) || undefined
   const customerId = (formData.get('customerId') as string) || undefined
   const slack = (formData.get('slack') as string) || undefined
@@ -30,8 +33,8 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
       domain,
       googleAdsCustomerId: customerId,
       slackWebhookUrl: slack,
-      monthlyBrandSpend: spendRaw ? String(parseFloat(spendRaw)) : undefined,
-      brandRoas: roasRaw ? String(parseFloat(roasRaw)) : undefined,
+      monthlyBrandSpend: spendRaw && !isNaN(parseFloat(spendRaw)) ? String(parseFloat(spendRaw)) : undefined,
+      brandRoas: roasRaw && !isNaN(parseFloat(roasRaw)) ? String(parseFloat(roasRaw)) : undefined,
     })
     return { clientToken: brand.clientToken }
   } catch (err) {

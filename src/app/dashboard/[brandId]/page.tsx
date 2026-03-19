@@ -15,10 +15,14 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
   const session = await auth()
   if (!session) redirect('/login')
 
-  if (!isAdminEmail(session.user?.email)) redirect('/unauthorized')
+  const userEmail = session.user?.email ?? ''
+  const isAdmin = isAdminEmail(userEmail)
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
+
+  // Allow if admin OR if they own this brand
+  if (!isAdmin && brand.userId !== userEmail) redirect('/unauthorized')
 
   const checks = await getRecentSerpChecks(brandId, 100)
   const allAds = await getCompetitorAdsForChecks(checks.map(c => c.id))
@@ -42,7 +46,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
         <div className="container mx-auto max-w-6xl flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gradient-tech">{brand.name}</h1>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground mt-0.5">Admin — Brand Monitor</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mt-0.5">{isAdmin ? 'Admin — Brand Monitor' : 'Brand Monitor'}</p>
           </div>
           <ThemeToggle />
         </div>

@@ -14,52 +14,67 @@ export async function GET(request: Request) {
   }
 
   const allBrands = await getAllActiveBrands()
-  const results = []
 
+  // Build all jobs upfront, fetching recent domains once per brand
+  const jobs: Array<{ brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }> = []
   for (const brand of allBrands) {
     const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
     for (const keyword of brand.keywords) {
-      try {
-        const ads = await checkSerpForBrand(keyword, 'United Kingdom', {
-          brandDomain: brand.domain ?? undefined,
-        })
-        let screenshotUrl: string | undefined
+      jobs.push({ brand, keyword, recentDomains })
+    }
+  }
 
-        if (ads.length > 0) {
-          const buffer = await screenshotSerp(keyword)
-          screenshotUrl = await uploadScreenshot(
-            buffer,
-            `${brand.id}/${Date.now()}-${encodeURIComponent(keyword)}.png`
-          )
-        }
+  async function processJob(job: { brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }) {
+    const { brand, keyword, recentDomains } = job
+    try {
+      const ads = await checkSerpForBrand(keyword, 'United Kingdom', {
+        brandDomain: brand.domain ?? undefined,
+      })
+      let screenshotUrl: string | undefined
 
-        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
+      if (ads.length > 0) {
+        const buffer = await screenshotSerp(keyword)
+        screenshotUrl = await uploadScreenshot(
+          buffer,
+          `${brand.id}/${Date.now()}-${encodeURIComponent(keyword)}.png`
+        )
+      }
 
-        if (ads.length > 0) {
-          const now = new Date()
-          await insertCompetitorAds(ads.map(ad => ({
-            serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
-            headline: ad.headline ?? undefined, description: ad.description ?? undefined,
-            displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
-            position: ad.position, firstSeenAt: now,
-          })))
-          for (const ad of ads) {
-            if (!recentDomains.includes(ad.domain)) {
-              try {
-                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, domain: ad.domain, keyword })
-              } catch (alertErr) {
-                console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
-              }
+      const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
+
+      if (ads.length > 0) {
+        const now = new Date()
+        await insertCompetitorAds(ads.map(ad => ({
+          serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
+          headline: ad.headline ?? undefined, description: ad.description ?? undefined,
+          displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
+          position: ad.position, firstSeenAt: now,
+        })))
+        for (const ad of ads) {
+          if (!recentDomains.includes(ad.domain)) {
+            try {
+              await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, domain: ad.domain, keyword })
+            } catch (alertErr) {
+              console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
             }
           }
         }
-
-        results.push({ brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' })
-      } catch (err) {
-        console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
-        results.push({ brand: brand.name, keyword, status: 'error', error: String(err) })
       }
+
+      return { brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' }
+    } catch (err) {
+      console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
+      return { brand: brand.name, keyword, status: 'error', error: String(err) }
     }
+  }
+
+  // Process in parallel with concurrency limit of 5
+  const CONCURRENCY = 5
+  const results = []
+  for (let i = 0; i < jobs.length; i += CONCURRENCY) {
+    const batch = jobs.slice(i, i + CONCURRENCY)
+    const batchResults = await Promise.all(batch.map(processJob))
+    results.push(...batchResults)
   }
 
   return NextResponse.json({ results, timestamp: new Date().toISOString() })

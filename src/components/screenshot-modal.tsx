@@ -13,11 +13,11 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
             variant="outline"
             size="sm"
             aria-label={`View SERP screenshot for ${keyword}`}
-          />
+          >
+            Screenshot
+          </Button>
         }
-      >
-        Screenshot
-      </DialogTrigger>
+      />
       <DialogContent className="max-w-4xl">
         <p className="text-sm font-medium mb-2 font-mono">
           SERP: <span className="text-primary">{keyword}</span>
