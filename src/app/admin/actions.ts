@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { auth } from '../../../auth'
 import { isAdminEmail } from '@/lib/auth'
 import { createBrand } from '@/lib/db/queries'
@@ -38,6 +39,7 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
       monthlyBrandSpend: spendRaw && !isNaN(parseFloat(spendRaw)) ? String(parseFloat(spendRaw)) : undefined,
       brandRoas: roasRaw && !isNaN(parseFloat(roasRaw)) ? String(parseFloat(roasRaw)) : undefined,
     })
+    revalidatePath('/admin')
     return { clientToken: brand.clientToken }
   } catch (err) {
     const msg = err instanceof Error ? err.message : ''
