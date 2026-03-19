@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       SELECT 1 FROM information_schema.columns
       WHERE table_name = 'brands' AND column_name = 'user_id'
     `)
-    if (hasUserId.rows.length === 0) {
+    if (hasUserId.length === 0) {
       await db.execute(sql`ALTER TABLE brands ADD COLUMN IF NOT EXISTS user_id TEXT`)
       results.push('✓ Added user_id column')
     } else {
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       SELECT 1 FROM information_schema.columns
       WHERE table_name = 'brands' AND column_name = 'plan'
     `)
-    if (hasPlan.rows.length === 0) {
+    if (hasPlan.length === 0) {
       await db.execute(sql`ALTER TABLE brands ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'free'`)
       results.push('✓ Added plan column')
     } else {
