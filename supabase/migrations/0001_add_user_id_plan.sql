@@ -1,0 +1,3 @@
+ALTER TABLE brands ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE brands ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'free';
+CREATE INDEX IF NOT EXISTS brands_user_id_idx ON brands (user_id);

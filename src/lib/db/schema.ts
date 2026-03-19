@@ -12,10 +12,13 @@ export const brands = pgTable('brands', {
   slackWebhookUrl: text('slack_webhook_url'),
   monthlyBrandSpend: numeric('monthly_brand_spend'),
   brandRoas: numeric('brand_roas'),
+  userId: text('user_id'),
+  plan: text('plan').notNull().default('free'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => [
   index('brands_active_idx').on(table.active),
+  index('brands_user_id_idx').on(table.userId),
 ])
 
 export const serpChecks = pgTable('serp_checks', {

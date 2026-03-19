@@ -1,6 +1,13 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, desc, inArray } from 'drizzle-orm'
+import { eq, and, gte, desc, inArray, count } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
+
+export const PLAN_LIMITS = {
+  free:         { brands: 1,  keywords: 5   },
+  starter:      { brands: 3,  keywords: 25  },
+  professional: { brands: 10, keywords: 100 },
+  agency:       { brands: 50, keywords: 500 },
+} as const
 
 export async function getBrandById(id: string): Promise<Brand | null> {
   const rows = await db.select().from(brands).where(eq(brands.id, id)).limit(1)
@@ -69,6 +76,35 @@ export async function insertAuctionInsights(insights: {
 }[]): Promise<void> {
   if (insights.length === 0) return
   await db.insert(auctionInsights).values(insights).onConflictDoNothing()
+}
+
+export async function getBrandsForUser(userId: string): Promise<Brand[]> {
+  return db.select().from(brands).where(eq(brands.userId, userId))
+}
+
+export async function createBrandForUser(
+  data: { name: string; keywords: string[]; domain?: string },
+  userId: string,
+): Promise<Brand> {
+  const slug = data.name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+  const rows = await db.insert(brands).values({
+    name: data.name,
+    slug,
+    keywords: data.keywords,
+    domain: data.domain,
+    plan: 'free',
+    userId,
+  }).returning()
+  if (!rows[0]) throw new Error('Failed to create brand')
+  return rows[0]
+}
+
+export async function getUserBrandCount(userId: string): Promise<number> {
+  const rows = await db.select({ count: count() }).from(brands).where(eq(brands.userId, userId))
+  return rows[0]?.count ?? 0
 }
 
 export async function createBrand(data: {
