@@ -1,6 +1,7 @@
 'use server'
 
 import { auth } from '../../../auth'
+import { isAdminEmail } from '@/lib/auth'
 import { createBrand } from '@/lib/db/queries'
 
 export type CreateBrandState = {
@@ -11,17 +12,18 @@ export type CreateBrandState = {
 export async function createBrandAction(_prev: CreateBrandState, formData: FormData): Promise<CreateBrandState> {
   const session = await auth()
   if (!session) return { error: 'Unauthorized' }
+  if (!isAdminEmail(session.user?.email)) return { error: 'Unauthorized' }
 
-  const name = formData.get('name') as string
-  const keywords = (formData.get('keywords') as string)
+  const name = ((formData.get('name') as string) ?? '').trim()
+  const keywords = ((formData.get('keywords') as string) ?? '')
     .split(/[\n,]/)
     .map(k => k.trim())
     .filter(Boolean)
-  const domain = (formData.get('domain') as string) || undefined
-  const customerId = (formData.get('customerId') as string) || undefined
-  const slack = (formData.get('slack') as string) || undefined
-  const spendRaw = (formData.get('monthlyBrandSpend') as string) || undefined
-  const roasRaw = (formData.get('brandRoas') as string) || undefined
+  const domain = ((formData.get('domain') as string) ?? '').trim() || undefined
+  const customerId = ((formData.get('customerId') as string) ?? '').trim() || undefined
+  const slack = ((formData.get('slack') as string) ?? '').trim() || undefined
+  const spendRaw = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || undefined
+  const roasRaw = ((formData.get('brandRoas') as string) ?? '').trim() || undefined
 
   if (!name) return { error: 'Brand name is required' }
 

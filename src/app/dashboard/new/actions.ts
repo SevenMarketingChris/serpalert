@@ -20,7 +20,7 @@ export async function createBrand(
   const userEmail = session.user?.email
   if (!userEmail) return { error: 'Unauthorized' }
 
-  const name = (formData.get('name') as string)?.trim()
+  const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
 
   // Check plan limit
@@ -29,8 +29,8 @@ export async function createBrand(
     return { error: `You've reached the limit of ${PLAN_LIMITS.free.brands} brand on the free plan. Upgrade to add more.` }
   }
 
-  const domain = (formData.get('domain') as string)?.trim() || undefined
-  const keywordsRaw = (formData.get('keywords') as string) ?? ''
+  const domain = ((formData.get('domain') as string) ?? '').trim() || undefined
+  const keywordsRaw = ((formData.get('keywords') as string) ?? '')
   const keywords = keywordsRaw
     .split(',')
     .map(k => k.trim())

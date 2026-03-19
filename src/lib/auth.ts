@@ -10,11 +10,17 @@ function safeCompare(a: string, b: string): boolean {
   }
 }
 
-export const isAdminRequest = (req: Request) =>
-  safeCompare(req.headers.get('authorization') ?? '', `Bearer ${process.env.ADMIN_SECRET ?? ''}`)
+export const isAdminRequest = (req: Request) => {
+  const secret = process.env.ADMIN_SECRET
+  if (!secret) return false
+  return safeCompare(req.headers.get('authorization') ?? '', `Bearer ${secret}`)
+}
 
-export const isCronRequest = (req: Request) =>
-  safeCompare(req.headers.get('authorization') ?? '', `Bearer ${process.env.CRON_SECRET ?? ''}`)
+export const isCronRequest = (req: Request) => {
+  const secret = process.env.CRON_SECRET
+  if (!secret) return false
+  return safeCompare(req.headers.get('authorization') ?? '', `Bearer ${secret}`)
+}
 
 export function getAdminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? '').split(',').map(s => s.trim()).filter(Boolean)

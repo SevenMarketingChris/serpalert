@@ -1,11 +1,11 @@
 import chromium from '@sparticuz/chromium-min'
 import puppeteer from 'puppeteer-core'
 
-const CHROMIUM_URL =
+const DEFAULT_CHROMIUM_URL =
   'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
 
 export async function screenshotSerp(keyword: string): Promise<Buffer> {
-  const executablePath = await chromium.executablePath(CHROMIUM_URL)
+  const executablePath = await chromium.executablePath(process.env.CHROMIUM_URL || DEFAULT_CHROMIUM_URL)
   const browser = await puppeteer.launch({
     args: chromium.args,
     executablePath,
