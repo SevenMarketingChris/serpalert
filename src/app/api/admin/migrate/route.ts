@@ -41,7 +41,16 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, results })
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    return NextResponse.json({ success: false, error: msg, results }, { status: 500 })
+    const err = e as Record<string, unknown>
+    return NextResponse.json({
+      success: false,
+      error: err?.message ?? String(e),
+      code: err?.code,
+      detail: err?.detail,
+      hint: err?.hint,
+      db_url_set: !!process.env.DATABASE_URL,
+      db_url_prefix: process.env.DATABASE_URL?.slice(0, 40),
+      results,
+    }, { status: 500 })
   }
 }
