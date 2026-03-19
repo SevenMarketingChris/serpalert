@@ -15,53 +15,46 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
   }
 
   return (
-    <div className="space-y-0">
+    <div className="divide-y divide-border">
       {checks.map(check => {
         const hasCompetitors = check.competitorCount > 0
         return (
           <div
             key={check.id}
-            className={`bg-card border border-border rounded-lg p-4 mb-3 tech-card-hover ${hasCompetitors ? 'border-l-2 border-l-destructive/50' : 'border-l-2 border-l-primary/40'}`}
+            className={`p-4 ${hasCompetitors ? 'border-l-2 border-l-destructive/50' : ''}`}
           >
-            <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
-              {/* Timestamp */}
-              <span className="font-mono text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
-                {new Date(check.checkedAt).toLocaleString('en-GB')}
+            {/* Row 1: timestamp, keyword, status, screenshot */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                {new Date(check.checkedAt).toLocaleString('en-GB', {
+                  day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+                })}
               </span>
-
-              {/* Keyword */}
-              <span className="text-sm font-medium shrink-0">{check.keyword}</span>
-
-              {/* Result badge */}
+              <span className="text-sm font-medium">{check.keyword}</span>
               {hasCompetitors ? (
-                <Badge variant="destructive" className="shrink-0">
-                  {check.competitorCount} found
+                <Badge variant="destructive">
+                  {check.competitorCount} competitor{check.competitorCount !== 1 ? 's' : ''}
                 </Badge>
               ) : (
-                <Badge
-                  variant="outline"
-                  className="shrink-0 text-tech-green border-primary/20"
-                >
-                  None
-                </Badge>
+                <span className="text-xs text-tech-green font-mono">Clear</span>
               )}
-
-              {/* Screenshot trigger */}
-              <div className="ml-auto shrink-0">
-                <ScreenshotModal screenshotUrl={check.screenshotUrl} keyword={check.keyword} />
-              </div>
+              {check.screenshotUrl && (
+                <div className="ml-auto">
+                  <ScreenshotModal screenshotUrl={check.screenshotUrl} keyword={check.keyword} />
+                </div>
+              )}
             </div>
 
-            {/* Competitor domain pills */}
+            {/* Row 2: competitor domains */}
             {check.ads.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
+              <div className="flex flex-wrap gap-1.5 mt-2 ml-0">
                 {check.ads
                   .map(a => a.domain)
                   .filter((d, i, arr) => arr.indexOf(d) === i)
                   .map(domain => (
                   <span
                     key={domain}
-                    className="bg-primary/8 text-primary border border-primary/20 font-mono text-xs rounded px-2 py-0.5"
+                    className="bg-destructive/5 text-destructive border border-destructive/20 font-mono text-xs rounded px-2 py-0.5"
                   >
                     {domain}
                   </span>
@@ -69,7 +62,7 @@ export function CompetitorTimeline({ checks }: { checks: CheckWithAds[] }) {
               </div>
             )}
 
-            {/* Ad copy cards */}
+            {/* Row 3: ad copy details */}
             {check.ads.length > 0 && (
               <div className="mt-3">
                 <AdCopyCard ads={check.ads} />
