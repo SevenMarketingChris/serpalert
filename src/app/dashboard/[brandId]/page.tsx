@@ -41,7 +41,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
   const backUrl = isAdmin ? '/admin' : '/dashboard'
 
   return (
-    <div className="min-h-screen bg-background bg-dot-pattern">
+    <div className="min-h-screen bg-background ">
       {/* Header */}
       <div className="border-b border-border bg-card px-6 py-4">
         <div className="container mx-auto max-w-6xl flex items-center justify-between">

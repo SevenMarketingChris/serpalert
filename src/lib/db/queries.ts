@@ -138,6 +138,23 @@ export async function getUserBrandCount(userId: string): Promise<number> {
   return rows[0]?.count ?? 0
 }
 
+export async function updateBrand(
+  id: string,
+  data: {
+    name?: string; keywords?: string[]; domain?: string | null
+    googleAdsCustomerId?: string | null; slackWebhookUrl?: string | null
+    monthlyBrandSpend?: string | null; brandRoas?: string | null
+    active?: boolean
+  },
+): Promise<Brand> {
+  const rows = await db.update(brands)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(brands.id, id))
+    .returning()
+  if (!rows[0]) throw new Error('Brand not found')
+  return rows[0]
+}
+
 export async function createBrand(data: {
   name: string; slug: string; keywords: string[]
   domain?: string

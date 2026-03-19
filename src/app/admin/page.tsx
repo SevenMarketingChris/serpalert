@@ -94,8 +94,9 @@ export default async function AdminPage() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 shrink-0">
+                        <Link href={`/admin/edit/${b.id}`} className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors">Edit</Link>
                         <Link href={`/dashboard/${b.id}`} className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors">Dashboard</Link>
-                        <Link href={`/client/${b.clientToken}`} className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors">Client View</Link>
+                        <Link href={`/client/${b.clientToken}`} className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors">Client</Link>
                       </div>
                     </div>
                   ))}
