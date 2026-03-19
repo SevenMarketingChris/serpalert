@@ -31,7 +31,7 @@ export async function checkSerpForBrand(
   ).toString('base64')
 
   const response = await fetch(
-    'https://api.dataforseo.com/v3/serp/google/paid/live/advanced',
+    'https://api.dataforseo.com/v3/serp/google/paid/live/regular',
     {
       method: 'POST',
       headers: { Authorization: `Basic ${credentials}`, 'Content-Type': 'application/json' },

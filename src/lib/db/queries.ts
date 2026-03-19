@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, desc, inArray, count } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, isNotNull } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -100,6 +100,37 @@ export async function createBrandForUser(
   }).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
+}
+
+export async function hasScreenshotToday(brandId: string, keyword: string): Promise<boolean> {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const rows = await db.select({ id: serpChecks.id })
+    .from(serpChecks)
+    .where(and(
+      eq(serpChecks.brandId, brandId),
+      eq(serpChecks.keyword, keyword),
+      gte(serpChecks.checkedAt, todayStart),
+      isNotNull(serpChecks.screenshotUrl),
+    ))
+    .limit(1)
+  return rows.length > 0
+}
+
+export async function getScreenshotUrlsOlderThan(days: number): Promise<{ id: string; screenshotUrl: string }[]> {
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const rows = await db.select({ id: serpChecks.id, screenshotUrl: serpChecks.screenshotUrl })
+    .from(serpChecks)
+    .where(and(lte(serpChecks.checkedAt, cutoff), isNotNull(serpChecks.screenshotUrl)))
+  return rows.filter(r => r.screenshotUrl != null) as { id: string; screenshotUrl: string }[]
+}
+
+export async function nullifyScreenshotUrls(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  await db.update(serpChecks)
+    .set({ screenshotUrl: null })
+    .where(inArray(serpChecks.id, ids))
 }
 
 export async function getUserBrandCount(userId: string): Promise<number> {

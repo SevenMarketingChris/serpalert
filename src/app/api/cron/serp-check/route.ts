@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
-import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
+import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, hasScreenshotToday } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
@@ -32,11 +32,11 @@ export async function GET(request: Request) {
       })
       let screenshotUrl: string | undefined
 
-      if (ads.length > 0) {
+      if (ads.length > 0 && !(await hasScreenshotToday(brand.id, keyword))) {
         const buffer = await screenshotSerp(keyword)
         screenshotUrl = await uploadScreenshot(
           buffer,
-          `${brand.id}/${Date.now()}-${encodeURIComponent(keyword)}.png`
+          `${brand.id}/${new Date().toISOString().split('T')[0]}-${encodeURIComponent(keyword)}.png`
         )
       }
 
