@@ -1,16 +1,22 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks, getAuctionInsightsLast30Days } from '@/lib/db/queries'
+import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks, getAuctionInsightsLast30Days, getBrandAhrefsMetrics, getCompetitorAhrefsMetrics, getTopKeywordsForDomain, getMonthlyReports } from '@/lib/db/queries'
 import { auth } from '../../../../auth'
 import { isAdminEmail } from '@/lib/auth'
 import { CompetitorTimeline } from '@/components/competitor-timeline'
 import { AuctionChart } from '@/components/auction-chart'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { SeoMetricsPanel } from '@/components/seo-metrics-panel'
+import { SeoCompetitorTable } from '@/components/seo-competitor-table'
+import { TopKeywordsTable } from '@/components/top-keywords-table'
+import { MonthlyReportTab } from '@/components/monthly-report-tab'
 import type { CompetitorAd } from '@/lib/db/schema'
+import { ManualCheckButton } from '@/components/manual-check-button'
 
-export default async function DashboardPage({ params }: { params: Promise<{ brandId: string }> }) {
+export default async function DashboardPage({ params, searchParams }: { params: Promise<{ brandId: string }>; searchParams: Promise<{ keyword?: string }> }) {
   const { brandId } = await params
+  const { keyword: selectedKeyword } = await searchParams
   const session = await auth()
   if (!session) redirect('/login')
 
@@ -31,8 +37,13 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
     return acc
   }, {})
   const checksWithAds = checks.map(c => ({ ...c, ads: adsByCheckId[c.id] ?? [] }))
-  const insights = isAdmin && brand.googleAdsCustomerId ? await getAuctionInsightsLast30Days(brandId) : []
+  const insights = brand.googleAdsCustomerId ? await getAuctionInsightsLast30Days(brandId) : []
+  const ahrefsBrandMetrics = brand.domain ? await getBrandAhrefsMetrics(brandId) : null
+  const ahrefsCompetitorMetrics = brand.domain ? await getCompetitorAhrefsMetrics(brandId) : null
+  const brandTopKeywords = brand.domain ? await getTopKeywordsForDomain(brandId, brand.domain) : []
+  const monthlyReports = brand.domain ? await getMonthlyReports(brandId) : []
 
+  const filteredChecks = selectedKeyword ? checksWithAds.filter(c => c.keyword === selectedKeyword) : checksWithAds
   const todayStr = new Date().toDateString()
   const todayChecks = checksWithAds.filter(c => new Date(c.checkedAt).toDateString() === todayStr)
   const competitorsToday = new Set(todayChecks.flatMap(c => c.ads.map(a => a.domain))).size
@@ -58,13 +69,16 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
               <p className="text-xs uppercase tracking-widest text-muted-foreground mt-0.5">Brand Monitor</p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <ManualCheckButton brandId={brandId} />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto p-6 max-w-6xl space-y-6">
         {/* Metric Cards */}
-        <div className={`grid gap-4 ${isAdmin ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-2 sm:grid-cols-3'}`}>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {/* Monthly Spend — admin only */}
           {isAdmin && brand.monthlyBrandSpend && (
             <div className="rounded-lg border border-border bg-card p-4 metric-stripe-blue tech-card-hover">
@@ -100,6 +114,23 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Keywords</p>
             <p className="font-mono text-2xl font-bold text-tech-orange">{brand.keywords.length}</p>
           </div>
+
+          {ahrefsBrandMetrics && (
+            <>
+              <div className="rounded-lg border border-border bg-card p-4 metric-stripe-green tech-card-hover">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Domain Rating</p>
+                <p className="font-mono text-2xl font-bold text-tech-green">{parseFloat(ahrefsBrandMetrics.domainRating ?? '0').toFixed(1)}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4 metric-stripe-cyan tech-card-hover">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Organic Traffic</p>
+                <p className="font-mono text-2xl font-bold text-tech-cyan">{(ahrefsBrandMetrics.organicTraffic ?? 0).toLocaleString()}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4 metric-stripe-purple tech-card-hover">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Referring Domains</p>
+                <p className="font-mono text-2xl font-bold text-tech-purple">{(ahrefsBrandMetrics.referringDomains ?? 0).toLocaleString()}</p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Unique competitors (all time) */}
@@ -110,30 +141,93 @@ export default async function DashboardPage({ params }: { params: Promise<{ bran
           </div>
         )}
 
+        {/* Keyword Filter */}
+        {brand.keywords.length > 1 && (
+          <div className="flex flex-wrap gap-1.5">
+            <Link
+              href={`/dashboard/${brandId}`}
+              className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-mono transition-colors ${!selectedKeyword ? 'bg-primary text-primary-foreground' : 'border border-border hover:bg-muted'}`}
+            >
+              All
+            </Link>
+            {brand.keywords.map((kw: string) => (
+              <Link
+                key={kw}
+                href={`/dashboard/${brandId}?keyword=${encodeURIComponent(kw)}`}
+                className={`inline-flex h-7 items-center rounded-full px-3 text-xs font-mono transition-colors ${selectedKeyword === kw ? 'bg-primary text-primary-foreground' : 'border border-border hover:bg-muted'}`}
+              >
+                {kw}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {/* Tabs: Timeline / Auction Insights */}
         <Tabs defaultValue="timeline">
           <TabsList variant="line" className="border-b border-border rounded-none w-full justify-start pb-0 mb-0 gap-4">
             <TabsTrigger value="timeline" className="pb-3">
               SERP Timeline
             </TabsTrigger>
-            {isAdmin && brand.googleAdsCustomerId && (
+            {brand.googleAdsCustomerId && (
               <TabsTrigger value="auction" className="pb-3">
                 Auction Insights
+              </TabsTrigger>
+            )}
+            {brand.domain && ahrefsBrandMetrics && (
+              <TabsTrigger value="seo" className="pb-3">
+                SEO Metrics
+              </TabsTrigger>
+            )}
+            {brand.domain && monthlyReports.length > 0 && (
+              <TabsTrigger value="reports" className="pb-3">
+                Monthly Reports
               </TabsTrigger>
             )}
           </TabsList>
 
           <TabsContent value="timeline">
             <div className="rounded-lg border border-border bg-card overflow-x-auto">
-              <CompetitorTimeline checks={checksWithAds} />
+              <CompetitorTimeline checks={filteredChecks} />
             </div>
           </TabsContent>
 
-          {isAdmin && brand.googleAdsCustomerId && (
+          {brand.googleAdsCustomerId && (
             <TabsContent value="auction">
               <div className="rounded-lg border border-border bg-card metric-stripe-cyan p-6">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">30-Day Auction Insights</p>
                 <AuctionChart insights={insights} />
+              </div>
+            </TabsContent>
+          )}
+
+          {brand.domain && ahrefsBrandMetrics && (
+            <TabsContent value="seo">
+              <div className="space-y-6">
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Brand SEO Overview</p>
+                  <SeoMetricsPanel brandMetrics={ahrefsBrandMetrics} brandDomain={brand.domain} />
+                </div>
+                {brandTopKeywords.length > 0 && (
+                  <div className="rounded-lg border border-border bg-card p-6">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Top Organic Keywords</p>
+                    <TopKeywordsTable keywords={brandTopKeywords} domain={brand.domain} />
+                  </div>
+                )}
+                {ahrefsCompetitorMetrics && ahrefsCompetitorMetrics.length > 0 && (
+                  <div className="rounded-lg border border-border bg-card p-6">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Competitor SEO Comparison</p>
+                    <SeoCompetitorTable competitors={ahrefsCompetitorMetrics} />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          )}
+
+          {brand.domain && monthlyReports.length > 0 && (
+            <TabsContent value="reports">
+              <div className="rounded-lg border border-border bg-card p-6">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Monthly SEO Reports</p>
+                <MonthlyReportTab reports={monthlyReports} brandDomain={brand.domain} />
               </div>
             </TabsContent>
           )}
