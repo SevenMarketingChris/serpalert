@@ -155,6 +155,29 @@ export async function updateBrand(
   return rows[0]
 }
 
+// Stub functions for upcoming Ahrefs SEO features (no tables yet)
+export type AhrefsMetrics = {
+  domainRating: string | null
+  organicTraffic: number | null
+  referringDomains: number | null
+}
+
+export async function getBrandAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics | null> {
+  return null
+}
+
+export async function getCompetitorAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics[]> {
+  return []
+}
+
+export async function getTopKeywordsForDomain(_brandId: string, _domain: string): Promise<{ keyword: string; position: number; volume: number }[]> {
+  return []
+}
+
+export async function getMonthlyReports(_brandId: string): Promise<{ id: string; month: string; summary: string }[]> {
+  return []
+}
+
 export async function createBrand(data: {
   name: string; slug: string; keywords: string[]
   domain?: string

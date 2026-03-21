@@ -21,7 +21,7 @@ export async function acquireLock(jobName: string): Promise<boolean> {
     const result = await db.execute(
       sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`
     )
-    const row = result.rows?.[0] as { acquired?: boolean } | undefined
+    const row = (result as unknown as { acquired: boolean }[])[0]
     return row?.acquired === true
   } catch (err) {
     console.error(`Failed to acquire advisory lock for "${jobName}":`, err)
