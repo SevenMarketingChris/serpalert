@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!acquireLock('auction-insights')) {
+  if (!(await acquireLock('auction-insights'))) {
     return NextResponse.json({ error: 'Already running' }, { status: 409 })
   }
 
@@ -42,6 +42,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ results, date: today })
   } finally {
-    releaseLock('auction-insights')
+    await releaseLock('auction-insights')
   }
 }

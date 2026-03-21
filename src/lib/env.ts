@@ -4,6 +4,33 @@ function requireEnv(name: string): string {
   return value;
 }
 
+/**
+ * Validate critical env vars at startup (fail fast).
+ * Import this in the root layout or instrumentation file.
+ */
+export function validateEnv(): void {
+  const errors: string[] = [];
+
+  const required = ['AUTH_SECRET', 'AUTH_GOOGLE_ID', 'AUTH_GOOGLE_SECRET', 'DATABASE_URL'] as const;
+  for (const name of required) {
+    const val = process.env[name];
+    if (!val || val.trim() === '') {
+      errors.push(`${name} is missing or empty`);
+    }
+  }
+
+  const authSecret = process.env.AUTH_SECRET;
+  if (authSecret && authSecret.length < 32) {
+    errors.push(`AUTH_SECRET must be at least 32 characters (got ${authSecret.length})`);
+  }
+
+  if (errors.length > 0) {
+    const msg = `Environment validation failed:\n  - ${errors.join('\n  - ')}`;
+    console.error(msg);
+    throw new Error(msg);
+  }
+}
+
 function optionalEnv(name: string): string | undefined {
   return process.env[name] ?? undefined;
 }

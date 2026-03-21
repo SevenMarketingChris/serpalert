@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!acquireLock('serp-check')) {
+  if (!(await acquireLock('serp-check'))) {
     return NextResponse.json({ error: 'Already running' }, { status: 409 })
   }
 
@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     }
 
     // Process in parallel with concurrency limit
-    const CONCURRENCY = 3
+    const CONCURRENCY = 1 // Keep at 1: 768MB RAM with Chromium is tight
     const results = []
     for (let i = 0; i < jobs.length; i += CONCURRENCY) {
       const batch = jobs.slice(i, i + CONCURRENCY)
@@ -89,6 +89,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ results, timestamp: new Date().toISOString() })
   } finally {
-    releaseLock('serp-check')
+    await releaseLock('serp-check')
   }
 }
