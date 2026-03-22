@@ -17,27 +17,29 @@ interface DataForSeoItem {
   rank_absolute?: number
 }
 
-export async function checkSerpForBrand(
-  keyword: string,
-  location = 'United Kingdom',
-  options: { brandDomain?: string } = {}
-): Promise<SerpAdResult[]> {
+function getCredentials(): string {
   if (!process.env.DATAFORSEO_LOGIN || !process.env.DATAFORSEO_PASSWORD) {
     throw new Error('Missing DataForSEO credentials: DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD required')
   }
-
-  const credentials = Buffer.from(
+  return Buffer.from(
     `${process.env.DATAFORSEO_LOGIN}:${process.env.DATAFORSEO_PASSWORD}`
   ).toString('base64')
+}
 
-  // Use the regular SERP endpoint (organic+paid) instead of paid-only,
-  // as the paid-only endpoint can miss ad formats and return empty results
+async function fetchSerp(
+  endpoint: string,
+  keyword: string,
+  location: string,
+  depth: number
+): Promise<DataForSeoItem[]> {
+  const credentials = getCredentials()
+
   const response = await fetch(
-    'https://api.dataforseo.com/v3/serp/google/organic/live/regular',
+    `https://api.dataforseo.com/v3/serp/google/${endpoint}/live/regular`,
     {
       method: 'POST',
       headers: { Authorization: `Basic ${credentials}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify([{ keyword, location_name: location, language_name: 'English', device: 'desktop', depth: 100 }]),
+      body: JSON.stringify([{ keyword, location_name: location, language_name: 'English', device: 'desktop', depth }]),
       signal: AbortSignal.timeout(30_000),
     }
   )
@@ -49,33 +51,62 @@ export async function checkSerpForBrand(
 
   const data = await response.json()
 
-  // Validate the task completed successfully
   const task = data?.tasks?.[0]
   if (!task) {
-    console.error(`DataForSEO: no task returned for "${keyword}"`, JSON.stringify(data).slice(0, 500))
+    console.error(`DataForSEO [${endpoint}]: no task returned for "${keyword}"`, JSON.stringify(data).slice(0, 500))
     throw new Error(`DataForSEO: no task returned for "${keyword}"`)
   }
 
   if (task.status_code !== 20000) {
-    console.error(`DataForSEO task error for "${keyword}": ${task.status_code} ${task.status_message}`)
+    console.error(`DataForSEO [${endpoint}] task error for "${keyword}": ${task.status_code} ${task.status_message}`)
     throw new Error(`DataForSEO task failed: ${task.status_code} ${task.status_message}`)
   }
 
   const result = task.result?.[0]
   if (!result) {
-    console.error(`DataForSEO: no result in task for "${keyword}"`, JSON.stringify(task).slice(0, 500))
-    throw new Error(`DataForSEO: no result for "${keyword}"`)
+    console.warn(`DataForSEO [${endpoint}]: no result for "${keyword}" (may have no data)`)
+    return []
   }
 
-  const items = result.items ?? []
-  console.log(`DataForSEO "${keyword}": ${items.length} total items, types: ${[...new Set(items.map((i: DataForSeoItem) => i.type))].join(', ')}`)
+  const items: DataForSeoItem[] = result.items ?? []
+  const types = [...new Set(items.map((i) => i.type))].join(', ')
+  console.log(`DataForSEO [${endpoint}] "${keyword}": ${items.length} items, types: ${types}`)
+  return items
+}
 
-  const paidItems = items.filter((i: DataForSeoItem) => i.type === 'paid')
-  console.log(`DataForSEO "${keyword}": ${paidItems.length} paid ads found`)
+export async function checkSerpForBrand(
+  keyword: string,
+  location = 'United Kingdom',
+  options: { brandDomain?: string } = {}
+): Promise<SerpAdResult[]> {
+  // Strategy: try the dedicated paid endpoint first (cheaper, purpose-built).
+  // If it returns 0 results, fall back to the organic endpoint which includes
+  // all SERP item types (paid ads appear as type "paid" alongside organic results).
+  let paidItems: DataForSeoItem[] = []
+
+  // 1. Try the paid-only endpoint
+  try {
+    const items = await fetchSerp('paid', keyword, location, 10)
+    paidItems = items.filter((i) => i.type === 'paid')
+    console.log(`DataForSEO "${keyword}": paid endpoint returned ${paidItems.length} ads`)
+  } catch (err) {
+    console.error(`DataForSEO paid endpoint failed for "${keyword}":`, err)
+  }
+
+  // 2. If paid endpoint returned nothing, try organic endpoint (includes all types)
+  if (paidItems.length === 0) {
+    try {
+      const items = await fetchSerp('organic', keyword, location, 100)
+      paidItems = items.filter((i) => i.type === 'paid')
+      console.log(`DataForSEO "${keyword}": organic fallback returned ${paidItems.length} ads`)
+    } catch (err) {
+      console.error(`DataForSEO organic endpoint also failed for "${keyword}":`, err)
+    }
+  }
 
   return paidItems
-    .filter((i: DataForSeoItem) => !options.brandDomain || i.domain !== options.brandDomain)
-    .map((i: DataForSeoItem) => ({
+    .filter((i) => !options.brandDomain || i.domain !== options.brandDomain)
+    .map((i) => ({
       domain: i.domain ?? new URL(i.url ?? 'https://unknown').hostname,
       headline: i.title ?? null,
       description: i.description ?? null,

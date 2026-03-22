@@ -29,6 +29,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
+# Create writable dirs for Chromium (crashpad, temp profiles)
+RUN mkdir -p /tmp/chromium-data /home/nextjs/.cache && \
+    chown -R nextjs:nodejs /tmp/chromium-data /home/nextjs
+
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
