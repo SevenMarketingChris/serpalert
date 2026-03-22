@@ -31,6 +31,11 @@ export async function screenshotSerp(keyword: string): Promise<Buffer> {
   const executablePath = await getExecPath()
   console.log(`Puppeteer using browser: ${executablePath}`)
 
+  // Ensure Chromium has writable dirs for crash handler and profile data
+  process.env.HOME = process.env.HOME || '/tmp'
+  process.env.XDG_CONFIG_HOME = process.env.XDG_CONFIG_HOME || '/tmp/.config'
+  process.env.XDG_CACHE_HOME = process.env.XDG_CACHE_HOME || '/tmp/.cache'
+
   const browser = await puppeteer.launch({
     args: [
       '--no-sandbox',
@@ -42,6 +47,8 @@ export async function screenshotSerp(keyword: string): Promise<Buffer> {
       '--disable-breakpad',
       '--no-zygote',
       '--disable-extensions',
+      '--crash-dumps-dir=/tmp/chromium-crashes',
+      '--user-data-dir=/tmp/chromium-data',
     ],
     executablePath,
     headless: true,

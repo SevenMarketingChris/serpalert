@@ -84,24 +84,22 @@ export async function checkSerpForBrand(
   // all SERP item types (paid ads appear as type "paid" alongside organic results).
   let paidItems: DataForSeoItem[] = []
 
-  // 1. Try the paid-only endpoint
+  // Use the organic endpoint which returns all SERP item types.
+  // Paid ads appear as type "paid" in the items array.
+  // The dedicated /paid/ endpoint returns 40402 Invalid Path errors.
   try {
-    const items = await fetchSerp('paid', keyword, location, 10)
-    paidItems = items.filter((i) => i.type === 'paid')
-    console.log(`DataForSEO "${keyword}": paid endpoint returned ${paidItems.length} ads`)
-  } catch (err) {
-    console.error(`DataForSEO paid endpoint failed for "${keyword}":`, err)
-  }
-
-  // 2. If paid endpoint returned nothing, try organic endpoint (includes all types)
-  if (paidItems.length === 0) {
-    try {
-      const items = await fetchSerp('organic', keyword, location, 100)
-      paidItems = items.filter((i) => i.type === 'paid')
-      console.log(`DataForSEO "${keyword}": organic fallback returned ${paidItems.length} ads`)
-    } catch (err) {
-      console.error(`DataForSEO organic endpoint also failed for "${keyword}":`, err)
+    const items = await fetchSerp('organic', keyword, location, 100)
+    // Paid ads can appear as "paid", "ads", or other ad-related types
+    paidItems = items.filter((i) =>
+      i.type === 'paid' || i.type === 'ads' || i.type === 'shopping' ||
+      i.type === 'paid_box' || i.type === 'top_stories_paid'
+    )
+    console.log(`DataForSEO "${keyword}": ${paidItems.length} paid/ad items found`)
+    if (paidItems.length === 0) {
+      console.log(`DataForSEO "${keyword}": no paid ads detected at this time`)
     }
+  } catch (err) {
+    console.error(`DataForSEO failed for "${keyword}":`, err)
   }
 
   return paidItems
