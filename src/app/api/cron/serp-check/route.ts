@@ -38,7 +38,9 @@ export async function GET(request: Request) {
         })
         let screenshotUrl: string | undefined
 
-        if (ads.length > 0 && !(await hasScreenshotToday(brand.id, keyword))) {
+        // Always take a screenshot (once per day per keyword) so results can be verified,
+        // regardless of whether competitors were detected
+        if (!(await hasScreenshotToday(brand.id, keyword))) {
           try {
             const buffer = await screenshotSerp(keyword)
             screenshotUrl = await uploadScreenshot(

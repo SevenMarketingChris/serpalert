@@ -1,18 +1,43 @@
-import chromium from '@sparticuz/chromium-min'
 import puppeteer from 'puppeteer-core'
 
-const DEFAULT_CHROMIUM_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v143.0.1/chromium-v143.0.1-pack.tar'
+/**
+ * Resolve the Chromium executable path.
+ *
+ * On Coolify/Docker: use system-installed chromium/google-chrome
+ * (the Dockerfile installs chromium via apt).
+ *
+ * Fallback: use @sparticuz/chromium-min for serverless environments.
+ */
+async function getExecPath(): Promise<string> {
+  // Check for system-installed browsers (Docker / Coolify)
+  const { execSync } = await import('child_process')
+  for (const bin of ['chromium-browser', 'chromium', 'google-chrome-stable', 'google-chrome']) {
+    try {
+      const p = execSync(`which ${bin}`, { encoding: 'utf-8' }).trim()
+      if (p) return p
+    } catch {
+      // not found, try next
+    }
+  }
+
+  // Fallback: serverless chromium (Vercel/Lambda)
+  const chromium = (await import('@sparticuz/chromium-min')).default
+  return chromium.executablePath(
+    'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+  )
+}
 
 export async function screenshotSerp(keyword: string): Promise<Buffer> {
-  const executablePath = await chromium.executablePath(process.env.CHROMIUM_URL || DEFAULT_CHROMIUM_URL)
+  const executablePath = await getExecPath()
+  console.log(`Puppeteer using browser: ${executablePath}`)
+
   const browser = await puppeteer.launch({
     args: [
-      ...chromium.args,
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-gpu',
+      '--single-process',
     ],
     executablePath,
     headless: true,
