@@ -42,13 +42,19 @@
 - `/admin` redirects to `/admin/brands` (single admin page for managing all brands)
 - `/admin/edit/[brandId]` removed — settings are inline in `/dashboard/[brandId]/settings`
 - Brand switcher in sidebar replaces navigating back to brand list
-- New `/evidence/[checkId]` public page for shareable evidence cards
+- New `/evidence/[checkId]` public page for shareable evidence cards (`checkId` is a UUID — not enumerable)
+- Landing page CTA ("Start Monitoring Free") links to `/login` — first-time users get a free plan auto-provisioned on first OAuth sign-in, then redirect to `/dashboard/new`
 
 ---
 
 ## 3. Sidebar Navigation
 
-Persistent left sidebar inside `/dashboard/*`. Collapses to icons on mobile (hamburger toggle).
+Persistent left sidebar inside `/dashboard/*`. Width: 220px on desktop.
+
+**Responsive behaviour:**
+- **≥1024px (lg):** Full sidebar with text labels
+- **768–1023px (md):** Collapsed to 56px icon-only rail
+- **<768px (sm):** Hidden entirely, accessible via hamburger icon in top bar. Opens as an overlay (not push).
 
 **Contents (top to bottom):**
 - SerpAlert logo (gradient text: blue→cyan, using `text-gradient-tech`)
@@ -65,6 +71,46 @@ Persistent left sidebar inside `/dashboard/*`. Collapses to icons on mobile (ham
 **Admin extras visible in sidebar:**
 - "All Brands" link at top (goes to `/admin/brands`)
 - Settings section shows additional fields (spend, ROAS, Slack webhook, Google Ads ID)
+
+---
+
+## 4. Brand List (`/dashboard`) & Create Brand (`/dashboard/new`)
+
+### 4.0a Brand List (`/dashboard`)
+
+Grid of brand cards. Each card shows:
+- Brand name (bold), domain (monospace, muted)
+- Plan badge (colored pill: free=gray, starter=blue, professional=purple, agency=orange)
+- Keyword count: "X keywords"
+- Last check status: green dot "Protected" or red dot "X threats"
+- Actions: "Open Dashboard" button
+
+**Empty state (new user, no brands):**
+- Centred card: "Welcome to SerpAlert" heading, subtext "Start monitoring your brand keywords", "Create Your First Brand" CTA button → `/dashboard/new`
+
+**Admin view:** Shows all brands across all users, with a "User" column showing owner email.
+
+### 4.0b Create Brand (`/dashboard/new`)
+
+Form page within the sidebar layout.
+
+**Fields:**
+- Brand Name (required, text input)
+- Domain (optional, text input, placeholder "yourbrand.com")
+- Keywords (required, textarea, one per line, with plan limit shown: "3/3 keywords used" for free tier)
+
+**On submit:** Server action `createBrand()`, validates plan limits, redirects to `/dashboard/[brandId]`.
+
+**Plan limits table:**
+
+| Plan | Brands | Keywords | Check frequency |
+|------|--------|----------|----------------|
+| Free | 1 | 3 | 3x/day |
+| Starter | 3 | 25 | 3x/day |
+| Professional | 10 | 100 | 6x/day |
+| Agency | 50 | 500 | 12x/day |
+
+These limits are enforced in `createBrand()` and `updateBrand()` server actions.
 
 ---
 
@@ -94,7 +140,7 @@ Full-width card at the top. Two states:
 
 ### 4.2 Metric Cards
 
-4-column grid below the hero. Each card:
+Responsive grid below the hero: 4 columns on lg, 2 columns on sm, 1 column on xs. Each card:
 - Background: oklch(16% 0.025 250)
 - Border: oklch(22% 0.03 250)
 - Top stripe: 3px colored border (existing `metric-stripe-*` pattern)
@@ -105,7 +151,7 @@ Full-width card at the top. Two states:
 1. **Checks Today** — blue stripe (oklch 62% 0.22 250), integer count
 2. **Threats Today** — green stripe if 0, red stripe if >0 (dynamic), integer count
 3. **Keywords** — purple stripe (oklch 72% 0.15 310), integer count
-4. **7d Trend** — orange stripe (oklch 72% 0.15 55), inline sparkline (text-based: ▁▂▃▅ characters)
+4. **7d Trend** — orange stripe (oklch 72% 0.15 55), inline sparkline showing threats-per-day for the last 7 days. Uses Unicode blocks (▁▂▃▄▅▆▇█) normalised to the max value in the window. If <7 days of data, pad left with ▁.
 
 **Admin-only cards (appended to grid when admin):**
 5. **Monthly Spend** — blue stripe, formatted as £X,XXX.XX
@@ -113,18 +159,20 @@ Full-width card at the top. Two states:
 
 ### 4.3 Tabs
 
-Horizontal tab bar below metrics. Tabs:
-- **Activity** (default) — alert feed
-- **Competitors** — leaderboard table (links to `/dashboard/[brandId]/competitors`)
-- **Auction Insights** — charts (links to `/dashboard/[brandId]/insights`)
+Horizontal tab bar below metrics. These are **navigation links styled as tabs** — each navigates to a sub-page under the sidebar layout (not inline tab panels):
+- **Activity** (default) — `/dashboard/[brandId]` — alert feed
+- **Competitors** — `/dashboard/[brandId]/competitors` — leaderboard table
+- **Insights** — `/dashboard/[brandId]/insights` — auction charts
 
-Active tab: 2px bottom border in primary blue, white text.
+Active tab: 2px bottom border in primary blue, white text. Determined by current pathname.
 Inactive: muted text, no border.
 Style: uppercase, letter-spaced, 11px, matching existing tab pattern.
 
 ### 4.4 Activity Feed
 
-Chronological feed of SERP checks, newest first. Each item is a card with:
+Chronological feed of SERP checks, newest first. Loads 20 items initially, with a "Load more" button at the bottom (not infinite scroll — explicit pagination). Empty state: "No SERP checks yet — data will appear after the first scheduled check." with a prominent "Run Check Now" CTA.
+
+Each item is a card with:
 
 **Layout:**
 - Left border: 3px colored (red for threat, green for clear, orange for reported, cyan for resolved)
@@ -141,8 +189,19 @@ Chronological feed of SERP checks, newest first. Each item is a card with:
 **Action buttons:**
 - 📸 Screenshot — opens screenshot modal
 - 📋 Evidence — opens evidence modal or navigates to `/evidence/[checkId]`
-- 📝 Report — changes status to next state (New → Acknowledged → Reported)
-- ✓ Resolve — marks as resolved
+- Status action button (label changes by current state):
+  - When `new`: "Acknowledge" → sets status to `acknowledged`
+  - When `acknowledged`: "Mark Reported" → sets status to `reported`
+  - When `reported`: "Resolve" → sets status to `resolved`
+  - When `resolved`: no action button (card is faded)
+- Transitions are forward-only (no going backwards). To undo, an admin can reset via Settings or API.
+
+**"Run Check Now" button states:**
+- Idle: primary blue button with neon glow
+- Loading: spinner icon, "Checking..." text, button disabled
+- Success: green text "Checked X keywords — Y ads found", auto-refreshes page via `router.refresh()` after 2s
+- Error: red text "Check failed — try again", button re-enabled
+- Rate limit: disabled for 60s after a manual check to prevent spam
 
 **Filters (above the feed):**
 - Pill buttons: All | New | Unresolved | Resolved
@@ -167,7 +226,9 @@ Ranked table of all competitor domains detected.
 | Status | Active (seen in last 7 days) / Inactive (not seen recently) |
 | Trend | 30-day sparkline of detection frequency |
 
-**Row expansion:** Click a row to expand and show:
+**Mobile layout:** On screens <768px, the table converts to stacked cards (one card per competitor) showing domain, detection count, last seen, and status. Expansion works by tapping the card.
+
+**Desktop row expansion:** Click a row to expand and show:
 - All ad copy variants (AdCopyCard component, restyled)
 - Screenshot history (thumbnail grid, clickable to open modal)
 - Destination URLs (list)
@@ -297,7 +358,9 @@ No new table needed. Evidence is derived from existing `serp_checks` + `competit
 
 **Evidence page (`/evidence/[checkId]`):**
 - Server component, fetches SerpCheck + CompetitorAds by check ID
+- `checkId` is a UUID (from `serp_checks.id`) — not enumerable
 - Public (no auth), but only accessible if you know the UUID
+- Returns 404 for invalid/non-existent IDs
 - Renders the evidence card with all details
 
 ---
@@ -305,12 +368,23 @@ No new table needed. Evidence is derived from existing `serp_checks` + `competit
 ## 13. Status Tracking (New Feature)
 
 **Schema change:**
-Add `status` column to `competitor_ads` table:
+Add `status` column to `competitor_ads` table using a Drizzle `text` column with a type union (not a Postgres enum — avoids migration complexity):
+
+```typescript
+// In schema.ts
+status: text('status', { enum: ['new', 'acknowledged', 'reported', 'resolved'] }).notNull().default('new'),
+```
+
+Drizzle migration:
 ```sql
 ALTER TABLE competitor_ads ADD COLUMN status TEXT NOT NULL DEFAULT 'new';
 ```
 
-Valid values: `new`, `acknowledged`, `reported`, `resolved`
+**State machine (forward-only):**
+```
+new → acknowledged → reported → resolved
+```
+No backward transitions via UI. Admin can reset via API if needed.
 
 **New query functions:**
 - `updateCompetitorAdStatus(id: string, status: string)` — updates status
@@ -333,7 +407,7 @@ Valid values: `new`, `acknowledged`, `reported`, `resolved`
 
 **Changed pages:**
 - `/admin` → redirects to `/admin/brands`
-- `/admin/brands` — table of all brands with: name, domain, keywords, plan, status, actions (Dashboard, Client Portal, Edit Settings)
+- `/admin/brands` — table of all brands with: name, domain, keywords, plan, status, actions (Dashboard, Client Portal, Edit Settings). "Edit Settings" navigates to `/dashboard/[brandId]/settings` — the sidebar auto-updates to show that brand's context.
 
 **Admin role detection:**
 - Same as current: `isAdminEmail(session.user?.email)` checking `ADMIN_EMAILS` env var
@@ -341,7 +415,30 @@ Valid values: `new`, `acknowledged`, `reported`, `resolved`
 
 ---
 
-## 15. Design System Refinements
+## 15. Loading & Error States
+
+**Loading states:** Every page and data-dependent section uses skeleton placeholders matching the final layout shape:
+- Status hero: gray gradient block at full width, 80px height
+- Metric cards: 4 skeleton cards with pulsing animation
+- Activity feed: 3 skeleton cards with left border placeholder
+- Tables: skeleton rows with column-width-matched blocks
+
+Use Next.js `loading.tsx` files per route segment for page-level loading. Use React Suspense boundaries for component-level loading within pages.
+
+**Error states:**
+- API failures: inline error card with red left border, "Failed to load [section] — try refreshing" message
+- Empty data: contextual empty states per section (not a generic "no data" message)
+- Auth errors: redirect to `/login` with flash message
+
+**Client portal token management:**
+- Tokens are UUIDs, auto-generated on brand creation (existing behaviour)
+- Tokens cannot be rotated in v1 (future feature)
+- Invalid/non-existent tokens show a styled 404 page: "This report is not available" with SerpAlert branding
+- No rate limiting on client portal (it's read-only server-rendered)
+
+---
+
+## 16. Design System Refinements
 
 **Keep:**
 - OKLch color model
