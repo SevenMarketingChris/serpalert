@@ -50,7 +50,7 @@ export function NewUserBrandForm({ keywordLimit }: Props) {
             </p>
           </div>
 
-          <Button type="submit" disabled={isPending} className="neon-glow w-full">
+          <Button type="submit" disabled={isPending} className="neon-glow-cta w-full">
             {isPending ? 'Creating…' : 'Create Brand'}
           </Button>
 
