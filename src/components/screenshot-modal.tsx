@@ -1,9 +1,13 @@
 'use client'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: string | null; keyword: string }) {
+  const [imageError, setImageError] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+
   if (!screenshotUrl) return null
   return (
     <Dialog>
@@ -25,15 +29,27 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
         <p className="text-sm font-medium mb-2 font-mono">
           SERP: <span className="text-primary">{keyword}</span>
         </p>
-        <div className="rounded-lg overflow-hidden bg-muted">
-          <Image
-            src={screenshotUrl}
-            alt={`SERP for ${keyword}`}
-            width={1200}
-            height={800}
-            className="w-full h-auto"
-            loading="lazy"
-          />
+        <div className="rounded-lg overflow-hidden bg-muted relative">
+          {imageError ? (
+            <div className="p-12 text-center text-muted-foreground text-sm">Screenshot unavailable</div>
+          ) : (
+            <>
+              {!loaded && (
+                <div className="absolute inset-0 bg-muted animate-pulse" />
+              )}
+              <Image
+                src={screenshotUrl}
+                alt={`SERP for ${keyword}`}
+                width={1200}
+                height={800}
+                className="w-full h-auto"
+                loading="lazy"
+                unoptimized
+                onError={() => setImageError(true)}
+                onLoad={() => setLoaded(true)}
+              />
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

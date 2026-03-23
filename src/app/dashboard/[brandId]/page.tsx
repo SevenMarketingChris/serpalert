@@ -5,6 +5,7 @@ import { isAdminEmail } from '@/lib/auth'
 import { StatusHero } from '@/components/status-hero'
 import { MetricCards } from '@/components/metric-cards'
 import { DashboardTabs } from '@/components/dashboard-tabs'
+import { ActivityFeed } from '@/components/activity-feed'
 
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -40,6 +41,11 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
   const lastCheckAt = checks[0]?.checkedAt ?? null
 
+  const checksWithAds = checks.map(c => ({
+    ...c,
+    ads: allAds.filter(a => a.serpCheckId === c.id),
+  }))
+
   return (
     <div className="space-y-4 max-w-5xl">
       <StatusHero brandId={brandId} threatsToday={threatsToday} lastCheckAt={lastCheckAt} isAdmin={isAdmin} />
@@ -53,10 +59,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         isAdmin={isAdmin}
       />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
-      {/* Activity feed will be added in Task 4 */}
-      <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground text-sm">
-        Activity feed loading...
-      </div>
+      <ActivityFeed checks={checksWithAds} brandId={brandId} />
     </div>
   )
 }
