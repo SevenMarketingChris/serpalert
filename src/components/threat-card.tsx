@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { ScreenshotModal } from '@/components/screenshot-modal'
+import { EvidenceModal } from '@/components/evidence-modal'
 
 interface ThreatCardProps {
   checkId: string
@@ -113,9 +113,20 @@ export function ThreatCard({ checkId, brandId, ads, keyword, checkedAt, screensh
       {/* Row 3: Actions */}
       <div className="flex items-center gap-2 mt-2.5 flex-wrap">
         <ScreenshotModal screenshotUrl={screenshotUrl} keyword={keyword} />
-        <Link href={`/evidence/${checkId}`} className="action-btn inline-flex items-center no-underline">
-          📋 Evidence
-        </Link>
+        <EvidenceModal
+          checkId={checkId}
+          keyword={keyword}
+          checkedAt={checkedAt}
+          screenshotUrl={screenshotUrl}
+          ads={ads.map(a => ({
+            domain: a.domain,
+            headline: a.headline,
+            description: a.description,
+            displayUrl: a.displayUrl,
+            destinationUrl: null,
+            position: a.position,
+          }))}
+        />
         {transition && (
           <button
             onClick={handleStatusChange}

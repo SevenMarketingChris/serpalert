@@ -1,0 +1,144 @@
+import { notFound, redirect } from 'next/navigation'
+import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
+import { auth } from '../../../../../auth'
+import { DashboardTabs } from '@/components/dashboard-tabs'
+
+function formatRelativeTime(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - new Date(date).getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  const diffDays = Math.floor(diffHours / 24)
+  return `${diffDays}d ago`
+}
+
+const rankBorderColors: Record<number, string> = {
+  1: 'oklch(75% 0.15 85)',
+  2: 'oklch(70% 0 0)',
+  3: 'oklch(65% 0.1 55)',
+}
+
+export default async function CompetitorsPage({ params }: { params: Promise<{ brandId: string }> }) {
+  const { brandId } = await params
+  const session = await auth()
+  if (!session) redirect('/login')
+
+  const brand = await getBrandById(brandId)
+  if (!brand) notFound()
+
+  const competitors = await getCompetitorSummaryForBrand(brandId)
+
+  return (
+    <div className="max-w-5xl space-y-4">
+      <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
+
+      {competitors.length === 0 ? (
+        <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground">
+          No competitors detected yet.
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block bg-card border border-edge rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-edge text-left text-xs text-muted-foreground uppercase tracking-wider">
+                  <th className="px-4 py-3 font-medium">Rank</th>
+                  <th className="px-4 py-3 font-medium">Domain</th>
+                  <th className="px-4 py-3 font-medium">Detections</th>
+                  <th className="px-4 py-3 font-medium">Keywords</th>
+                  <th className="px-4 py-3 font-medium">Last Seen</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {competitors.map((competitor, index) => {
+                  const rank = index + 1
+                  const borderColor = rankBorderColors[rank]
+                  return (
+                    <tr
+                      key={competitor.domain}
+                      className="border-b border-edge last:border-b-0 hover:bg-card/80 transition-colors"
+                      style={borderColor ? { borderLeftWidth: '3px', borderLeftColor: borderColor } : undefined}
+                    >
+                      <td className="px-4 py-3 text-sm text-muted-foreground">#{rank}</td>
+                      <td className="px-4 py-3 font-mono text-sm">{competitor.domain}</td>
+                      <td className="px-4 py-3 font-mono font-bold text-sm">{competitor.detectionCount}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {competitor.keywords.slice(0, 3).map((kw) => (
+                            <span
+                              key={kw}
+                              className="bg-tech-purple/10 text-tech-purple text-xs font-mono px-2 py-0.5 rounded"
+                            >
+                              {kw}
+                            </span>
+                          ))}
+                          {competitor.keywords.length > 3 && (
+                            <span className="text-muted-foreground text-xs">
+                              +{competitor.keywords.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                        {formatRelativeTime(competitor.lastSeen)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center gap-1.5 text-xs">
+                          <span
+                            className="inline-block w-2 h-2 rounded-full"
+                            style={{
+                              backgroundColor: competitor.isActive
+                                ? 'oklch(72% 0.15 145)'
+                                : 'oklch(55% 0.02 250)',
+                            }}
+                          />
+                          {competitor.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {competitors.map((competitor, index) => (
+              <div
+                key={competitor.domain}
+                className="bg-card border border-edge rounded-lg p-4 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-sm">{competitor.domain}</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs">
+                    <span
+                      className="inline-block w-2 h-2 rounded-full"
+                      style={{
+                        backgroundColor: competitor.isActive
+                          ? 'oklch(72% 0.15 145)'
+                          : 'oklch(55% 0.02 250)',
+                      }}
+                    />
+                    {competitor.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>
+                    <span className="font-mono font-bold text-foreground">{competitor.detectionCount}</span> detections
+                  </span>
+                  <span className="font-mono text-xs">{formatRelativeTime(competitor.lastSeen)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

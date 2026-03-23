@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, isNotNull, ne } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, isNotNull, ne, sql, max } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -202,6 +202,61 @@ export async function getUnresolvedAdsForBrand(brandId: string): Promise<Competi
 export async function getCompetitorAdById(id: string): Promise<CompetitorAd | null> {
   const rows = await db.select().from(competitorAds).where(eq(competitorAds.id, id)).limit(1)
   return rows[0] ?? null
+}
+
+export async function getSerpCheckWithAds(checkId: string): Promise<{
+  check: SerpCheck
+  ads: CompetitorAd[]
+} | null> {
+  const rows = await db.select().from(serpChecks).where(eq(serpChecks.id, checkId)).limit(1)
+  const check = rows[0]
+  if (!check) return null
+  const ads = await db.select().from(competitorAds).where(eq(competitorAds.serpCheckId, checkId))
+  return { check, ads }
+}
+
+export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
+  domain: string
+  detectionCount: number
+  keywords: string[]
+  lastSeen: Date
+  isActive: boolean
+}[]> {
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  const rows = await db
+    .select({
+      domain: competitorAds.domain,
+      detectionCount: count(competitorAds.id),
+      lastSeen: max(competitorAds.firstSeenAt),
+    })
+    .from(competitorAds)
+    .where(eq(competitorAds.brandId, brandId))
+    .groupBy(competitorAds.domain)
+    .orderBy(desc(count(competitorAds.id)))
+
+  // For each domain, get the distinct keywords from the associated serp_checks
+  const results = await Promise.all(
+    rows.map(async (row) => {
+      const keywordRows = await db
+        .selectDistinct({ keyword: serpChecks.keyword })
+        .from(competitorAds)
+        .innerJoin(serpChecks, eq(competitorAds.serpCheckId, serpChecks.id))
+        .where(and(eq(competitorAds.brandId, brandId), eq(competitorAds.domain, row.domain)))
+
+      const lastSeen = row.lastSeen ? new Date(row.lastSeen) : new Date(0)
+      return {
+        domain: row.domain,
+        detectionCount: row.detectionCount,
+        keywords: keywordRows.map((k) => k.keyword),
+        lastSeen,
+        isActive: lastSeen >= sevenDaysAgo,
+      }
+    })
+  )
+
+  return results
 }
 
 export async function createBrand(data: {
