@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, isNotNull } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, isNotNull, ne, sql, max } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -176,6 +176,120 @@ export async function getTopKeywordsForDomain(_brandId: string, _domain: string)
 
 export async function getMonthlyReports(_brandId: string): Promise<{ id: string; month: string; summary: string }[]> {
   return []
+}
+
+const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
+type AdStatus = typeof VALID_STATUSES[number]
+
+export async function updateCompetitorAdStatus(id: string, status: string): Promise<CompetitorAd> {
+  if (!VALID_STATUSES.includes(status as AdStatus)) {
+    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
+  }
+  const rows = await db.update(competitorAds)
+    .set({ status: status as AdStatus })
+    .where(eq(competitorAds.id, id))
+    .returning()
+  if (!rows[0]) throw new Error('Competitor ad not found')
+  return rows[0]
+}
+
+export async function updateAllAdsStatusForCheck(checkId: string, status: string): Promise<void> {
+  if (!VALID_STATUSES.includes(status as AdStatus)) {
+    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
+  }
+  await db.update(competitorAds)
+    .set({ status: status as AdStatus })
+    .where(eq(competitorAds.serpCheckId, checkId))
+}
+
+export async function getUnresolvedAdsForBrand(brandId: string): Promise<CompetitorAd[]> {
+  return db.select().from(competitorAds)
+    .where(and(eq(competitorAds.brandId, brandId), ne(competitorAds.status, 'resolved')))
+    .orderBy(desc(competitorAds.firstSeenAt))
+}
+
+export async function getCompetitorAdById(id: string): Promise<CompetitorAd | null> {
+  const rows = await db.select().from(competitorAds).where(eq(competitorAds.id, id)).limit(1)
+  return rows[0] ?? null
+}
+
+export async function getSerpCheckWithAds(checkId: string): Promise<{
+  check: SerpCheck
+  ads: CompetitorAd[]
+  brandClientToken: string
+} | null> {
+  const rows = await db.select().from(serpChecks).where(eq(serpChecks.id, checkId)).limit(1)
+  const check = rows[0]
+  if (!check) return null
+  const brand = await db.select({ clientToken: brands.clientToken }).from(brands).where(eq(brands.id, check.brandId)).limit(1)
+  if (!brand[0]) return null
+  const ads = await db.select().from(competitorAds).where(eq(competitorAds.serpCheckId, checkId))
+  return { check, ads, brandClientToken: brand[0].clientToken }
+}
+
+export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
+  domain: string
+  detectionCount: number
+  keywords: string[]
+  lastSeen: Date
+  isActive: boolean
+}[]> {
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  const rows = await db
+    .select({
+      domain: competitorAds.domain,
+      detectionCount: count(competitorAds.id),
+      lastSeen: max(competitorAds.firstSeenAt),
+    })
+    .from(competitorAds)
+    .where(eq(competitorAds.brandId, brandId))
+    .groupBy(competitorAds.domain)
+    .orderBy(desc(count(competitorAds.id)))
+
+  // For each domain, get the distinct keywords from the associated serp_checks
+  const results = await Promise.all(
+    rows.map(async (row) => {
+      const keywordRows = await db
+        .selectDistinct({ keyword: serpChecks.keyword })
+        .from(competitorAds)
+        .innerJoin(serpChecks, eq(competitorAds.serpCheckId, serpChecks.id))
+        .where(and(eq(competitorAds.brandId, brandId), eq(competitorAds.domain, row.domain)))
+
+      const lastSeen = row.lastSeen ? new Date(row.lastSeen) : new Date(0)
+      return {
+        domain: row.domain,
+        detectionCount: row.detectionCount,
+        keywords: keywordRows.map((k) => k.keyword),
+        lastSeen,
+        isActive: lastSeen >= sevenDaysAgo,
+      }
+    })
+  )
+
+  return results
+}
+
+export async function deleteBrand(id: string): Promise<void> {
+  // Delete related data first
+  const checkRows = await db.select({ id: serpChecks.id }).from(serpChecks).where(eq(serpChecks.brandId, id))
+  const checkIds = checkRows.map(r => r.id)
+  if (checkIds.length > 0) {
+    await db.delete(competitorAds).where(inArray(competitorAds.serpCheckId, checkIds))
+  }
+  await db.delete(competitorAds).where(eq(competitorAds.brandId, id))
+  await db.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
+  await db.delete(serpChecks).where(eq(serpChecks.brandId, id))
+  await db.delete(brands).where(eq(brands.id, id))
+}
+
+export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck | null> {
+  const rows = await db.select().from(serpChecks)
+    .where(eq(serpChecks.brandId, brandId))
+    .orderBy(desc(serpChecks.checkedAt))
+    .limit(1)
+  return rows[0] ?? null
 }
 
 export async function createBrand(data: {

@@ -1,0 +1,222 @@
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { auth } from '../../../../auth'
+import { isAdminEmail } from '@/lib/auth'
+import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
+import type { SerpCheck } from '@/lib/db/schema'
+import { Badge } from '@/components/ui/badge'
+import { ThemeToggle } from '@/components/theme-toggle'
+
+export default async function AdminBrandsPage() {
+  const session = await auth()
+  if (!session) redirect('/login')
+  if (!isAdminEmail(session.user?.email)) redirect('/unauthorized')
+
+  const brands = await getAllActiveBrands()
+
+  // Fetch last check for each brand
+  const lastCheckResults = await Promise.allSettled(
+    brands.map(async (b) => {
+      const check = await getLastCheckForBrand(b.id)
+      return { brandId: b.id, check }
+    })
+  )
+  const checkMap = new Map<string, SerpCheck | null>(
+    lastCheckResults
+      .filter((r): r is PromiseFulfilledResult<{ brandId: string; check: SerpCheck | null }> => r.status === 'fulfilled')
+      .map(({ value: { brandId, check } }) => [brandId, check])
+  )
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b border-border bg-card px-6 py-4">
+        <div className="container mx-auto max-w-6xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
+            <Badge className="font-mono text-xs tracking-widest">ADMIN</Badge>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+            <a
+              href="/api/auth/signout"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sign out
+            </a>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto p-6 max-w-6xl space-y-6">
+        {/* Stats */}
+        <div className="bg-card border border-edge rounded-lg p-4 inline-block">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Brands</p>
+          <p className="text-3xl font-black text-gradient-tech">{brands.length}</p>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono">
+            All Brands
+          </h2>
+          <Link
+            href="/dashboard/new"
+            className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+          >
+            + Add Brand
+          </Link>
+        </div>
+
+        {brands.length === 0 ? (
+          <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground">
+            No brands yet.
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-card border border-edge rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-edge text-left text-xs text-muted-foreground uppercase tracking-wider">
+                    <th className="px-4 py-3 font-medium">Name</th>
+                    <th className="px-4 py-3 font-medium">Domain</th>
+                    <th className="px-4 py-3 font-medium">Keywords</th>
+                    <th className="px-4 py-3 font-medium">Plan</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {brands.map((b) => {
+                    const lastCheck = checkMap.get(b.id)
+                    const hasThreat = lastCheck != null && (lastCheck.competitorCount ?? 0) > 0
+                    return (
+                      <tr
+                        key={b.id}
+                        className="border-b border-edge last:border-b-0 hover:bg-card/80 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="font-semibold text-sm">{b.name}</div>
+                          <div className="text-xs text-muted-foreground">{b.userId ?? 'Admin-created'}</div>
+                        </td>
+                        <td className="px-4 py-3 font-mono text-sm text-muted-foreground">
+                          {b.domain || '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {b.keywords.slice(0, 3).map((kw) => (
+                              <span
+                                key={kw}
+                                className="bg-tech-purple/10 text-tech-purple text-xs font-mono px-2 py-0.5 rounded"
+                              >
+                                {kw}
+                              </span>
+                            ))}
+                            {b.keywords.length > 3 && (
+                              <span className="text-muted-foreground text-xs">
+                                +{b.keywords.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-mono text-xs uppercase tracking-wider">
+                            {b.plan ?? 'free'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1.5 text-xs">
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{
+                                backgroundColor: hasThreat
+                                  ? 'oklch(65% 0.25 25)'
+                                  : 'oklch(72% 0.15 145)',
+                              }}
+                            />
+                            {hasThreat ? 'Threats' : 'Clear'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/dashboard/${b.id}`}
+                              className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              Dashboard
+                            </Link>
+                            <Link
+                              href={`/client/${b.clientToken}`}
+                              className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              Client
+                            </Link>
+                            <Link
+                              href={`/dashboard/${b.id}/settings`}
+                              className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              Settings
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-3">
+              {brands.map((b) => {
+                const lastCheck = checkMap.get(b.id)
+                const hasThreat = lastCheck != null && (lastCheck.competitorCount ?? 0) > 0
+                return (
+                  <div key={b.id} className="bg-card border border-edge rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-sm">{b.name}</h3>
+                        <p className="font-mono text-xs text-muted-foreground">{b.domain || '—'}</p>
+                      </div>
+                      <span className="inline-flex items-center gap-1.5 text-xs">
+                        <span
+                          className="inline-block w-2 h-2 rounded-full"
+                          style={{
+                            backgroundColor: hasThreat
+                              ? 'oklch(65% 0.25 25)'
+                              : 'oklch(72% 0.15 145)',
+                          }}
+                        />
+                        {hasThreat ? 'Threats' : 'Clear'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/dashboard/${b.id}`}
+                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-edge"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href={`/dashboard/${b.id}/settings`}
+                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-edge"
+                      >
+                        Settings
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

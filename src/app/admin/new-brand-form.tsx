@@ -94,7 +94,7 @@ export function NewBrandForm() {
             <Input id="slack" name="slack" placeholder="https://hooks.slack.com/…" />
           </div>
 
-          <Button type="submit" disabled={isPending} className="neon-glow w-full">
+          <Button type="submit" disabled={isPending} className="neon-glow-cta w-full">
             {isPending ? 'Creating…' : 'Create Brand'}
           </Button>
 

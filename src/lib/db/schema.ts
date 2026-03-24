@@ -44,10 +44,12 @@ export const competitorAds = pgTable('competitor_ads', {
   displayUrl: text('display_url'),
   destinationUrl: text('destination_url'),
   position: integer('position'),
+  status: text('status', { enum: ['new', 'acknowledged', 'reported', 'resolved'] }).notNull().default('new'),
   firstSeenAt: timestamp('first_seen_at').notNull().defaultNow(),
 }, (table) => [
   index('competitor_ads_brand_first_seen_at_idx').on(table.brandId, table.firstSeenAt),
   index('competitor_ads_domain_idx').on(table.domain),
+  index('competitor_ads_brand_status_idx').on(table.brandId, table.status),
 ])
 
 export const auctionInsights = pgTable('auction_insights', {
