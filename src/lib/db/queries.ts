@@ -259,6 +259,27 @@ export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
   return results
 }
 
+export async function deleteBrand(id: string): Promise<void> {
+  // Delete related data first
+  const checkRows = await db.select({ id: serpChecks.id }).from(serpChecks).where(eq(serpChecks.brandId, id))
+  const checkIds = checkRows.map(r => r.id)
+  if (checkIds.length > 0) {
+    await db.delete(competitorAds).where(inArray(competitorAds.serpCheckId, checkIds))
+  }
+  await db.delete(competitorAds).where(eq(competitorAds.brandId, id))
+  await db.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
+  await db.delete(serpChecks).where(eq(serpChecks.brandId, id))
+  await db.delete(brands).where(eq(brands.id, id))
+}
+
+export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck | null> {
+  const rows = await db.select().from(serpChecks)
+    .where(eq(serpChecks.brandId, brandId))
+    .orderBy(desc(serpChecks.checkedAt))
+    .limit(1)
+  return rows[0] ?? null
+}
+
 export async function createBrand(data: {
   name: string; slug: string; keywords: string[]
   domain?: string

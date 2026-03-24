@@ -10,23 +10,25 @@ import { NewUserBrandForm } from './new-user-brand-form'
 export default async function NewBrandPage() {
   const session = await auth()
   if (!session) redirect('/login')
-  if (isAdminEmail(session.user?.email)) redirect('/admin')
 
   const userEmail = session.user?.email ?? ''
-  const brandCount = await getUserBrandCount(userEmail)
-  const atLimit = brandCount >= PLAN_LIMITS.free.brands
+  const isAdmin = isAdminEmail(userEmail)
+
+  // Admin users can create brands without limit
+  const brandCount = isAdmin ? 0 : await getUserBrandCount(userEmail)
+  const atLimit = !isAdmin && brandCount >= PLAN_LIMITS.free.brands
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card px-6 py-4">
-        <div className="container mx-auto max-w-4xl flex items-center justify-between">
+        <div className="container mx-auto max-w-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              ← Back
+              &larr; Back
             </Link>
             <span className="text-border">|</span>
             <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
@@ -35,17 +37,16 @@ export default async function NewBrandPage() {
         </div>
       </div>
 
-      <div className="container mx-auto p-6 max-w-4xl space-y-6">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-black tracking-tight text-gradient-tech">Add a brand</h2>
+      <div className="container mx-auto p-6 max-w-lg space-y-6">
+        <div className="space-y-1 text-center">
+          <h2 className="text-2xl font-black tracking-tight text-gradient-tech">Create New Brand</h2>
           <p className="text-sm text-muted-foreground">
             Set up a brand to start monitoring competitor ads on your keywords.
           </p>
         </div>
 
         {atLimit ? (
-          /* Upgrade prompt */
-          <Card className="metric-stripe-orange max-w-lg tech-card-hover">
+          <Card className="metric-stripe-orange tech-card-hover">
             <CardContent className="p-6 space-y-4">
               <div className="space-y-1">
                 <p className="font-semibold">Free plan limit reached</p>
@@ -71,7 +72,9 @@ export default async function NewBrandPage() {
             </CardContent>
           </Card>
         ) : (
-          <NewUserBrandForm keywordLimit={PLAN_LIMITS.free.keywords} />
+          <div className="max-w-lg mx-auto">
+            <NewUserBrandForm keywordLimit={PLAN_LIMITS.free.keywords} />
+          </div>
         )}
       </div>
     </div>

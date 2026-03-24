@@ -17,6 +17,7 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
     ...(hasGoogleAds
       ? [{ label: 'Insights', href: `/dashboard/${brandId}/insights`, exact: false }]
       : []),
+    { label: 'Settings', href: `/dashboard/${brandId}/settings`, exact: false },
   ]
 
   return (
