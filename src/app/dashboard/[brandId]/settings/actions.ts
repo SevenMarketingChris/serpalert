@@ -66,6 +66,10 @@ export async function updateAdminSettings(
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const active = formData.get('active') === 'on'
 
+  if (slackWebhookUrl && !slackWebhookUrl.startsWith('https://hooks.slack.com/')) {
+    return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
+  }
+
   try {
     await updateBrand(brandId, {
       monthlyBrandSpend,

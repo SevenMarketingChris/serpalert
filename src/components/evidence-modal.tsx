@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/
 
 interface EvidenceModalProps {
   checkId: string
+  brandToken: string
   keyword: string
   checkedAt: Date
   screenshotUrl: string | null
@@ -30,11 +31,11 @@ function formatDateTime(date: Date): string {
   })
 }
 
-export function EvidenceModal({ checkId, keyword, checkedAt, screenshotUrl, ads }: EvidenceModalProps) {
+export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screenshotUrl, ads }: EvidenceModalProps) {
   const [copied, setCopied] = useState(false)
 
   function handleCopyLink() {
-    const url = `${window.location.origin}/evidence/${checkId}`
+    const url = `${window.location.origin}/evidence/${checkId}?token=${brandToken}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -42,7 +43,7 @@ export function EvidenceModal({ checkId, keyword, checkedAt, screenshotUrl, ads 
   }
 
   function handleOpenNewTab() {
-    window.open(`/evidence/${checkId}`, '_blank')
+    window.open(`/evidence/${checkId}?token=${brandToken}`, '_blank')
   }
 
   return (
@@ -76,7 +77,7 @@ export function EvidenceModal({ checkId, keyword, checkedAt, screenshotUrl, ads 
         {/* Ads */}
         <div className="space-y-3">
           {ads.map((ad, i) => (
-            <div key={i} className="border border-edge rounded-lg p-3 space-y-1">
+            <div key={ad.domain + '-' + (ad.position ?? i)} className="border border-edge rounded-lg p-3 space-y-1">
               <div className="flex items-center gap-2">
                 <span className="font-mono font-semibold text-sm">{ad.domain}</span>
                 {ad.position != null && (

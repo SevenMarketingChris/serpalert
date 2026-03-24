@@ -59,7 +59,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         isAdmin={isAdmin}
       />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
-      <ActivityFeed checks={checksWithAds} brandId={brandId} />
+      <ActivityFeed checks={checksWithAds} brandId={brandId} brandToken={brand.clientToken} />
     </div>
   )
 }

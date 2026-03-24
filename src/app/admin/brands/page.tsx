@@ -15,14 +15,16 @@ export default async function AdminBrandsPage() {
   const brands = await getAllActiveBrands()
 
   // Fetch last check for each brand
-  const lastChecks = await Promise.all(
+  const lastCheckResults = await Promise.allSettled(
     brands.map(async (b) => {
       const check = await getLastCheckForBrand(b.id)
       return { brandId: b.id, check }
     })
   )
   const checkMap = new Map<string, SerpCheck | null>(
-    lastChecks.map(({ brandId, check }) => [brandId, check])
+    lastCheckResults
+      .filter((r): r is PromiseFulfilledResult<{ brandId: string; check: SerpCheck | null }> => r.status === 'fulfilled')
+      .map(({ value: { brandId, check } }) => [brandId, check])
   )
 
   return (
@@ -93,7 +95,7 @@ export default async function AdminBrandsPage() {
                 <tbody>
                   {brands.map((b) => {
                     const lastCheck = checkMap.get(b.id)
-                    const hasThreat = lastCheck && lastCheck.competitorCount > 0
+                    const hasThreat = lastCheck != null && (lastCheck.competitorCount ?? 0) > 0
                     return (
                       <tr
                         key={b.id}
@@ -174,7 +176,7 @@ export default async function AdminBrandsPage() {
             <div className="md:hidden space-y-3">
               {brands.map((b) => {
                 const lastCheck = checkMap.get(b.id)
-                const hasThreat = lastCheck && lastCheck.competitorCount > 0
+                const hasThreat = lastCheck != null && (lastCheck.competitorCount ?? 0) > 0
                 return (
                   <div key={b.id} className="bg-card border border-edge rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">

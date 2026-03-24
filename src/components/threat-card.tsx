@@ -8,6 +8,7 @@ import { EvidenceModal } from '@/components/evidence-modal'
 interface ThreatCardProps {
   checkId: string
   brandId: string
+  brandToken: string
   ads: {
     id: string
     domain: string
@@ -56,7 +57,7 @@ function formatTime(date: Date): string {
   return `${diffDays}d ago`
 }
 
-export function ThreatCard({ checkId, brandId, ads, keyword, checkedAt, screenshotUrl, competitorCount }: ThreatCardProps) {
+export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checkedAt, screenshotUrl, competitorCount }: ThreatCardProps) {
   const router = useRouter()
   const [patching, setPatching] = useState(false)
 
@@ -73,7 +74,7 @@ export function ThreatCard({ checkId, brandId, ads, keyword, checkedAt, screensh
     if (!transition) return
     setPatching(true)
     try {
-      const res = await fetch(`/api/brands/${brandId}/ads/${firstAd.id}/status`, {
+      const res = await fetch(`/api/brands/${brandId}/checks/${checkId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: transition.next }),
@@ -81,8 +82,9 @@ export function ThreatCard({ checkId, brandId, ads, keyword, checkedAt, screensh
       if (res.ok) {
         router.refresh()
       }
-    } catch {
-      // silently fail
+    } catch (error) {
+      console.error('Status update failed:', error)
+      alert('Failed to update status. Please try again.')
     } finally {
       setPatching(false)
     }
@@ -115,6 +117,7 @@ export function ThreatCard({ checkId, brandId, ads, keyword, checkedAt, screensh
         <ScreenshotModal screenshotUrl={screenshotUrl} keyword={keyword} />
         <EvidenceModal
           checkId={checkId}
+          brandToken={brandToken}
           keyword={keyword}
           checkedAt={checkedAt}
           screenshotUrl={screenshotUrl}

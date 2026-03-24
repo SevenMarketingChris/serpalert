@@ -193,6 +193,15 @@ export async function updateCompetitorAdStatus(id: string, status: string): Prom
   return rows[0]
 }
 
+export async function updateAllAdsStatusForCheck(checkId: string, status: string): Promise<void> {
+  if (!VALID_STATUSES.includes(status as AdStatus)) {
+    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
+  }
+  await db.update(competitorAds)
+    .set({ status: status as AdStatus })
+    .where(eq(competitorAds.serpCheckId, checkId))
+}
+
 export async function getUnresolvedAdsForBrand(brandId: string): Promise<CompetitorAd[]> {
   return db.select().from(competitorAds)
     .where(and(eq(competitorAds.brandId, brandId), ne(competitorAds.status, 'resolved')))
@@ -207,12 +216,15 @@ export async function getCompetitorAdById(id: string): Promise<CompetitorAd | nu
 export async function getSerpCheckWithAds(checkId: string): Promise<{
   check: SerpCheck
   ads: CompetitorAd[]
+  brandClientToken: string
 } | null> {
   const rows = await db.select().from(serpChecks).where(eq(serpChecks.id, checkId)).limit(1)
   const check = rows[0]
   if (!check) return null
+  const brand = await db.select({ clientToken: brands.clientToken }).from(brands).where(eq(brands.id, check.brandId)).limit(1)
+  if (!brand[0]) return null
   const ads = await db.select().from(competitorAds).where(eq(competitorAds.serpCheckId, checkId))
-  return { check, ads }
+  return { check, ads, brandClientToken: brand[0].clientToken }
 }
 
 export async function getCompetitorSummaryForBrand(brandId: string): Promise<{

@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
-import { getSerpCheckWithAds } from '@/lib/db/queries'
+import { auth } from '../../../../auth'
+import { isAdminEmail } from '@/lib/auth'
+import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
 import { CopyLinkButton } from '@/components/copy-link-button'
 
 function formatDateTime(date: Date): string {
@@ -14,13 +16,36 @@ function formatDateTime(date: Date): string {
   })
 }
 
-export default async function EvidencePage({ params }: { params: Promise<{ checkId: string }> }) {
+export default async function EvidencePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ checkId: string }>
+  searchParams: Promise<{ token?: string }>
+}) {
   const { checkId } = await params
+  const { token } = await searchParams
 
   const result = await getSerpCheckWithAds(checkId)
   if (!result) notFound()
 
-  const { check, ads } = result
+  const { check, ads, brandClientToken } = result
+
+  // Validate access: require matching token OR authenticated brand owner/admin
+  let hasAccess = false
+  if (token && token === brandClientToken) {
+    hasAccess = true
+  } else {
+    const session = await auth()
+    if (session?.user?.email) {
+      const brand = await getBrandById(check.brandId)
+      if (brand && (brand.userId === session.user.email || isAdminEmail(session.user.email))) {
+        hasAccess = true
+      }
+    }
+  }
+
+  if (!hasAccess) notFound()
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-4 py-8">

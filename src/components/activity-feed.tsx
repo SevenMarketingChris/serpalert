@@ -22,6 +22,7 @@ interface ActivityFeedProps {
     }[]
   }[]
   brandId: string
+  brandToken: string
 }
 
 function formatTime(date: Date): string {
@@ -37,7 +38,7 @@ function formatTime(date: Date): string {
   return `${diffDays}d ago`
 }
 
-export function ActivityFeed({ checks, brandId }: ActivityFeedProps) {
+export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps) {
   const [filter, setFilter] = useState('unresolved')
   const [displayCount, setDisplayCount] = useState(20)
 
@@ -49,13 +50,13 @@ export function ActivityFeed({ checks, brandId }: ActivityFeedProps) {
         return true
       case 'new':
         if (isClear) return true
-        return check.ads.some((a) => a.status === 'new')
+        return check.ads?.some((a) => a.status === 'new') ?? false
       case 'unresolved':
         if (isClear) return true
-        return check.ads.some((a) => ['new', 'acknowledged', 'reported'].includes(a.status))
+        return check.ads?.some((a) => ['new', 'acknowledged', 'reported'].includes(a.status)) ?? false
       case 'resolved':
         if (isClear) return false
-        return check.ads.length > 0 && check.ads.every((a) => a.status === 'resolved')
+        return (check.ads?.length ?? 0) > 0 && (check.ads?.every((a) => a.status === 'resolved') ?? false)
       default:
         return true
     }
@@ -117,6 +118,7 @@ export function ActivityFeed({ checks, brandId }: ActivityFeedProps) {
             key={check.id}
             checkId={check.id}
             brandId={brandId}
+            brandToken={brandToken}
             ads={check.ads}
             keyword={check.keyword}
             checkedAt={check.checkedAt}
