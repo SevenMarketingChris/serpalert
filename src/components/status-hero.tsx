@@ -5,6 +5,7 @@ interface StatusHeroProps {
   threatsToday: number
   lastCheckAt: Date | null
   isAdmin?: boolean
+  showCheckButton?: boolean
 }
 
 function getRelativeTime(date: Date | null): string {
@@ -20,7 +21,7 @@ function getRelativeTime(date: Date | null): string {
   return `Last check ${diffDays}d ago`
 }
 
-export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin }: StatusHeroProps) {
+export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin, showCheckButton = true }: StatusHeroProps) {
   const isProtected = threatsToday === 0
   const relativeTime = getRelativeTime(lastCheckAt)
 
@@ -50,7 +51,7 @@ export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin }: Stat
             </p>
           </div>
         </div>
-        <ManualCheckButton brandId={brandId} />
+        {showCheckButton && <ManualCheckButton brandId={brandId} />}
       </div>
     )
   }
@@ -80,7 +81,7 @@ export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin }: Stat
           </p>
         </div>
       </div>
-      <ManualCheckButton brandId={brandId} />
+      {showCheckButton && <ManualCheckButton brandId={brandId} />}
     </div>
   )
 }
