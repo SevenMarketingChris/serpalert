@@ -3,13 +3,21 @@ import puppeteer from 'puppeteer-core'
 /**
  * Resolve the Chromium executable path.
  *
- * On Coolify/Docker: use system-installed chromium/google-chrome
- * (the Dockerfile installs chromium via apt).
- *
- * Fallback: use @sparticuz/chromium-min for serverless environments.
+ * Uses @sparticuz/chromium-min for serverless environments (Vercel/Lambda).
+ * Falls back to system-installed chromium for local dev / Docker.
  */
 async function getExecPath(): Promise<string> {
-  // Check for system-installed browsers (Docker / Coolify)
+  // Serverless: use @sparticuz/chromium-min (primary path on Vercel)
+  try {
+    const chromium = (await import('@sparticuz/chromium-min')).default
+    return chromium.executablePath(
+      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+    )
+  } catch {
+    // Not available (e.g. local dev without the package)
+  }
+
+  // Fallback: system-installed browser (local dev / Docker)
   const { execSync } = await import('child_process')
   for (const bin of ['chromium-browser', 'chromium', 'google-chrome-stable', 'google-chrome']) {
     try {
@@ -20,11 +28,7 @@ async function getExecPath(): Promise<string> {
     }
   }
 
-  // Fallback: serverless chromium (Vercel/Lambda)
-  const chromium = (await import('@sparticuz/chromium-min')).default
-  return chromium.executablePath(
-    'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
-  )
+  throw new Error('No Chromium binary found')
 }
 
 export async function screenshotSerp(keyword: string): Promise<Buffer> {
