@@ -19,7 +19,7 @@ export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateBrandDetails, null)
 
   return (
-    <div className="bg-card border border-edge rounded-lg p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
         Brand Details
       </h3>

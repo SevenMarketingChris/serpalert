@@ -22,7 +22,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
           className={`px-3 py-1 rounded-full text-xs font-mono cursor-pointer transition-colors ${
             value === f.key
               ? 'bg-primary/10 text-primary border-primary/30 font-semibold border'
-              : 'bg-card border border-edge text-muted-foreground hover:bg-card/80'
+              : 'bg-card border border-border text-muted-foreground hover:bg-card/80'
           }`}
         >
           {f.label}

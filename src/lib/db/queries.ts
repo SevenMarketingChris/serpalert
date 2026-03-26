@@ -79,7 +79,7 @@ export async function insertAuctionInsights(insights: {
 }
 
 export async function getBrandsForUser(userId: string): Promise<Brand[]> {
-  return db.select().from(brands).where(eq(brands.userId, userId))
+  return db.select().from(brands).where(and(eq(brands.userId, userId), eq(brands.active, true)))
 }
 
 export async function createBrandForUser(

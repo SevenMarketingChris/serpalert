@@ -119,7 +119,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
 
       {/* ── 1. Navigation Bar ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur border-b border-edge">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur border-b border-border">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="text-gradient-tech font-extrabold text-lg tracking-tight">
             SerpAlert
@@ -152,7 +152,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 3. Social Proof Strip ── */}
-      <section className="py-6 border-y border-edge text-center">
+      <section className="py-6 border-y border-border text-center">
         <p className="text-sm text-muted-foreground font-mono">
           Monitoring brand keywords across multiple brands
         </p>
@@ -168,7 +168,7 @@ export default function HomePage() {
             {PROBLEM_CARDS.map((card) => (
               <div
                 key={card.num}
-                className="bg-card border border-edge rounded-lg p-6 tech-card-hover relative"
+                className="bg-card border border-border rounded-lg p-6 tech-card-hover relative"
               >
                 <span className="text-4xl font-extrabold text-primary/10 block mb-4">
                   {card.num}
@@ -218,7 +218,7 @@ export default function HomePage() {
             {FEATURES.map((feature) => (
               <div
                 key={feature.title}
-                className="bg-card border border-edge rounded-lg p-5 tech-card-hover"
+                className="bg-card border border-border rounded-lg p-5 tech-card-hover"
               >
                 <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
                   <feature.icon className="h-4 w-4" />
@@ -243,7 +243,7 @@ export default function HomePage() {
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`bg-card border border-edge rounded-lg overflow-hidden flex flex-col ${
+                className={`bg-card border border-border rounded-lg overflow-hidden flex flex-col ${
                   plan.popular ? 'ring-2 ring-primary/30 relative' : ''
                 }`}
               >
@@ -279,7 +279,7 @@ export default function HomePage() {
                     className={`mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition-colors ${
                       plan.popular
                         ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                        : 'border border-edge bg-background hover:bg-muted'
+                        : 'border border-border bg-background hover:bg-muted'
                     }`}
                   >
                     Get Started
@@ -297,7 +297,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-center mb-12">
             Calculate your savings
           </h2>
-          <div className="bg-card border border-edge rounded-xl p-8">
+          <div className="bg-card border border-border rounded-xl p-8">
             <RoiCalculator />
           </div>
         </div>

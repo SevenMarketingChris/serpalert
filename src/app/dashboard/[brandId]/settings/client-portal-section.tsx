@@ -31,7 +31,7 @@ export function ClientPortalSection({ clientToken }: Props) {
   }
 
   return (
-    <div className="bg-card border border-edge rounded-lg p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
         Client Portal
       </h3>
@@ -39,7 +39,7 @@ export function ClientPortalSection({ clientToken }: Props) {
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Client Token</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-card border border-edge rounded-lg px-3 py-2 font-mono text-sm truncate">
+            <div className="flex-1 bg-card border border-border rounded-lg px-3 py-2 font-mono text-sm truncate">
               {clientToken}
             </div>
             <Button type="button" variant="outline" size="sm" onClick={copyToken}>
@@ -51,7 +51,7 @@ export function ClientPortalSection({ clientToken }: Props) {
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Client Portal Link</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-card border border-edge rounded-lg px-3 py-2 font-mono text-sm truncate">
+            <div className="flex-1 bg-card border border-border rounded-lg px-3 py-2 font-mono text-sm truncate">
               {portalLink}
             </div>
             <Button type="button" variant="outline" size="sm" onClick={copyLink}>

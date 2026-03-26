@@ -16,7 +16,7 @@ export function ClientMetricCards({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {/* Keywords Monitored */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-purple">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-purple">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Keywords
         </p>
@@ -24,7 +24,7 @@ export function ClientMetricCards({
       </div>
 
       {/* Total Checks */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-blue">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-blue">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Total Checks
         </p>
@@ -33,7 +33,7 @@ export function ClientMetricCards({
 
       {/* Today */}
       <div
-        className={`bg-card border border-edge rounded-lg p-3.5 ${isClear ? 'metric-stripe-green' : ''}`}
+        className={`bg-card border border-border rounded-lg p-3.5 ${isClear ? 'metric-stripe-green' : ''}`}
         style={!isClear ? { borderTop: '3px solid oklch(52% 0.22 15)' } : undefined}
       >
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
@@ -48,7 +48,7 @@ export function ClientMetricCards({
       </div>
 
       {/* All-Time Competitors */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-orange">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-orange">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Competitors
         </p>

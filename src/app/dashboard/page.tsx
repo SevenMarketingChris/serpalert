@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                 return (
                   <div
                     key={b.id}
-                    className="bg-card border border-edge rounded-lg p-5 tech-card-hover"
+                    className="bg-card border border-border rounded-lg p-5 tech-card-hover"
                   >
                     <div className="space-y-3">
                       <div>
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
 
                       <Link
                         href={`/dashboard/${b.id}`}
-                        className="inline-flex h-8 items-center justify-center rounded-lg border border-edge px-4 text-xs font-medium hover:bg-muted transition-colors w-full"
+                        className="inline-flex h-8 items-center justify-center rounded-lg border border-border px-4 text-xs font-medium hover:bg-muted transition-colors w-full"
                       >
                         Open Dashboard
                       </Link>

@@ -20,14 +20,14 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
       <DashboardTabs brandId={brandId} hasGoogleAds={hasGoogleAds} />
 
       {hasGoogleAds ? (
-        <div className="bg-card border border-edge rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
             Auction Insights — Last 30 Days
           </h2>
           <AuctionChartSection brandId={brandId} />
         </div>
       ) : (
-        <div className="bg-card border border-edge rounded-lg p-6 text-center space-y-2">
+        <div className="bg-card border border-border rounded-lg p-6 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
             Connect Google Ads to see auction insights. Add your Customer ID in Settings.
           </p>
@@ -42,10 +42,10 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
 
       {/* Future sections */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-card border border-edge rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <p className="text-muted-foreground text-sm">SEO Metrics — Coming soon</p>
         </div>
-        <div className="bg-card border border-edge rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <p className="text-muted-foreground text-sm">Monthly Reports — Coming soon</p>
         </div>
       </div>

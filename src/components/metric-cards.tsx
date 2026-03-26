@@ -36,7 +36,7 @@ export function MetricCards({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       {/* Checks Today */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-blue">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-blue">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Checks Today
         </p>
@@ -45,7 +45,7 @@ export function MetricCards({
 
       {/* Threats Today */}
       <div
-        className={`bg-card border border-edge rounded-lg p-3.5 ${threatIsZero ? 'metric-stripe-green' : ''}`}
+        className={`bg-card border border-border rounded-lg p-3.5 ${threatIsZero ? 'metric-stripe-green' : ''}`}
         style={!threatIsZero ? { borderTop: '3px solid oklch(52% 0.22 15)' } : undefined}
       >
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
@@ -60,7 +60,7 @@ export function MetricCards({
       </div>
 
       {/* Keywords */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-purple">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-purple">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Keywords
         </p>
@@ -68,7 +68,7 @@ export function MetricCards({
       </div>
 
       {/* 7d Trend */}
-      <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-orange">
+      <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-orange">
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           7d Trend
         </p>
@@ -77,7 +77,7 @@ export function MetricCards({
 
       {/* Admin: Monthly Spend */}
       {isAdmin && monthlySpend && (
-        <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-blue">
+        <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-blue">
           <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
             Monthly Spend
           </p>
@@ -89,7 +89,7 @@ export function MetricCards({
 
       {/* Admin: Brand ROAS */}
       {isAdmin && brandRoas && (
-        <div className="bg-card border border-edge rounded-lg p-3.5 metric-stripe-cyan">
+        <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-cyan">
           <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
             Brand ROAS
           </p>

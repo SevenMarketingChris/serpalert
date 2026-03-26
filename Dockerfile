@@ -11,6 +11,13 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Provide dummy env vars so Next.js build doesn't crash when
+# server modules (postgres, validateEnv) are evaluated at build time.
+# Real values are injected at runtime by Coolify.
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
+    AUTH_SECRET="build-time-placeholder-value-min-32-chars!" \
+    AUTH_GOOGLE_ID="build-placeholder" \
+    AUTH_GOOGLE_SECRET="build-placeholder"
 RUN npm run build
 
 # --- Production ---

@@ -36,16 +36,16 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
 
       {competitors.length === 0 ? (
-        <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground">
+        <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
           No competitors detected yet.
         </div>
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="hidden md:block bg-card border border-edge rounded-lg overflow-hidden">
+          <div className="hidden md:block bg-card border border-border rounded-lg overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-edge text-left text-xs text-muted-foreground uppercase tracking-wider">
+                <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase tracking-wider">
                   <th className="px-4 py-3 font-medium">Rank</th>
                   <th className="px-4 py-3 font-medium">Domain</th>
                   <th className="px-4 py-3 font-medium">Detections</th>
@@ -61,7 +61,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                   return (
                     <tr
                       key={competitor.domain}
-                      className="border-b border-edge last:border-b-0 hover:bg-card/80 transition-colors"
+                      className="border-b border-border last:border-b-0 hover:bg-card/80 transition-colors"
                       style={borderColor ? { borderLeftWidth: '3px', borderLeftColor: borderColor } : undefined}
                     >
                       <td className="px-4 py-3 text-sm text-muted-foreground">#{rank}</td>
@@ -112,7 +112,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
             {competitors.map((competitor, index) => (
               <div
                 key={competitor.domain}
-                className="bg-card border border-edge rounded-lg p-4 space-y-2"
+                className="bg-card border border-border rounded-lg p-4 space-y-2"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono font-bold text-sm">{competitor.domain}</span>

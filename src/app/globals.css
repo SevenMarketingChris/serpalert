@@ -45,6 +45,10 @@
   --sidebar-accent-foreground: oklch(13% 0.015 250);
   --sidebar-border: oklch(88% 0.006 250);
   --sidebar-ring: oklch(44% 0.22 250);
+  --status-new: oklch(52% 0.22 15);
+  --status-acknowledged: oklch(44% 0.22 250);
+  --status-reported: oklch(55% 0.15 55);
+  --status-resolved: oklch(50% 0.15 195);
 }
 
 .dark {

@@ -56,7 +56,7 @@ export default async function AdminBrandsPage() {
 
       <div className="container mx-auto p-6 max-w-6xl space-y-6">
         {/* Stats */}
-        <div className="bg-card border border-edge rounded-lg p-4 inline-block">
+        <div className="bg-card border border-border rounded-lg p-4 inline-block">
           <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Brands</p>
           <p className="text-3xl font-black text-gradient-tech">{brands.length}</p>
         </div>
@@ -74,16 +74,16 @@ export default async function AdminBrandsPage() {
         </div>
 
         {brands.length === 0 ? (
-          <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground">
+          <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
             No brands yet.
           </div>
         ) : (
           <>
             {/* Desktop Table */}
-            <div className="hidden md:block bg-card border border-edge rounded-lg overflow-hidden">
+            <div className="hidden md:block bg-card border border-border rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-edge text-left text-xs text-muted-foreground uppercase tracking-wider">
+                  <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase tracking-wider">
                     <th className="px-4 py-3 font-medium">Name</th>
                     <th className="px-4 py-3 font-medium">Domain</th>
                     <th className="px-4 py-3 font-medium">Keywords</th>
@@ -99,7 +99,7 @@ export default async function AdminBrandsPage() {
                     return (
                       <tr
                         key={b.id}
-                        className="border-b border-edge last:border-b-0 hover:bg-card/80 transition-colors"
+                        className="border-b border-border last:border-b-0 hover:bg-card/80 transition-colors"
                       >
                         <td className="px-4 py-3">
                           <div className="font-semibold text-sm">{b.name}</div>
@@ -178,7 +178,7 @@ export default async function AdminBrandsPage() {
                 const lastCheck = checkMap.get(b.id)
                 const hasThreat = lastCheck != null && (lastCheck.competitorCount ?? 0) > 0
                 return (
-                  <div key={b.id} className="bg-card border border-edge rounded-lg p-4 space-y-3">
+                  <div key={b.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold text-sm">{b.name}</h3>
@@ -199,13 +199,13 @@ export default async function AdminBrandsPage() {
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/dashboard/${b.id}`}
-                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-edge"
+                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-border"
                       >
                         Dashboard
                       </Link>
                       <Link
                         href={`/dashboard/${b.id}/settings`}
-                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-edge"
+                        className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-colors border border-border"
                       >
                         Settings
                       </Link>

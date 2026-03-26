@@ -56,7 +56,7 @@ export default async function EvidencePage({
         </div>
 
         {/* Evidence Card */}
-        <div className="bg-card border border-edge rounded-lg p-5 space-y-4">
+        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
           <h1 className="font-semibold text-lg">Evidence Report</h1>
 
           {/* Screenshot */}
@@ -76,7 +76,7 @@ export default async function EvidencePage({
           {/* Ads */}
           <div className="space-y-3">
             {ads.map((ad) => (
-              <div key={ad.id} className="border border-edge rounded-lg p-3 space-y-1">
+              <div key={ad.id} className="border border-border rounded-lg p-3 space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-semibold text-sm">{ad.domain}</span>
                   {ad.position != null && (
@@ -99,7 +99,7 @@ export default async function EvidencePage({
           </div>
 
           {/* Metadata */}
-          <div className="border-t border-edge pt-3 space-y-1 text-sm text-muted-foreground">
+          <div className="border-t border-border pt-3 space-y-1 text-sm text-muted-foreground">
             <p><span className="font-semibold text-foreground">Keyword:</span> {check.keyword}</p>
             <p><span className="font-semibold text-foreground">Date/Time:</span> {formatDateTime(check.checkedAt)}</p>
             <p><span className="font-semibold text-foreground">Location:</span> United Kingdom</p>
