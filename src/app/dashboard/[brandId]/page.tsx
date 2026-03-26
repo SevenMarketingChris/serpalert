@@ -39,11 +39,23 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     last7Days.push(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length)
   }
 
-  const lastCheckAt = checks[0]?.checkedAt ?? null
+  const lastCheckAt = checks[0]?.checkedAt ? new Date(checks[0].checkedAt).toISOString() : null
 
   const checksWithAds = checks.map(c => ({
-    ...c,
-    ads: allAds.filter(a => a.serpCheckId === c.id),
+    id: c.id,
+    keyword: c.keyword,
+    checkedAt: new Date(c.checkedAt).toISOString(),
+    competitorCount: c.competitorCount,
+    screenshotUrl: c.screenshotUrl ?? null,
+    ads: allAds.filter(a => a.serpCheckId === c.id).map(a => ({
+      id: a.id,
+      domain: a.domain,
+      headline: a.headline,
+      description: a.description,
+      displayUrl: a.displayUrl,
+      position: a.position,
+      status: a.status,
+    })),
   }))
 
   return (

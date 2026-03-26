@@ -19,7 +19,7 @@ interface ThreatCardProps {
     status: string
   }[]
   keyword: string
-  checkedAt: Date
+  checkedAt: string
   screenshotUrl: string | null
   competitorCount: number
 }
@@ -44,7 +44,7 @@ const nextStatusMap: Record<string, { label: string; next: string }> = {
   reported: { label: 'Resolve', next: 'resolved' },
 }
 
-function formatTime(date: Date): string {
+function formatTime(date: string): string {
   const d = new Date(date)
   const now = new Date()
   const diffMs = now.getTime() - d.getTime()
@@ -92,7 +92,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
 
   return (
     <div
-      className={`bg-card border border-edge rounded-lg p-3.5 ${isResolved ? 'opacity-70' : ''}`}
+      className={`bg-card border border-border rounded-lg p-3.5 ${isResolved ? 'opacity-70' : ''}`}
       style={{ borderLeftWidth: '3px', borderLeftColor: borderColor }}
     >
       {/* Row 1: Status + domain + keyword + timestamp */}

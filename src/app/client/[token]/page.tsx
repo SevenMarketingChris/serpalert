@@ -120,7 +120,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         <StatusHero
           brandId={brand.id}
           threatsToday={competitorsToday}
-          lastCheckAt={lastCheck?.checkedAt ?? null}
+          lastCheckAt={lastCheck?.checkedAt ? new Date(lastCheck.checkedAt).toISOString() : null}
           showCheckButton={false}
         />
 
@@ -133,7 +133,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         />
 
         {/* 4. 7-Day Activity Chart */}
-        <section className="bg-card border border-edge rounded-lg p-6">
+        <section className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-muted-foreground mb-4">
             7-Day Activity
           </h2>
@@ -177,7 +177,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 
         {/* 5. Competitor Domains Table */}
         {competitorStats.length > 0 && (
-          <section className="bg-card border border-edge rounded-lg overflow-hidden">
+          <section className="bg-card border border-border rounded-lg overflow-hidden">
             <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-muted-foreground px-6 pt-6 mb-4">
               Competitor Domains
             </h2>
@@ -251,7 +251,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         )}
 
         {/* 6. Recent Detections */}
-        <section className="bg-card border border-edge rounded-lg overflow-hidden">
+        <section className="bg-card border border-border rounded-lg overflow-hidden">
           <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-muted-foreground px-6 pt-6 mb-4">
             Recent Detections
           </h2>

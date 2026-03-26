@@ -3,12 +3,12 @@ import { ManualCheckButton } from '@/components/manual-check-button'
 interface StatusHeroProps {
   brandId: string
   threatsToday: number
-  lastCheckAt: Date | null
+  lastCheckAt: string | null
   isAdmin?: boolean
   showCheckButton?: boolean
 }
 
-function getRelativeTime(date: Date | null): string {
+function getRelativeTime(date: string | null): string {
   if (!date) return 'No checks yet'
   const now = new Date()
   const diffMs = now.getTime() - new Date(date).getTime()

@@ -8,7 +8,7 @@ interface ActivityFeedProps {
   checks: {
     id: string
     keyword: string
-    checkedAt: Date
+    checkedAt: string
     competitorCount: number
     screenshotUrl: string | null
     ads: {
@@ -25,7 +25,7 @@ interface ActivityFeedProps {
   brandToken: string
 }
 
-function formatTime(date: Date): string {
+function formatTime(date: string): string {
   const d = new Date(date)
   const now = new Date()
   const diffMs = now.getTime() - d.getTime()
@@ -67,7 +67,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
 
   if (checks.length === 0) {
     return (
-      <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground text-sm">
+      <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground text-sm">
         No SERP checks yet — data will appear after the first scheduled check.
       </div>
     )
@@ -81,7 +81,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
       </div>
 
       {visible.length === 0 && (
-        <div className="bg-card border border-edge rounded-lg p-8 text-center text-muted-foreground text-sm">
+        <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground text-sm">
           No checks match the current filter.
         </div>
       )}
@@ -91,7 +91,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
           return (
             <div
               key={check.id}
-              className="bg-card border border-edge rounded-lg p-3.5"
+              className="bg-card border border-border rounded-lg p-3.5"
               style={{ borderLeftWidth: '3px', borderLeftColor: 'oklch(52% 0.20 145)' }}
             >
               <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
       {hasMore && (
         <button
           onClick={() => setDisplayCount((c) => c + 20)}
-          className="w-full bg-card border border-edge rounded-lg py-2.5 text-xs font-mono text-muted-foreground hover:bg-card/80 transition-colors cursor-pointer"
+          className="w-full bg-card border border-border rounded-lg py-2.5 text-xs font-mono text-muted-foreground hover:bg-card/80 transition-colors cursor-pointer"
         >
           Load more ({filtered.length - displayCount} remaining)
         </button>

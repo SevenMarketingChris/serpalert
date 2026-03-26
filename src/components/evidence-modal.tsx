@@ -7,7 +7,7 @@ interface EvidenceModalProps {
   checkId: string
   brandToken: string
   keyword: string
-  checkedAt: Date
+  checkedAt: string
   screenshotUrl: string | null
   ads: {
     domain: string
@@ -19,7 +19,7 @@ interface EvidenceModalProps {
   }[]
 }
 
-function formatDateTime(date: Date): string {
+function formatDateTime(date: string): string {
   const d = new Date(date)
   return d.toLocaleString('en-GB', {
     day: '2-digit',
@@ -77,7 +77,7 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
         {/* Ads */}
         <div className="space-y-3">
           {ads.map((ad, i) => (
-            <div key={ad.domain + '-' + (ad.position ?? i)} className="border border-edge rounded-lg p-3 space-y-1">
+            <div key={ad.domain + '-' + (ad.position ?? i)} className="border border-border rounded-lg p-3 space-y-1">
               <div className="flex items-center gap-2">
                 <span className="font-mono font-semibold text-sm">{ad.domain}</span>
                 {ad.position != null && (
@@ -100,7 +100,7 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
         </div>
 
         {/* Metadata */}
-        <div className="border-t border-edge pt-3 space-y-1 text-sm text-muted-foreground">
+        <div className="border-t border-border pt-3 space-y-1 text-sm text-muted-foreground">
           <p><span className="font-semibold text-foreground">Keyword:</span> {keyword}</p>
           <p><span className="font-semibold text-foreground">Date/Time:</span> {formatDateTime(checkedAt)}</p>
           <p><span className="font-semibold text-foreground">Location:</span> United Kingdom</p>
