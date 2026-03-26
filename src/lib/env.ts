@@ -57,6 +57,7 @@ export function getServerEnv() {
     cronSecret: requireEnv("CRON_SECRET"),
     adminEmails: requireEnvList("ADMIN_EMAILS"),
     chromiumUrl: optionalEnv("CHROMIUM_URL"),
+    ahrefsApiToken: optionalEnv("AHREFS_API_TOKEN"),
     authSecret: requireEnv("AUTH_SECRET"),
     authGoogleId: requireEnv("AUTH_GOOGLE_ID"),
     authGoogleSecret: requireEnv("AUTH_GOOGLE_SECRET"),

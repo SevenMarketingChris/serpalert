@@ -178,6 +178,21 @@ export async function getMonthlyReports(_brandId: string): Promise<{ id: string;
   return []
 }
 
+export async function upsertAhrefsDomainMetrics(_data: {
+  brandId: string; domain: string; isBrandDomain: boolean; date: string
+  domainRating: string | null; organicTraffic: number | null
+  organicKeywords: number | null; referringDomains: number | null; backlinks: number | null
+}): Promise<void> {
+  // Stub — tables not yet created
+}
+
+export async function replaceTopKeywords(
+  _brandId: string, _domain: string, _date: string,
+  _keywords: { keyword: string; position: number | null; volume: number | null; traffic: number | null }[],
+): Promise<void> {
+  // Stub — tables not yet created
+}
+
 const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
 type AdStatus = typeof VALID_STATUSES[number]
 
