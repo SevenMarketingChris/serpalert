@@ -5,7 +5,7 @@ import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 export async function POST(request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
