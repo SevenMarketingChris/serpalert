@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { auth } from '../../../../../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { getBrandById, getSerpCheckWithAds, updateAllAdsStatusForCheck } from '@/lib/db/queries'
 
 const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
@@ -10,22 +8,11 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ brandId: string; checkId: string }> },
 ) {
-  const session = await auth()
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { brandId, checkId } = await params
 
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
-  }
-
-  // Must be admin or brand owner
-  const isAdmin = isAdminEmail(session.user.email)
-  if (!isAdmin && brand.userId !== session.user.email) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   let body: unknown

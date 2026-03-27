@@ -1,7 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getBrandById, PLAN_LIMITS } from '@/lib/db/queries'
-import { auth } from '../../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
@@ -10,13 +8,11 @@ import { DangerZone } from './danger-zone'
 
 export default async function SettingsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
-  const session = await auth()
-  if (!session) redirect('/login')
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
 
-  const isAdmin = isAdminEmail(session.user?.email ?? '')
+  const isAdmin = true
   const plan = brand.plan ?? 'free'
   const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
 

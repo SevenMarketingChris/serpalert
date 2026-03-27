@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SERP Alert",
   description: "Monitor competitor ad activity on Google Search",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

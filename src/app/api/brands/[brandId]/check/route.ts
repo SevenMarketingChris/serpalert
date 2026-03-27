@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { auth } from '../../../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, hasScreenshotToday } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
@@ -10,21 +8,10 @@ import { sendNewCompetitorAlert } from '@/lib/slack'
 export const maxDuration = 120
 
 export async function POST(request: Request, { params }: { params: Promise<{ brandId: string }> }) {
-  const session = await auth()
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { brandId } = await params
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
-  }
-
-  // Must be admin or brand owner
-  const isAdmin = isAdminEmail(session.user.email)
-  if (!isAdmin && brand.userId !== session.user.email) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)

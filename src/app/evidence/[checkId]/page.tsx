@@ -1,7 +1,5 @@
 import { notFound } from 'next/navigation'
-import { auth } from '../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
-import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
+import { getSerpCheckWithAds } from '@/lib/db/queries'
 import { CopyLinkButton } from '@/components/copy-link-button'
 
 function formatDateTime(date: Date): string {
@@ -29,21 +27,10 @@ export default async function EvidencePage({
   const result = await getSerpCheckWithAds(checkId)
   if (!result) notFound()
 
-  const { check, ads, brandClientToken } = result
+  const { check, ads } = result
 
-  // Validate access: require matching token OR authenticated brand owner/admin
-  let hasAccess = false
-  if (token && token === brandClientToken) {
-    hasAccess = true
-  } else {
-    const session = await auth()
-    if (session?.user?.email) {
-      const brand = await getBrandById(check.brandId)
-      if (brand && (brand.userId === session.user.email || isAdminEmail(session.user.email))) {
-        hasAccess = true
-      }
-    }
-  }
+  // Open access — no auth required
+  const hasAccess = true
 
   if (!hasAccess) notFound()
 

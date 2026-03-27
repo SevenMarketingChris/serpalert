@@ -1,7 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
-import { auth } from '../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { StatusHero } from '@/components/status-hero'
 import { MetricCards } from '@/components/metric-cards'
 import { DashboardTabs } from '@/components/dashboard-tabs'
@@ -9,13 +7,11 @@ import { ActivityFeed } from '@/components/activity-feed'
 
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
-  const session = await auth()
-  if (!session) redirect('/login')
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
 
-  const isAdmin = isAdminEmail(session.user?.email ?? '')
+  const isAdmin = true
 
   const checks = await getRecentSerpChecks(brandId, 100)
   const todayStr = new Date().toDateString()

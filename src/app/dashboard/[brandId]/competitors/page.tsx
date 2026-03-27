@@ -1,6 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
-import { auth } from '../../../../../auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 
 function formatRelativeTime(date: Date): string {
@@ -23,9 +22,6 @@ const rankBorderColors: Record<number, string> = {
 
 export default async function CompetitorsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
-  const session = await auth()
-  if (!session) redirect('/login')
-
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
 

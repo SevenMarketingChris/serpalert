@@ -1,8 +1,5 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '../../../auth'
-import { isAdminEmail } from '@/lib/auth'
-import { getAllActiveBrands, getBrandsForUser, getLastCheckForBrand } from '@/lib/db/queries'
+import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
 import type { Brand, SerpCheck } from '@/lib/db/schema'
 import { ThemeToggle } from '@/components/theme-toggle'
 
@@ -14,15 +11,7 @@ const planColors: Record<string, string> = {
 }
 
 export default async function DashboardPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
-
-  const userEmail = session.user?.email ?? ''
-  const isAdmin = isAdminEmail(userEmail)
-
-  const brands: Brand[] = isAdmin
-    ? await getAllActiveBrands()
-    : await getBrandsForUser(userEmail)
+  const brands: Brand[] = await getAllActiveBrands()
 
   // Fetch last check for each brand
   const lastChecks = await Promise.all(
@@ -44,13 +33,6 @@ export default async function DashboardPage() {
             <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground hidden sm:inline">{userEmail}</span>
-            <a
-              href="/api/auth/signout"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign out
-            </a>
             <ThemeToggle />
           </div>
         </div>
@@ -78,7 +60,7 @@ export default async function DashboardPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono">
-                {isAdmin ? 'All Brands' : 'Your Brands'}
+                All Brands
               </h2>
               <Link
                 href="/dashboard/new"
@@ -106,11 +88,9 @@ export default async function DashboardPage() {
                         <p className="font-mono text-sm text-muted-foreground">
                           {b.domain || 'No domain set'}
                         </p>
-                        {isAdmin && (
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {b.userId ?? 'Admin-created'}
-                          </p>
-                        )}
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {b.userId ?? 'Admin-created'}
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-2">

@@ -125,10 +125,10 @@ export default function HomePage() {
             SerpAlert
           </Link>
           <Link
-            href="/login"
+            href="/dashboard"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Sign In
+            Dashboard
           </Link>
         </div>
       </nav>
@@ -143,7 +143,7 @@ export default function HomePage() {
             SerpAlert monitors Google Ads for competitors bidding on your brand keywords and alerts you in minutes.
           </p>
           <Link
-            href="/login"
+            href="/dashboard"
             className="neon-glow-cta bg-primary text-white px-8 py-3 rounded-lg font-semibold mt-8 inline-block"
           >
             Start Monitoring Free
@@ -275,7 +275,7 @@ export default function HomePage() {
                   </ul>
 
                   <Link
-                    href="/login"
+                    href="/dashboard"
                     className={`mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition-colors ${
                       plan.popular
                         ? 'bg-primary text-primary-foreground hover:bg-primary/90'
@@ -313,7 +313,7 @@ export default function HomePage() {
             Start monitoring for free. No credit card required.
           </p>
           <Link
-            href="/login"
+            href="/dashboard"
             className="neon-glow-cta bg-primary text-white px-8 py-3 rounded-lg font-semibold mt-8 inline-block"
           >
             Start Monitoring Free

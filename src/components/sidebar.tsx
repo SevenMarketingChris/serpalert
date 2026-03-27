@@ -10,7 +10,6 @@ import {
   Settings,
   Menu,
   X,
-  LogOut,
   Globe,
 } from 'lucide-react'
 import { BrandSwitcher } from './brand-switcher'
@@ -23,7 +22,6 @@ interface SidebarProps {
   keywordCount: number
   keywordLimit: number
   isAdmin: boolean
-  userEmail: string
 }
 
 const NAV_ITEMS = [
@@ -41,7 +39,6 @@ export function Sidebar({
   keywordCount,
   keywordLimit,
   isAdmin,
-  userEmail,
 }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -120,20 +117,11 @@ export function Sidebar({
         </p>
       </div>
 
-      {/* User section */}
+      {/* Footer */}
       <div className="border-t border-[oklch(22%_0.03_250)] px-4 py-3">
-        <p className="truncate text-xs text-muted-foreground lg:block md:hidden mb-2">
-          {userEmail}
+        <p className="truncate text-xs text-muted-foreground lg:block md:hidden">
+          SerpAlert
         </p>
-        <form action="/api/auth/signout" method="GET">
-          <button
-            type="submit"
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut className="h-3.5 w-3.5 shrink-0" />
-            <span className="lg:inline md:hidden">Sign out</span>
-          </button>
-        </form>
       </div>
     </>
   )

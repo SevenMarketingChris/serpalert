@@ -1,16 +1,10 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
 import type { SerpCheck } from '@/lib/db/schema'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export default async function AdminBrandsPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
-  if (!isAdminEmail(session.user?.email)) redirect('/unauthorized')
 
   const brands = await getAllActiveBrands()
 
@@ -43,12 +37,6 @@ export default async function AdminBrandsPage() {
             >
               Dashboard
             </Link>
-            <a
-              href="/api/auth/signout"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign out
-            </a>
             <ThemeToggle />
           </div>
         </div>

@@ -1,14 +1,11 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getBrandById, getAuctionInsightsLast30Days } from '@/lib/db/queries'
-import { auth } from '../../../../../auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { AuctionChart } from '@/components/auction-chart'
 
 export default async function InsightsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
-  const session = await auth()
-  if (!session) redirect('/login')
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()

@@ -1,23 +1,9 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
-import { getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
-import { Card, CardContent } from '@/components/ui/card'
+import { PLAN_LIMITS } from '@/lib/db/queries'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NewUserBrandForm } from './new-user-brand-form'
 
 export default async function NewBrandPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
-
-  const userEmail = session.user?.email ?? ''
-  const isAdmin = isAdminEmail(userEmail)
-
-  // Admin users can create brands without limit
-  const brandCount = isAdmin ? 0 : await getUserBrandCount(userEmail)
-  const atLimit = !isAdmin && brandCount >= PLAN_LIMITS.free.brands
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -45,37 +31,9 @@ export default async function NewBrandPage() {
           </p>
         </div>
 
-        {atLimit ? (
-          <Card className="metric-stripe-orange tech-card-hover">
-            <CardContent className="p-6 space-y-4">
-              <div className="space-y-1">
-                <p className="font-semibold">Free plan limit reached</p>
-                <p className="text-sm text-muted-foreground">
-                  You&apos;re using {brandCount} of {PLAN_LIMITS.free.brands} brand on the free plan.
-                  Upgrade to monitor more brands.
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="mailto:hello@serpalert.co.uk?subject=Upgrade%20request"
-                  className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-                >
-                  Contact us to upgrade
-                </a>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex h-9 items-center justify-center rounded-lg border border-border px-5 text-sm font-medium hover:bg-muted transition-colors"
-                >
-                  Back to dashboard
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="max-w-lg mx-auto">
-            <NewUserBrandForm keywordLimit={PLAN_LIMITS.free.keywords} />
-          </div>
-        )}
+        <div className="max-w-lg mx-auto">
+          <NewUserBrandForm keywordLimit={PLAN_LIMITS.free.keywords} />
+        </div>
       </div>
     </div>
   )

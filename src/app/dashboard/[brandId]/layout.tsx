@@ -1,10 +1,7 @@
-import { redirect, notFound } from 'next/navigation'
-import { auth } from '../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 import {
   getBrandById,
   getAllActiveBrands,
-  getBrandsForUser,
   PLAN_LIMITS,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
@@ -17,18 +14,11 @@ export default async function BrandDashboardLayout({
   params: Promise<{ brandId: string }>
 }) {
   const { brandId } = await params
-  const session = await auth()
-  if (!session) redirect('/login')
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
 
-  const isAdmin = isAdminEmail(session.user?.email ?? '')
-  if (!isAdmin && brand.userId !== session.user?.email) redirect('/unauthorized')
-
-  const userBrands = isAdmin
-    ? await getAllActiveBrands()
-    : await getBrandsForUser(session.user?.email ?? '')
+  const userBrands = await getAllActiveBrands()
 
   const plan = brand.plan ?? 'free'
   const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
@@ -42,8 +32,7 @@ export default async function BrandDashboardLayout({
         plan={plan}
         keywordCount={brand.keywords.length}
         keywordLimit={limits.keywords}
-        isAdmin={isAdmin}
-        userEmail={session.user?.email ?? ''}
+        isAdmin={true}
       />
       <main className="flex-1 min-w-0 p-6">{children}</main>
     </div>

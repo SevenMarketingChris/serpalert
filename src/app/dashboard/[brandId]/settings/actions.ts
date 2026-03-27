@@ -2,8 +2,6 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { auth } from '../../../../../auth'
-import { isAdminEmail } from '@/lib/auth'
 import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/queries'
 
 export type SettingsState = {
@@ -15,17 +13,11 @@ export async function updateBrandDetails(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const session = await auth()
-  if (!session) return { error: 'Unauthorized' }
-
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
-
-  const isAdmin = isAdminEmail(session.user?.email ?? '')
-  if (!isAdmin && brand.userId !== session.user?.email) return { error: 'Unauthorized' }
 
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
@@ -53,10 +45,6 @@ export async function updateAdminSettings(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const session = await auth()
-  if (!session) return { error: 'Unauthorized' }
-  if (!isAdminEmail(session.user?.email ?? '')) return { error: 'Admin access required' }
-
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
 
@@ -86,14 +74,8 @@ export async function updateAdminSettings(
 }
 
 export async function deleteBrandAction(brandId: string): Promise<void> {
-  const session = await auth()
-  if (!session) return
-
   const brand = await getBrandById(brandId)
   if (!brand) return
-
-  const isAdmin = isAdminEmail(session.user?.email ?? '')
-  if (!isAdmin && brand.userId !== session.user?.email) return
 
   await deleteBrand(brandId)
   redirect('/dashboard')
