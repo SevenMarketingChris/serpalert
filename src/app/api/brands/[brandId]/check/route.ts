@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
       })
 
       let screenshotUrl: string | undefined
-      if (ads.length > 0 && !(await hasScreenshotToday(brand.id, keyword))) {
+      if (!(await hasScreenshotToday(brand.id, keyword))) {
         try {
           const buffer = await screenshotSerp(keyword)
           screenshotUrl = await uploadScreenshot(
