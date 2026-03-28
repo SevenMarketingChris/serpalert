@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, isNotNull, ne, sql, max } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, ne, sql, max } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -339,7 +339,7 @@ export async function getThreatCountLast7Days(brandId: string): Promise<number> 
 }
 
 export async function getUnresolvedThreatCount(brandId: string): Promise<number> {
-  const rows = await db.select({ count: count() })
+  const rows = await db.select({ count: countDistinct(competitorAds.serpCheckId) })
     .from(competitorAds)
     .where(and(
       eq(competitorAds.brandId, brandId),

@@ -89,7 +89,7 @@ export function Sidebar({
       </div>
 
       {lastCheckAt && (
-        <p className="px-4 pb-2 text-[10px] text-muted-foreground font-mono lg:block md:hidden">
+        <p className="px-4 pb-2 text-[10px] text-muted-foreground font-mono">
           Last scan {getRelativeTime(lastCheckAt)}
         </p>
       )}
@@ -125,7 +125,7 @@ export function Sidebar({
               <item.icon className="h-4 w-4 shrink-0" />
               <span className="lg:inline md:hidden">{item.label}</span>
               {item.path === '/competitors' && (unresolvedCount ?? 0) > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                <span className="ml-auto lg:inline md:hidden bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                   {unresolvedCount}
                 </span>
               )}

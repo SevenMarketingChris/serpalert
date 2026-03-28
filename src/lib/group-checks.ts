@@ -27,19 +27,24 @@ export interface ScanRun {
 export function groupChecksIntoRuns(checks: CheckItem[]): ScanRun[] {
   if (checks.length === 0) return []
 
-  const runs: ScanRun[] = []
-  let currentRun: CheckItem[] = [checks[0]]
+  // Sort descending by checkedAt to ensure correct grouping regardless of DB order
+  const sorted = [...checks].sort(
+    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime()
+  )
 
-  for (let i = 1; i < checks.length; i++) {
-    const prev = new Date(checks[i - 1].checkedAt).getTime()
-    const curr = new Date(checks[i].checkedAt).getTime()
+  const runs: ScanRun[] = []
+  let currentRun: CheckItem[] = [sorted[0]]
+
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1].checkedAt).getTime()
+    const curr = new Date(sorted[i].checkedAt).getTime()
     const diffMs = Math.abs(prev - curr)
 
     if (diffMs <= 5 * 60 * 1000) {
-      currentRun.push(checks[i])
+      currentRun.push(sorted[i])
     } else {
       runs.push(buildRun(currentRun))
-      currentRun = [checks[i]]
+      currentRun = [sorted[i]]
     }
   }
 

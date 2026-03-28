@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { StatusFilter } from '@/components/status-filter'
@@ -146,14 +146,14 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
   const [filter, setFilter] = useState('unresolved')
   const [displayCount, setDisplayCount] = useState(10)
 
-  const runs = groupChecksIntoRuns(checks)
+  const runs = useMemo(() => groupChecksIntoRuns(checks), [checks])
 
   const filtered = runs.filter(run => {
     switch (filter) {
       case 'all':
         return true
       case 'new':
-        return run.totalThreats === 0 || run.checks.some(c => c.ads.some(a => a.status === 'new'))
+        return run.totalThreats > 0 && run.checks.some(c => c.ads.some(a => a.status === 'new'))
       case 'unresolved':
         return run.totalThreats === 0 || run.hasUnresolved
       case 'resolved':
@@ -189,7 +189,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
 
       {visible.map((run, i) => (
         <ScanRunCard
-          key={run.timestamp + i}
+          key={run.checks[0].id}
           run={run}
           brandId={brandId}
           brandToken={brandToken}
