@@ -325,3 +325,25 @@ export async function createBrand(data: {
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
 }
+
+export async function getThreatCountLast7Days(brandId: string): Promise<number> {
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - 7)
+  const rows = await db.select({ count: count() })
+    .from(competitorAds)
+    .where(and(
+      eq(competitorAds.brandId, brandId),
+      gte(competitorAds.firstSeenAt, cutoff),
+    ))
+  return rows[0]?.count ?? 0
+}
+
+export async function getUnresolvedThreatCount(brandId: string): Promise<number> {
+  const rows = await db.select({ count: count() })
+    .from(competitorAds)
+    .where(and(
+      eq(competitorAds.brandId, brandId),
+      inArray(competitorAds.status, ['new', 'acknowledged', 'reported']),
+    ))
+  return rows[0]?.count ?? 0
+}

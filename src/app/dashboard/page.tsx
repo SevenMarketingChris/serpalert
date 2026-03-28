@@ -3,6 +3,18 @@ import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
 import type { Brand, SerpCheck } from '@/lib/db/schema'
 import { ThemeToggle } from '@/components/theme-toggle'
 
+function formatRelativeTime(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  const diffDays = Math.floor(diffHours / 24)
+  return `${diffDays}d ago`
+}
+
 const planColors: Record<string, string> = {
   free: 'bg-muted text-muted-foreground',
   starter: 'bg-blue-500/10 text-blue-500',
@@ -70,6 +82,17 @@ export default async function DashboardPage() {
               </Link>
             </div>
 
+            {/* Summary bar */}
+            <div className="bg-card border border-border rounded-lg px-4 py-3 flex items-center gap-4 text-sm">
+              <span className="text-muted-foreground">
+                <span className="font-mono font-bold text-foreground">{brands.length}</span> brand{brands.length !== 1 ? 's' : ''}
+              </span>
+              <span className="text-border">·</span>
+              <span className="text-muted-foreground">
+                <span className="font-mono font-bold text-foreground">{brands.reduce((s, b) => s + b.keywords.length, 0)}</span> keywords
+              </span>
+            </div>
+
             {/* Brand grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {brands.map((b) => {
@@ -78,9 +101,10 @@ export default async function DashboardPage() {
                 const planClass = planColors[b.plan ?? 'free'] ?? planColors.free
 
                 return (
-                  <div
+                  <Link
                     key={b.id}
-                    className="bg-card border border-border rounded-lg p-5 tech-card-hover"
+                    href={`/dashboard/${b.id}`}
+                    className="block bg-card border border-border rounded-lg p-5 tech-card-hover"
                   >
                     <div className="space-y-3">
                       <div>
@@ -104,12 +128,7 @@ export default async function DashboardPage() {
 
                       <div className="flex items-center gap-1.5 text-xs">
                         <span
-                          className="inline-block w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor: hasThreat
-                              ? 'oklch(65% 0.25 25)'
-                              : 'oklch(72% 0.15 145)',
-                          }}
+                          className={`inline-block w-2 h-2 rounded-full ${hasThreat ? 'bg-red-500' : 'bg-emerald-500'}`}
                         />
                         {hasThreat ? (
                           <span className="text-muted-foreground">
@@ -118,16 +137,14 @@ export default async function DashboardPage() {
                         ) : (
                           <span className="text-muted-foreground">Protected</span>
                         )}
+                        {lastCheck && (
+                          <span className="text-muted-foreground font-mono text-xs">
+                            {formatRelativeTime(new Date(lastCheck.checkedAt))}
+                          </span>
+                        )}
                       </div>
-
-                      <Link
-                        href={`/dashboard/${b.id}`}
-                        className="inline-flex h-8 items-center justify-center rounded-lg border border-border px-4 text-xs font-medium hover:bg-muted transition-colors w-full"
-                      >
-                        Open Dashboard
-                      </Link>
                     </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>

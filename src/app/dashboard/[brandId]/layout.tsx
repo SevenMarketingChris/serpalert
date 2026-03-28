@@ -3,6 +3,8 @@ import {
   getBrandById,
   getAllActiveBrands,
   PLAN_LIMITS,
+  getUnresolvedThreatCount,
+  getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
 
@@ -20,6 +22,11 @@ export default async function BrandDashboardLayout({
 
   const userBrands = await getAllActiveBrands()
 
+  const [unresolvedCount, lastCheck] = await Promise.all([
+    getUnresolvedThreatCount(brandId),
+    getLastCheckForBrand(brandId),
+  ])
+
   const plan = brand.plan ?? 'free'
   const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
 
@@ -33,6 +40,8 @@ export default async function BrandDashboardLayout({
         keywordCount={brand.keywords.length}
         keywordLimit={limits.keywords}
         isAdmin={true}
+        unresolvedCount={unresolvedCount}
+        lastCheckAt={lastCheck ? new Date(lastCheck.checkedAt).toISOString() : null}
       />
       <main className="flex-1 min-w-0 p-6">{children}</main>
     </div>

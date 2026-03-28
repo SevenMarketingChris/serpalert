@@ -4,6 +4,18 @@ import type { SerpCheck } from '@/lib/db/schema'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
 
+function formatRelativeTime(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  const diffDays = Math.floor(diffHours / 24)
+  return `${diffDays}d ago`
+}
+
 export default async function AdminBrandsPage() {
 
   const brands = await getAllActiveBrands()
@@ -44,9 +56,15 @@ export default async function AdminBrandsPage() {
 
       <div className="container mx-auto p-6 max-w-6xl space-y-6">
         {/* Stats */}
-        <div className="bg-card border border-border rounded-lg p-4 inline-block">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Brands</p>
-          <p className="text-3xl font-black text-gradient-tech">{brands.length}</p>
+        <div className="flex items-center gap-4">
+          <div className="bg-card border border-border rounded-lg p-4 inline-block">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Brands</p>
+            <p className="text-3xl font-black text-gradient-tech">{brands.length}</p>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4 inline-block">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-mono mb-1">Total Keywords</p>
+            <p className="text-3xl font-black text-gradient-tech">{brands.reduce((s, b) => s + b.keywords.length, 0)}</p>
+          </div>
         </div>
 
         <div className="flex items-center justify-between">
@@ -77,6 +95,7 @@ export default async function AdminBrandsPage() {
                     <th className="px-4 py-3 font-medium">Keywords</th>
                     <th className="px-4 py-3 font-medium">Plan</th>
                     <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium">Last Check</th>
                     <th className="px-4 py-3 font-medium">Actions</th>
                   </tr>
                 </thead>
@@ -130,6 +149,9 @@ export default async function AdminBrandsPage() {
                             />
                             {hasThreat ? 'Threats' : 'Clear'}
                           </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground">
+                          {lastCheck ? formatRelativeTime(new Date(lastCheck.checkedAt)) : 'Never'}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">

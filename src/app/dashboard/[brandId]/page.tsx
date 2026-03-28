@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { StatusHero } from '@/components/status-hero'
-import { MetricCards } from '@/components/metric-cards'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { ActivityFeed } from '@/components/activity-feed'
 
@@ -56,15 +55,14 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
   return (
     <div className="space-y-4 max-w-5xl">
-      <StatusHero brandId={brandId} threatsToday={threatsToday} lastCheckAt={lastCheckAt} isAdmin={isAdmin} />
-      <MetricCards
-        checksToday={checksToday.length}
+      <StatusHero
+        brandId={brandId}
         threatsToday={threatsToday}
+        lastCheckAt={lastCheckAt}
+        isAdmin={isAdmin}
+        checksToday={checksToday.length}
         keywordCount={brand.keywords.length}
         last7DaysThreats={last7Days}
-        monthlySpend={brand.monthlyBrandSpend}
-        brandRoas={brand.brandRoas}
-        isAdmin={isAdmin}
       />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
       <ActivityFeed checks={checksWithAds} brandId={brandId} brandToken={brand.clientToken} />

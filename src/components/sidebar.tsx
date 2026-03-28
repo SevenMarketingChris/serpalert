@@ -15,6 +15,19 @@ import {
 } from 'lucide-react'
 import { BrandSwitcher } from './brand-switcher'
 
+function getRelativeTime(date: string | null): string {
+  if (!date) return ''
+  const now = new Date()
+  const diffMs = now.getTime() - new Date(date).getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin}m ago`
+  const diffHours = Math.floor(diffMin / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  const diffDays = Math.floor(diffHours / 24)
+  return `${diffDays}d ago`
+}
+
 interface SidebarProps {
   brandId: string
   brandName: string
@@ -23,6 +36,8 @@ interface SidebarProps {
   keywordCount: number
   keywordLimit: number
   isAdmin: boolean
+  unresolvedCount?: number
+  lastCheckAt?: string | null
 }
 
 const NAV_ITEMS = [
@@ -41,6 +56,8 @@ export function Sidebar({
   keywordCount,
   keywordLimit,
   isAdmin,
+  unresolvedCount,
+  lastCheckAt,
 }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -70,6 +87,12 @@ export function Sidebar({
           brands={brands}
         />
       </div>
+
+      {lastCheckAt && (
+        <p className="px-4 pb-2 text-[10px] text-muted-foreground font-mono lg:block md:hidden">
+          Last scan {getRelativeTime(lastCheckAt)}
+        </p>
+      )}
 
       {/* Admin link */}
       {isAdmin && (
@@ -101,6 +124,11 @@ export function Sidebar({
             >
               <item.icon className="h-4 w-4 shrink-0" />
               <span className="lg:inline md:hidden">{item.label}</span>
+              {item.path === '/competitors' && (unresolvedCount ?? 0) > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                  {unresolvedCount}
+                </span>
+              )}
             </Link>
           )
         })}
