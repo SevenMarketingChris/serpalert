@@ -32,14 +32,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
 
   for (const keyword of brand.keywords) {
     try {
-      const ads = await checkSerpForBrand(keyword, 'United Kingdom', {
+      const { ads, taskId } = await checkSerpForBrand(keyword, 'United Kingdom', {
         brandDomain: brand.domain ?? undefined,
       })
 
       let screenshotUrl: string | undefined
-      if (!(await hasScreenshotToday(brand.id, keyword))) {
+      if (taskId && !(await hasScreenshotToday(brand.id, keyword))) {
         try {
-          const buffer = await screenshotSerp(keyword)
+          const buffer = await screenshotSerp(taskId)
           screenshotUrl = await uploadScreenshot(
             buffer,
             `${brand.id}/${new Date().toISOString().split('T')[0]}-${encodeURIComponent(keyword)}.png`

@@ -33,16 +33,15 @@ export async function GET(request: Request) {
     async function processJob(job: { brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }) {
       const { brand, keyword, recentDomains } = job
       try {
-        const ads = await checkSerpForBrand(keyword, 'United Kingdom', {
+        const { ads, taskId } = await checkSerpForBrand(keyword, 'United Kingdom', {
           brandDomain: brand.domain ?? undefined,
         })
         let screenshotUrl: string | undefined
 
-        // Always take a screenshot (once per day per keyword) so results can be verified,
-        // regardless of whether competitors were detected
-        if (!(await hasScreenshotToday(brand.id, keyword))) {
+        // Always take a screenshot (once per day per keyword) so results can be verified
+        if (taskId && !(await hasScreenshotToday(brand.id, keyword))) {
           try {
-            const buffer = await screenshotSerp(keyword)
+            const buffer = await screenshotSerp(taskId)
             screenshotUrl = await uploadScreenshot(
               buffer,
               `${brand.id}/${new Date().toISOString().split('T')[0]}-${encodeURIComponent(keyword)}.png`

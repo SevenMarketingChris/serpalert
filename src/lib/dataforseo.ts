@@ -26,12 +26,17 @@ function getCredentials(): string {
   ).toString('base64')
 }
 
+interface FetchSerpResult {
+  items: DataForSeoItem[]
+  taskId: string | null
+}
+
 async function fetchSerp(
   endpoint: string,
   keyword: string,
   location: string,
   depth: number
-): Promise<DataForSeoItem[]> {
+): Promise<FetchSerpResult> {
   const credentials = getCredentials()
 
   const response = await fetch(
@@ -62,35 +67,37 @@ async function fetchSerp(
     throw new Error(`DataForSEO task failed: ${task.status_code} ${task.status_message}`)
   }
 
+  const taskId: string | null = task.id ?? null
+
   const result = task.result?.[0]
   if (!result) {
     console.warn(`DataForSEO [${endpoint}]: no result for "${keyword}" (may have no data)`)
-    return []
+    return { items: [], taskId }
   }
 
   const items: DataForSeoItem[] = result.items ?? []
   const types = [...new Set(items.map((i) => i.type))].join(', ')
   console.log(`DataForSEO [${endpoint}] "${keyword}": ${items.length} items, types: ${types}`)
-  return items
+  return { items, taskId }
+}
+
+export interface SerpCheckResult {
+  ads: SerpAdResult[]
+  taskId: string | null
 }
 
 export async function checkSerpForBrand(
   keyword: string,
   location = 'United Kingdom',
   options: { brandDomain?: string } = {}
-): Promise<SerpAdResult[]> {
-  // Strategy: try the dedicated paid endpoint first (cheaper, purpose-built).
-  // If it returns 0 results, fall back to the organic endpoint which includes
-  // all SERP item types (paid ads appear as type "paid" alongside organic results).
+): Promise<SerpCheckResult> {
   let paidItems: DataForSeoItem[] = []
+  let taskId: string | null = null
 
-  // Use the organic endpoint which returns all SERP item types.
-  // Paid ads appear as type "paid" in the items array.
-  // The dedicated /paid/ endpoint returns 40402 Invalid Path errors.
   try {
-    const items = await fetchSerp('organic', keyword, location, 100)
-    // Paid ads can appear as "paid", "ads", or other ad-related types
-    paidItems = items.filter((i) =>
+    const result = await fetchSerp('organic', keyword, location, 100)
+    taskId = result.taskId
+    paidItems = result.items.filter((i) =>
       i.type === 'paid' || i.type === 'ads' || i.type === 'shopping' ||
       i.type === 'paid_box' || i.type === 'top_stories_paid'
     )
@@ -102,7 +109,7 @@ export async function checkSerpForBrand(
     console.error(`DataForSEO failed for "${keyword}":`, err)
   }
 
-  return paidItems
+  const ads = paidItems
     .filter((i) => !options.brandDomain || i.domain !== options.brandDomain)
     .map((i) => ({
       domain: i.domain ?? (() => { try { return new URL(i.url ?? '').hostname } catch { return 'unknown' } })(),
@@ -112,4 +119,6 @@ export async function checkSerpForBrand(
       destinationUrl: i.url ?? null,
       position: i.rank_absolute ?? 0,
     }))
+
+  return { ads, taskId }
 }
