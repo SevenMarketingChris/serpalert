@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { StatusFilter } from '@/components/status-filter'
 import { ThreatCard } from '@/components/threat-card'
 
@@ -98,6 +99,23 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
                   CLEAR
                 </span>
                 <span className="text-tech-purple font-mono text-sm">{check.keyword}</span>
+                {check.screenshotUrl && (
+                  <a
+                    href={check.screenshotUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative w-16 h-10 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity shrink-0"
+                    title="View SERP screenshot"
+                  >
+                    <Image
+                      src={check.screenshotUrl}
+                      alt={`SERP for "${check.keyword}"`}
+                      fill
+                      className="object-cover object-top"
+                      sizes="64px"
+                    />
+                  </a>
+                )}
                 <span className="ml-auto text-muted-foreground font-mono text-xs">
                   {formatTime(check.checkedAt)}
                 </span>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ScreenshotModal } from '@/components/screenshot-modal'
 import { EvidenceModal } from '@/components/evidence-modal'
@@ -95,12 +96,29 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
       className={`bg-card border border-border rounded-lg p-3.5 ${isResolved ? 'opacity-70' : ''}`}
       style={{ borderLeftWidth: '3px', borderLeftColor: borderColor }}
     >
-      {/* Row 1: Status + domain + keyword + timestamp */}
+      {/* Row 1: Status + domain + keyword + screenshot + timestamp */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className={badgeClass}>{status.toUpperCase()}</span>
         <span className="font-semibold text-sm">{firstAd.domain}</span>
         <span className="text-muted-foreground text-xs">on</span>
         <span className="text-tech-purple font-mono text-sm">{keyword}</span>
+        {screenshotUrl && (
+          <a
+            href={screenshotUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative w-16 h-10 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity shrink-0"
+            title="View SERP screenshot"
+          >
+            <Image
+              src={screenshotUrl}
+              alt={`SERP for "${keyword}"`}
+              fill
+              className="object-cover object-top"
+              sizes="64px"
+            />
+          </a>
+        )}
         <span className="ml-auto text-muted-foreground font-mono text-xs">{formatTime(checkedAt)}</span>
       </div>
 
