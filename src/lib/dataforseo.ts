@@ -105,7 +105,7 @@ export async function checkSerpForBrand(
   return paidItems
     .filter((i) => !options.brandDomain || i.domain !== options.brandDomain)
     .map((i) => ({
-      domain: i.domain ?? new URL(i.url ?? 'https://unknown').hostname,
+      domain: i.domain ?? (() => { try { return new URL(i.url ?? '').hostname } catch { return 'unknown' } })(),
       headline: i.title ?? null,
       description: i.description ?? null,
       displayUrl: i.breadcrumb ?? null,

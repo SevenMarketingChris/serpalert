@@ -11,7 +11,7 @@ async function getExecPath(): Promise<string> {
   try {
     const chromium = (await import('@sparticuz/chromium-min')).default
     return chromium.executablePath(
-      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+      'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar'
     )
   } catch {
     // Not available (e.g. local dev without the package)
@@ -63,7 +63,7 @@ export async function screenshotSerp(keyword: string): Promise<Buffer> {
 
     // Set a realistic user agent to avoid bot detection
     await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     )
     await page.setViewport({ width: 1280, height: 900 })
 

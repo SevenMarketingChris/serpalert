@@ -4,11 +4,24 @@ import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
+import { rateLimit } from '@/lib/rate-limit'
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export const maxDuration = 300
 
 export async function POST(request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+
+  if (!UUID_RE.test(brandId)) {
+    return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
+  }
+
+  const { ok } = rateLimit(`manual-check:${brandId}`, { limit: 3, windowMs: 300_000 })
+  if (!ok) {
+    return NextResponse.json({ error: 'Too many requests. Try again in a few minutes.' }, { status: 429 })
+  }
+
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })

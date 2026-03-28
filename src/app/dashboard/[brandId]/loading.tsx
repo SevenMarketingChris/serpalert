@@ -1,23 +1,10 @@
-import { Skeleton } from "@/components/ui/skeleton";
-
-export default function DashboardLoading() {
+export default function Loading() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b border-border bg-card px-6 py-4">
-        <div className="container mx-auto max-w-6xl flex items-center justify-between">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-8 w-8 rounded-md" />
-        </div>
-      </div>
-      <div className="container mx-auto p-6 max-w-6xl space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-lg" />
-          ))}
-        </div>
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-96 rounded-lg" />
+    <div className="py-12 bg-background flex items-center justify-center">
+      <div className="flex items-center gap-3">
+        <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     </div>
-  );
+  )
 }

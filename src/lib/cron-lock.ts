@@ -1,39 +1,61 @@
 import { db } from '@/lib/db'
 import { sql } from 'drizzle-orm'
 
+const LOCK_TIMEOUT_MINUTES = 10
+
 /**
- * Database-based cron lock using PostgreSQL advisory locks.
- * Survives process restarts unlike the previous in-memory Set.
+ * Table-based cron lock suitable for serverless environments.
+ * Uses a cron_locks table instead of PostgreSQL advisory locks,
+ * which are connection-scoped and unreliable on serverless.
+ *
+ * The table must exist:
+ *   CREATE TABLE IF NOT EXISTS cron_locks (
+ *     job_name TEXT PRIMARY KEY,
+ *     locked_at TIMESTAMP NOT NULL DEFAULT now()
+ *   );
  */
 
-// Stable hash: convert job name to a 32-bit integer for pg_try_advisory_lock
-function jobNameToLockId(jobName: string): number {
-  let hash = 0
-  for (let i = 0; i < jobName.length; i++) {
-    hash = ((hash << 5) - hash + jobName.charCodeAt(i)) | 0
-  }
-  return Math.abs(hash)
-}
-
 export async function acquireLock(jobName: string): Promise<boolean> {
-  const lockId = jobNameToLockId(jobName)
   try {
-    const result = await db.execute(
-      sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`
-    )
-    const row = (result as unknown as { acquired: boolean }[])[0]
-    return row?.acquired === true
+    // Ensure the table exists
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS cron_locks (
+        job_name TEXT PRIMARY KEY,
+        locked_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `)
+
+    // Delete stale locks older than the timeout
+    await db.execute(sql`
+      DELETE FROM cron_locks
+      WHERE job_name = ${jobName}
+        AND locked_at < now() - INTERVAL '${sql.raw(String(LOCK_TIMEOUT_MINUTES))} minutes'
+    `)
+
+    // Try to insert a new lock row; if it already exists the INSERT fails
+    await db.execute(sql`
+      INSERT INTO cron_locks (job_name, locked_at)
+      VALUES (${jobName}, now())
+    `)
+
+    return true
   } catch (err) {
-    console.error(`Failed to acquire advisory lock for "${jobName}":`, err)
+    // Unique violation (23505) means lock is already held
+    const pgErr = err as { code?: string }
+    if (pgErr.code === '23505') {
+      return false
+    }
+    console.error(`Failed to acquire lock for "${jobName}":`, err)
     return false
   }
 }
 
 export async function releaseLock(jobName: string): Promise<void> {
-  const lockId = jobNameToLockId(jobName)
   try {
-    await db.execute(sql`SELECT pg_advisory_unlock(${lockId})`)
+    await db.execute(sql`
+      DELETE FROM cron_locks WHERE job_name = ${jobName}
+    `)
   } catch (err) {
-    console.error(`Failed to release advisory lock for "${jobName}":`, err)
+    console.error(`Failed to release lock for "${jobName}":`, err)
   }
 }

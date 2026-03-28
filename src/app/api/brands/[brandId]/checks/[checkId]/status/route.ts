@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getBrandById, getSerpCheckWithAds, updateAllAdsStatusForCheck } from '@/lib/db/queries'
+import { isAdminRequest } from '@/lib/auth'
 
 const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
 type AdStatus = typeof VALID_STATUSES[number]
@@ -8,6 +9,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ brandId: string; checkId: string }> },
 ) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const { brandId, checkId } = await params
 
   const brand = await getBrandById(brandId)

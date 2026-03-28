@@ -10,7 +10,7 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'ADMIN_SECRET', 'CRON_SECRET'] as const;
   for (const name of critical) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
@@ -33,8 +33,6 @@ function optionalEnv(name: string): string | undefined {
 export function getServerEnv() {
   return {
     databaseUrl: requireEnv("DATABASE_URL"),
-    supabaseUrl: optionalEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    supabaseServiceRoleKey: optionalEnv("SUPABASE_SERVICE_ROLE_KEY"),
     dataforSeoLogin: requireEnv("DATAFORSEO_LOGIN"),
     dataforSeoPassword: requireEnv("DATAFORSEO_PASSWORD"),
     googleAdsClientId: optionalEnv("GOOGLE_ADS_CLIENT_ID"),

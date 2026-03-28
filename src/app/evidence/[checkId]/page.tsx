@@ -16,23 +16,15 @@ function formatDateTime(date: Date): string {
 
 export default async function EvidencePage({
   params,
-  searchParams,
 }: {
   params: Promise<{ checkId: string }>
-  searchParams: Promise<{ token?: string }>
 }) {
   const { checkId } = await params
-  const { token } = await searchParams
 
   const result = await getSerpCheckWithAds(checkId)
   if (!result) notFound()
 
   const { check, ads } = result
-
-  // Open access — no auth required
-  const hasAccess = true
-
-  if (!hasAccess) notFound()
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-4 py-8">

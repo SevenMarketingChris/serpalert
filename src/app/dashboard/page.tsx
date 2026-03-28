@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                           {b.plan ?? 'free'}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {b.keywords.length} keywords
+                          {b.keywords.length} keyword{b.keywords.length !== 1 ? 's' : ''}
                         </span>
                       </div>
 

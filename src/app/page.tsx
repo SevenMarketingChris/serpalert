@@ -240,7 +240,9 @@ export default function HomePage() {
             Simple, transparent pricing
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PLANS.map((plan) => (
+            {PLANS.map((plan) => {
+              const isFree = plan.name === 'Free'
+              return (
               <div
                 key={plan.name}
                 className={`bg-card border border-border rounded-lg overflow-hidden flex flex-col ${
@@ -274,19 +276,24 @@ export default function HomePage() {
                     ))}
                   </ul>
 
-                  <Link
-                    href="/dashboard"
-                    className={`mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                      plan.popular
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                        : 'border border-border bg-background hover:bg-muted'
-                    }`}
-                  >
-                    Get Started
-                  </Link>
+                  {isFree ? (
+                    <Link
+                      href="/dashboard"
+                      className="mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition-colors border border-border bg-background hover:bg-muted"
+                    >
+                      Get Started
+                    </Link>
+                  ) : (
+                    <span
+                      className="mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium border border-border bg-muted text-muted-foreground cursor-not-allowed"
+                    >
+                      Coming Soon
+                    </span>
+                  )}
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>

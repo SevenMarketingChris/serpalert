@@ -31,18 +31,25 @@ export async function getAuctionInsights(customerId: string): Promise<AuctionIns
     refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN,
   })
 
-  const rows = await Promise.race([
-    customer.query(`
-      SELECT
-        auction_insight.domain,
-        metrics.auction_insight_search_impression_share,
-        metrics.auction_insight_search_overlap_rate,
-        metrics.auction_insight_search_outranking_share
-      FROM auction_insight
-      WHERE segments.date DURING LAST_7_DAYS
-    `),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Google Ads API timeout (30s)')), 30_000)),
-  ])
+  let timer: ReturnType<typeof setTimeout>
+  const actualQuery = customer.query(`
+    SELECT
+      auction_insight.domain,
+      metrics.auction_insight_search_impression_share,
+      metrics.auction_insight_search_overlap_rate,
+      metrics.auction_insight_search_outranking_share
+    FROM auction_insight
+    WHERE segments.date DURING LAST_7_DAYS
+  `)
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Google Ads API timeout (30s)')), 30_000)
+  })
+  let rows: unknown[]
+  try {
+    rows = await Promise.race([actualQuery, timeout])
+  } finally {
+    clearTimeout(timer!)
+  }
 
   return (rows as GoogleAdsRow[]).map((row) => ({
     competitorDomain: row.auction_insight?.domain ?? '',

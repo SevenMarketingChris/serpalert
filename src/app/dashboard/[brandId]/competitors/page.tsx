@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'
+import { Shield } from 'lucide-react'
 
 function formatRelativeTime(date: Date): string {
   const now = new Date()
@@ -32,8 +33,14 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
 
       {competitors.length === 0 ? (
-        <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
-          No competitors detected yet.
+        <div className="bg-card border border-border rounded-lg p-12 text-center space-y-3">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mx-auto">
+            <Shield className="h-6 w-6" />
+          </div>
+          <p className="font-semibold text-foreground">No competitors detected yet</p>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            When competitors start bidding on your brand keywords, they&apos;ll appear here with full details.
+          </p>
         </div>
       ) : (
         <>

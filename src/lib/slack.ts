@@ -14,5 +14,9 @@ export async function sendNewCompetitorAlert(params: {
     }),
     signal: AbortSignal.timeout(10_000),
   })
-  if (!response.ok) throw new Error(`Slack webhook failed: ${response.status}`)
+  if (!response.ok) {
+    const body = await response.text().catch(() => '')
+    console.error(`Slack webhook failed: ${response.status}`, body.slice(0, 200))
+    throw new Error(`Slack webhook failed: ${response.status}`)
+  }
 }

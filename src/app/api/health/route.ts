@@ -12,10 +12,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     })
   } catch (err) {
-    return NextResponse.json({
-      status: 'error',
-      database: 'failed',
-      error: err instanceof Error ? err.message : String(err),
-    }, { status: 500 })
+    console.error('[health] DB check failed:', err)
+    return NextResponse.json({ status: 'error', database: 'failed' }, { status: 500 })
   }
 }

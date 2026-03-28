@@ -1,8 +1,7 @@
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/neon-http'
+import { neon } from '@neondatabase/serverless'
 import * as schema from './schema'
 
-const globalForDb = globalThis as unknown as { db: ReturnType<typeof drizzle> }
-export const db = globalForDb.db ?? drizzle(postgres(process.env.DATABASE_URL!), { schema })
-globalForDb.db = db
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzle(sql, { schema })
 export * from './schema'

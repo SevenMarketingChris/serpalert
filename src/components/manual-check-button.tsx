@@ -34,7 +34,7 @@ export function ManualCheckButton({ brandId }: { brandId: string }) {
       <button
         onClick={handleCheck}
         disabled={status === 'running'}
-        className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-mono hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-mono hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       >
         {status === 'running' ? (
           <>

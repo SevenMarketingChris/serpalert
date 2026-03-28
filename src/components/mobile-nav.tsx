@@ -35,7 +35,7 @@ export function MobileNav() {
             </a>
           ))}
           <Link
-            href="/login"
+            href="/dashboard"
             className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors text-center"
             onClick={() => setOpen(false)}
           >
