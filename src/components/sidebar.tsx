@@ -74,7 +74,7 @@ export function Sidebar({
         <div className="px-2 pb-2">
           <Link
             href="/admin/brands"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-[oklch(20%_0.03_250)] transition-colors"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
           >
             <Globe className="h-4 w-4 shrink-0" />
             <span className="lg:inline md:hidden">All Brands</span>
@@ -93,8 +93,8 @@ export function Sidebar({
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
                 active
-                  ? 'sidebar-item-active'
-                  : 'text-sidebar-foreground hover:bg-[oklch(20%_0.03_250)]'
+                  ? 'sidebar-item-active bg-sidebar-accent text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent'
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
@@ -105,7 +105,7 @@ export function Sidebar({
       </nav>
 
       {/* Divider */}
-      <div className="mx-4 my-3 border-t border-[oklch(22%_0.03_250)]" />
+      <div className="mx-4 my-3 border-t border-sidebar-border" />
 
       {/* Plan info */}
       <div className="px-4 pb-3">
@@ -118,7 +118,7 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[oklch(22%_0.03_250)] px-4 py-3">
+      <div className="border-t border-sidebar-border px-4 py-3">
         <p className="truncate text-xs text-muted-foreground lg:block md:hidden">
           SerpAlert
         </p>
@@ -129,7 +129,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-[oklch(14%_0.025_250)] px-4 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-sidebar px-4 md:hidden">
         <button
           onClick={() => setMobileOpen(true)}
           className="p-1.5 text-sidebar-foreground hover:text-foreground transition-colors"
@@ -153,7 +153,7 @@ export function Sidebar({
             onClick={() => setMobileOpen(false)}
           />
           {/* Drawer */}
-          <aside className="relative flex h-full w-[260px] flex-col sidebar-bg">
+          <aside className="relative flex h-full w-[260px] flex-col bg-sidebar">
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute right-3 top-4 p-1 text-sidebar-foreground hover:text-foreground transition-colors"
@@ -167,7 +167,7 @@ export function Sidebar({
       )}
 
       {/* Tablet icon rail (md) + Desktop full sidebar (lg) */}
-      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col sidebar-bg border-r border-[oklch(22%_0.03_250)] min-h-screen sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-sidebar border-r border-sidebar-border min-h-screen sticky top-0 h-screen overflow-y-auto">
         {sidebarContent}
       </aside>
     </>

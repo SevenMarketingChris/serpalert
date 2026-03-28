@@ -21,10 +21,7 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
   ]
 
   return (
-    <nav
-      className="flex flex-row"
-      style={{ borderBottom: '1px solid oklch(22% 0.03 250)' }}
-    >
+    <nav className="flex flex-row border-b border-border">
       {tabs.map(tab => {
         const isActive = tab.exact
           ? pathname === tab.href
@@ -34,12 +31,11 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className="text-[11px] uppercase tracking-[1px] font-mono transition-colors"
-            style={{
-              padding: '8px 16px',
-              borderBottom: isActive ? '2px solid oklch(62% 0.22 250)' : '2px solid transparent',
-              color: isActive ? 'oklch(94% 0.005 250)' : 'oklch(60% 0.02 250)',
-            }}
+            className={`text-[11px] uppercase tracking-[1px] font-mono transition-colors px-4 py-2 ${
+              isActive
+                ? 'border-b-2 border-primary text-foreground font-medium'
+                : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'
+            }`}
           >
             {tab.label}
           </Link>

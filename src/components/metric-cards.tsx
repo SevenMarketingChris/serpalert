@@ -45,15 +45,13 @@ export function MetricCards({
 
       {/* Threats Today */}
       <div
-        className={`bg-card border border-border rounded-lg p-3.5 ${threatIsZero ? 'metric-stripe-green' : ''}`}
-        style={!threatIsZero ? { borderTop: '3px solid oklch(52% 0.22 15)' } : undefined}
+        className={`bg-card border border-border rounded-lg p-3.5 ${threatIsZero ? 'metric-stripe-green' : 'border-t-3 border-t-red-500'}`}
       >
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Threats Today
         </p>
         <p
-          className={`text-2xl font-bold font-mono ${threatIsZero ? 'text-tech-green' : ''}`}
-          style={!threatIsZero ? { color: 'oklch(52% 0.22 15)' } : undefined}
+          className={`text-2xl font-bold font-mono ${threatIsZero ? 'text-tech-green' : 'text-red-500'}`}
         >
           {threatsToday}
         </p>

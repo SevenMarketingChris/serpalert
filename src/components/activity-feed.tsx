@@ -91,17 +91,10 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
           return (
             <div
               key={check.id}
-              className="bg-card border border-border rounded-lg p-3.5"
-              style={{ borderLeftWidth: '3px', borderLeftColor: 'oklch(52% 0.20 145)' }}
+              className="bg-card border border-border rounded-lg p-3.5 border-l-3 border-l-emerald-500"
             >
               <div className="flex items-center gap-2">
-                <span
-                  className="font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-[10px] tracking-[0.5px]"
-                  style={{
-                    background: 'oklch(52% 0.20 145 / 0.12)',
-                    color: 'oklch(52% 0.20 145)',
-                  }}
-                >
+                <span className="font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-[10px] tracking-[0.5px] bg-emerald-500/10 text-emerald-500">
                   CLEAR
                 </span>
                 <span className="text-tech-purple font-mono text-sm">{check.keyword}</span>

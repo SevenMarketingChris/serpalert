@@ -38,7 +38,7 @@
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --sidebar: oklch(97% 0.004 250);
-  --sidebar-foreground: oklch(13% 0.015 250);
+  --sidebar-foreground: oklch(25% 0.015 250);
   --sidebar-primary: oklch(44% 0.22 250);
   --sidebar-primary-foreground: oklch(99% 0 0);
   --sidebar-accent: oklch(93% 0.01 250);
@@ -77,13 +77,13 @@
   --chart-3: oklch(65% 0.20 145);
   --chart-4: oklch(60% 0.20 280);
   --chart-5: oklch(70% 0.18 60);
-  --sidebar: oklch(14% 0.022 250);
-  --sidebar-foreground: oklch(94% 0.005 250);
+  --sidebar: oklch(14% 0.025 250);
+  --sidebar-foreground: oklch(85% 0.01 250);
   --sidebar-primary: oklch(62% 0.22 250);
   --sidebar-primary-foreground: oklch(99% 0 0);
-  --sidebar-accent: oklch(20% 0.03 250);
-  --sidebar-accent-foreground: oklch(94% 0.005 250);
-  --sidebar-border: oklch(22% 0.03 250);
+  --sidebar-accent: oklch(22% 0.03 250);
+  --sidebar-accent-foreground: oklch(95% 0.005 250);
+  --sidebar-border: oklch(25% 0.03 250);
   --sidebar-ring: oklch(62% 0.22 250);
   --status-new: oklch(65% 0.22 15);
   --status-acknowledged: oklch(62% 0.22 250);
@@ -301,22 +301,26 @@ body {
 
 /* ── Sidebar Utilities ── */
 .sidebar-bg {
-  background: oklch(14% 0.025 250);
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
 }
 .sidebar-item-active {
-  background: oklch(62% 0.22 250 / 0.12);
-  color: oklch(62% 0.22 250);
-  border-radius: 6px;
+  background-color: var(--sidebar-accent);
+  color: var(--sidebar-primary);
+  font-weight: 600;
 }
 
 /* ── Action Button ── */
 .action-btn {
-  background: oklch(20% 0.03 250);
-  color: oklch(80% 0.005 250);
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 10px;
-  border: 1px solid oklch(25% 0.03 250);
+  border: 1px solid var(--border);
   font-family: 'Geist Mono', monospace;
   cursor: pointer;
+}
+.action-btn:hover {
+  background-color: var(--accent);
 }

@@ -27,23 +27,13 @@ export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin, showCh
 
   if (isProtected) {
     return (
-      <div
-        className="rounded-xl p-4 flex items-center justify-between gap-4 neon-glow-hero"
-        style={{
-          background: 'linear-gradient(135deg, oklch(25% 0.08 155), oklch(14% 0.025 250))',
-          border: '1px solid oklch(55% 0.18 155 / 0.3)',
-          boxShadow: '0 0 20px oklch(55% 0.18 155 / 0.08)',
-        }}
-      >
+      <div className="rounded-xl p-4 flex items-center justify-between gap-4 bg-emerald-500/10 border border-emerald-500/30">
         <div className="flex items-center gap-3">
-          <div
-            className="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-            style={{ background: 'oklch(30% 0.1 155 / 0.5)' }}
-          >
+          <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0 bg-emerald-500/20">
             🛡
           </div>
           <div>
-            <p className="text-lg font-bold" style={{ color: 'oklch(75% 0.18 155)' }}>
+            <p className="text-lg font-bold text-emerald-500">
               BRAND PROTECTED
             </p>
             <p className="text-xs text-muted-foreground">
@@ -57,23 +47,13 @@ export function StatusHero({ brandId, threatsToday, lastCheckAt, isAdmin, showCh
   }
 
   return (
-    <div
-      className="rounded-xl p-4 flex items-center justify-between gap-4"
-      style={{
-        background: 'linear-gradient(135deg, oklch(25% 0.08 15), oklch(14% 0.025 250))',
-        border: '1px solid oklch(52% 0.22 15 / 0.3)',
-        boxShadow: '0 0 20px oklch(52% 0.22 15 / 0.08)',
-      }}
-    >
+    <div className="rounded-xl p-4 flex items-center justify-between gap-4 bg-red-500/10 border border-red-500/30">
       <div className="flex items-center gap-3">
-        <div
-          className="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-          style={{ background: 'oklch(30% 0.12 15 / 0.5)' }}
-        >
+        <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0 bg-red-500/20">
           ⚠
         </div>
         <div>
-          <p className="text-lg font-bold" style={{ color: 'oklch(65% 0.22 15)' }}>
+          <p className="text-lg font-bold text-red-500">
             {threatsToday} THREAT{threatsToday !== 1 ? 'S' : ''} DETECTED
           </p>
           <p className="text-xs text-muted-foreground">
