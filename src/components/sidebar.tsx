@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Shield,
   BarChart3,
+  Camera,
   Settings,
   Menu,
   X,
@@ -27,6 +28,7 @@ interface SidebarProps {
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Overview', path: '' },
   { icon: Shield, label: 'Competitors', path: '/competitors' },
+  { icon: Camera, label: 'Screenshots', path: '/screenshots' },
   { icon: BarChart3, label: 'Insights', path: '/insights' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ]

@@ -102,6 +102,14 @@ export async function createBrandForUser(
   return rows[0]
 }
 
+export async function getScreenshotsForBrand(brandId: string, limit = 50): Promise<SerpCheck[]> {
+  return db.select()
+    .from(serpChecks)
+    .where(and(eq(serpChecks.brandId, brandId), isNotNull(serpChecks.screenshotUrl)))
+    .orderBy(desc(serpChecks.checkedAt))
+    .limit(limit)
+}
+
 export async function hasScreenshotToday(brandId: string, keyword: string): Promise<boolean> {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)

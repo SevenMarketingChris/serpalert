@@ -14,6 +14,7 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
   const tabs = [
     { label: 'Activity', href: `/dashboard/${brandId}`, exact: true },
     { label: 'Competitors', href: `/dashboard/${brandId}/competitors`, exact: false },
+    { label: 'Screenshots', href: `/dashboard/${brandId}/screenshots`, exact: false },
     ...(hasGoogleAds
       ? [{ label: 'Insights', href: `/dashboard/${brandId}/insights`, exact: false }]
       : []),
