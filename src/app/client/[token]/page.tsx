@@ -68,9 +68,12 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
   // Recent threats only (checks with competitors)
   const recentThreats = checksWithAds.filter(c => c.competitorCount > 0).slice(0, 10)
 
+  // Count days with actual data for chart visibility
+  const daysWithData = last7Days.filter(d => d.checks > 0).length
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
 
         {/* 1. Header with context */}
         <header className="text-center space-y-1">
@@ -91,13 +94,21 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           showCheckButton={false}
         />
 
-        {/* 3. Executive Summary */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono text-foreground/70 mb-3 flex items-center gap-2">
+        {/* 3. Metric Cards (moved UP) */}
+        <ClientMetricCards
+          keywordCount={brand.keywords.length}
+          totalChecks={totalChecks}
+          todayThreats={competitorsToday}
+          allTimeCompetitors={competitorStats.length}
+        />
+
+        {/* 4. Executive Summary (compact) */}
+        <div className="bg-muted/40 border border-border rounded-lg px-5 py-4">
+          <h2 className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5 flex items-center gap-2">
             <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
             Summary
           </h2>
-          <p className="text-sm text-foreground leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             {competitorStats.length === 0 ? (
               `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
             ) : (
@@ -106,7 +117,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           </p>
         </div>
 
-        {/* 4. Competitor Ads Found — threats only */}
+        {/* 5. Competitor Ads Found — compact rows */}
         {recentThreats.length > 0 && (
           <section className="bg-card border border-border rounded-lg overflow-hidden">
             <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono text-foreground/70 px-6 pt-6 mb-4 flex items-center gap-2">
@@ -115,7 +126,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             </h2>
             <div className="divide-y divide-border">
               {recentThreats.map(check => (
-                <div key={check.id} className="px-6 py-4 border-l-4 border-l-destructive bg-destructive/[0.03]">
+                <div key={check.id} className="px-6 py-3 border-l-4 border-l-destructive bg-destructive/[0.03]">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-mono text-xs text-muted-foreground">
                       {new Date(check.checkedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
@@ -133,16 +144,12 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                     )}
                   </div>
                   {check.ads.map(ad => (
-                    <div key={ad.id} className="ml-4 mt-2 rounded border border-border p-3 bg-card text-xs">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono font-medium text-foreground">{ad.domain}</span>
-                        {ad.position != null && (
-                          <span className="ml-auto font-mono text-amber-500">Ad position {ad.position}</span>
-                        )}
-                      </div>
-                      {ad.headline && <p className="text-primary font-semibold text-sm">{ad.headline}</p>}
-                      {ad.description && <p className="text-muted-foreground mt-1">{ad.description}</p>}
-                      {ad.displayUrl && <p className="font-mono text-[11px] text-muted-foreground mt-1">{ad.displayUrl}</p>}
+                    <div key={ad.id} className="ml-4 mt-1.5 flex items-start gap-3 text-xs">
+                      <span className="font-mono font-medium text-foreground shrink-0">{ad.domain}</span>
+                      <span className="text-muted-foreground truncate">{ad.headline}</span>
+                      {ad.position != null && (
+                        <span className="ml-auto shrink-0 font-mono text-amber-500">Pos {ad.position}</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -151,15 +158,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           </section>
         )}
 
-        {/* 5. Metric Cards */}
-        <ClientMetricCards
-          keywordCount={brand.keywords.length}
-          totalChecks={totalChecks}
-          todayThreats={competitorsToday}
-          allTimeCompetitors={competitorStats.length}
-        />
-
-        {/* 6. Competitor Domains Table */}
+        {/* 6. Competitor Domains Table (with First Seen) */}
         {competitorStats.length > 0 && (
           <section className="bg-card border border-border rounded-lg overflow-hidden">
             <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono font-semibold text-foreground/80 px-6 pt-6 mb-4 flex items-center gap-2">
@@ -171,16 +170,17 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             </p>
             {/* Desktop table */}
             <div className="hidden sm:block">
-              <div className="grid grid-cols-[1.2fr_60px_60px_1.5fr_80px] gap-4 px-6 py-2 border-b border-border bg-muted/30 text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+              <div className="grid grid-cols-[1.2fr_60px_60px_1.2fr_80px_80px] gap-4 px-6 py-2 border-b border-border bg-muted/30 text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                 <span>Domain</span>
                 <span className="text-right">Last 30d</span>
                 <span className="text-right">Avg Pos</span>
                 <span>Keywords Targeted</span>
+                <span className="text-right">First Seen</span>
                 <span className="text-right">Last Seen</span>
               </div>
               <div className="divide-y divide-border">
                 {competitorStats.map(comp => (
-                  <div key={comp.domain} className="grid grid-cols-[1.2fr_60px_60px_1.5fr_80px] gap-4 px-6 py-3 items-center">
+                  <div key={comp.domain} className="grid grid-cols-[1.2fr_60px_60px_1.2fr_80px_80px] gap-4 px-6 py-3 items-center">
                     <span className="font-mono text-sm font-medium">{comp.domain}</span>
                     <span className="font-mono text-sm text-right tabular-nums">{comp.recentCount}</span>
                     <span className="font-mono text-sm text-right tabular-nums">
@@ -196,6 +196,9 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                         <span className="text-[10px] font-mono text-muted-foreground">+{comp.keywords.length - 3}</span>
                       )}
                     </div>
+                    <span className="font-mono text-xs text-muted-foreground text-right whitespace-nowrap">
+                      {new Date(comp.firstSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    </span>
                     <span className="font-mono text-xs text-muted-foreground text-right whitespace-nowrap">
                       {new Date(comp.lastSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                     </span>
@@ -216,6 +219,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>{comp.recentCount} times in 30d</span>
                     {comp.avgPosition != null && <span>Avg pos {comp.avgPosition}</span>}
+                    <span>First seen {new Date(comp.firstSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                   </div>
                 </div>
               ))}
@@ -223,7 +227,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           </section>
         )}
 
-        {/* 7. 7-Day Activity Chart */}
+        {/* 7. 7-Day Activity Chart (or not-enough-data message) */}
         <section className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono text-foreground/70 mb-1 flex items-center gap-2">
             <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
@@ -232,37 +236,45 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           <p className="text-xs text-muted-foreground mb-4">
             Each day we scan Google for competitors advertising on your brand name.
           </p>
-          <div className="flex items-end gap-3" style={{ height: 200 }}>
-            {last7Days.map((day, i) => {
-              const maxChecks = Math.max(...last7Days.map(d => d.checks), 1)
-              const barHeight = day.checks > 0 ? Math.max((day.checks / maxChecks) * 160, 8) : 4
-              const hasThreats = day.threats > 0
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1" style={{ height: '100%' }}>
-                  <div className="flex flex-col items-center justify-end flex-1">
-                    {hasThreats && (
-                      <span className="text-[10px] font-mono mb-0.5 text-destructive">
-                        {day.threats}
-                      </span>
-                    )}
-                    <div
-                      className={`w-full rounded-sm ${hasThreats ? 'bg-destructive/70' : 'bg-primary/30'}`}
-                      style={{ height: barHeight }}
-                    />
-                  </div>
-                  <span className="text-[10px] font-mono text-muted-foreground">{day.date}</span>
-                </div>
-              )
-            })}
-          </div>
-          <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border text-[10px] text-muted-foreground font-mono">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-sm bg-primary/30" /> No competitor ads found
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-sm bg-destructive/70" /> Competitor ads detected
-            </span>
-          </div>
+          {daysWithData < 3 ? (
+            <div className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-md">
+              Not enough data yet — the chart will appear after a few days of monitoring.
+            </div>
+          ) : (
+            <>
+              <div className="flex items-end gap-3" style={{ height: 200 }}>
+                {last7Days.map((day, i) => {
+                  const maxChecks = Math.max(...last7Days.map(d => d.checks), 1)
+                  const barHeight = day.checks > 0 ? Math.max((day.checks / maxChecks) * 160, 8) : 4
+                  const hasThreats = day.threats > 0
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1" style={{ height: '100%' }}>
+                      <div className="flex flex-col items-center justify-end flex-1">
+                        {hasThreats && (
+                          <span className="text-[10px] font-mono mb-0.5 text-destructive">
+                            {day.threats}
+                          </span>
+                        )}
+                        <div
+                          className={`w-full rounded-sm ${hasThreats ? 'bg-destructive/70' : 'bg-primary/30'}`}
+                          style={{ height: barHeight }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-mono text-muted-foreground">{day.date}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border text-[10px] text-muted-foreground font-mono">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-sm bg-primary/30" /> No competitor ads found
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-sm bg-destructive/70" /> Competitor ads detected
+                </span>
+              </div>
+            </>
+          )}
         </section>
 
         {/* 8. Stale data warning */}
