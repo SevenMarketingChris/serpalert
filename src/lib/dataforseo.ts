@@ -1,11 +1,6 @@
-export interface SerpAdResult {
-  domain: string
-  headline: string | null
-  description: string | null
-  displayUrl: string | null
-  destinationUrl: string | null
-  position: number
-}
+import { checkSerpForAds, type SerpAdResult } from './serpapi'
+
+export type { SerpAdResult }
 
 interface DataForSeoItem {
   type: string
@@ -91,34 +86,22 @@ export async function checkSerpForBrand(
   location = 'United Kingdom',
   options: { brandDomain?: string } = {}
 ): Promise<SerpCheckResult> {
-  let paidItems: DataForSeoItem[] = []
-  let taskId: string | null = null
-
+  // 1. Use SerpAPI for ad detection (reliable — returns actual paid ads)
+  let ads: SerpAdResult[] = []
   try {
-    const result = await fetchSerp('organic', keyword, location, 100)
-    taskId = result.taskId
-    paidItems = result.items.filter((i) =>
-      i.type === 'paid' || i.type === 'ads' || i.type === 'shopping' ||
-      i.type === 'paid_box' || i.type === 'top_stories_paid'
-    )
-    console.log(`DataForSEO "${keyword}": ${paidItems.length} paid/ad items found`)
-    if (paidItems.length === 0) {
-      console.log(`DataForSEO "${keyword}": no paid ads detected at this time`)
-    }
+    ads = await checkSerpForAds(keyword, location, options)
   } catch (err) {
-    console.error(`DataForSEO failed for "${keyword}":`, err)
+    console.error(`SerpAPI ad detection failed for "${keyword}":`, err)
   }
 
-  const ads = paidItems
-    .filter((i) => !options.brandDomain || i.domain !== options.brandDomain)
-    .map((i) => ({
-      domain: i.domain ?? (() => { try { return new URL(i.url ?? '').hostname } catch { return 'unknown' } })(),
-      headline: i.title ?? null,
-      description: i.description ?? null,
-      displayUrl: i.breadcrumb ?? null,
-      destinationUrl: i.url ?? null,
-      position: i.rank_absolute ?? 0,
-    }))
+  // 2. Use DataForSEO just for the taskId (for screenshots)
+  let taskId: string | null = null
+  try {
+    const result = await fetchSerp('organic', keyword, location, 10)
+    taskId = result.taskId
+  } catch (err) {
+    console.error(`DataForSEO taskId fetch failed for "${keyword}":`, err)
+  }
 
   return { ads, taskId }
 }

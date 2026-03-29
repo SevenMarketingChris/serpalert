@@ -10,7 +10,7 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
   for (const name of critical) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
@@ -39,6 +39,7 @@ export function getServerEnv() {
     googleAdsClientSecret: optionalEnv("GOOGLE_ADS_CLIENT_SECRET"),
     googleAdsRefreshToken: optionalEnv("GOOGLE_ADS_REFRESH_TOKEN"),
     googleAdsDeveloperToken: optionalEnv("GOOGLE_ADS_DEVELOPER_TOKEN"),
+    serpapiKey: requireEnv("SERPAPI_KEY"),
     adminSecret: requireEnv("ADMIN_SECRET"),
     cronSecret: requireEnv("CRON_SECRET"),
     chromiumUrl: optionalEnv("CHROMIUM_URL"),

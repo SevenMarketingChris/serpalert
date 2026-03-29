@@ -3,6 +3,7 @@ import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/
 import { StatusHero } from '@/components/status-hero'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { ActivityFeed } from '@/components/activity-feed'
+import { TrendChart } from '@/components/trend-chart'
 
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -32,6 +33,22 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     const dayChecks = checks.filter(c => new Date(c.checkedAt).toDateString() === dayStr)
     const dayCheckIds = dayChecks.map(c => c.id)
     last7Days.push(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length)
+  }
+
+  // Build 30-day activity data for trend chart
+  const last30Days: { date: string; checks: number; threats: number }[] = []
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const dayStr = d.toDateString()
+    const dayChecks = checks.filter(c => new Date(c.checkedAt).toDateString() === dayStr)
+    const dayCheckIds = dayChecks.map(c => c.id)
+    const dayThreats = allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length
+    last30Days.push({
+      date: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+      checks: dayChecks.length,
+      threats: dayThreats,
+    })
   }
 
   const lastCheckAt = checks[0]?.checkedAt ? new Date(checks[0].checkedAt).toISOString() : null
@@ -64,6 +81,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         keywordCount={brand.keywords.length}
         last7DaysThreats={last7Days}
       />
+      <TrendChart data={last30Days} />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
       <ActivityFeed checks={checksWithAds} brandId={brandId} brandToken={brand.clientToken} />
     </div>
