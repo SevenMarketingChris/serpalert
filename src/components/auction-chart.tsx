@@ -42,12 +42,11 @@ export function AuctionChart({ insights }: { insights: AuctionInsight[] }) {
         <Tooltip
           formatter={(v) => `${Number(v).toFixed(1)}%`}
           contentStyle={{
-            background: 'white',
-            border: '1px solid oklch(88% 0.01 250)',
-            borderRadius: '0.5rem',
+            background: 'var(--color-card, white)',
+            color: 'var(--color-card-foreground, black)',
+            border: '1px solid var(--color-border, #eee)',
+            borderRadius: '8px',
             fontSize: '12px',
-            color: 'oklch(20% 0.02 250)',
-            boxShadow: '0 2px 8px oklch(0% 0 0 / 8%)',
           }}
           labelStyle={{ color: 'oklch(50% 0.22 250)', fontFamily: 'monospace' }}
         />

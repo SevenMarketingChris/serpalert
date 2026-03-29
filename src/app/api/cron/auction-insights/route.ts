@@ -36,7 +36,7 @@ export async function GET(request: Request) {
         results.push({ brand: brand.name, status: 'ok', count: insights.length })
       } catch (err) {
         console.error(`Auction insights failed for ${brand.name}:`, err)
-        results.push({ brand: brand.name, status: 'error', error: String(err) })
+        results.push({ brand: brand.name, status: 'error', error: 'Check failed' })
       }
     }
 

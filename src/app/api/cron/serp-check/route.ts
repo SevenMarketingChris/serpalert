@@ -3,7 +3,7 @@ import { isCronRequest } from '@/lib/auth'
 import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
-import { uploadScreenshot } from '@/lib/supabase-storage'
+import { uploadScreenshot } from '@/lib/blob-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 import { acquireLock, releaseLock } from '@/lib/cron-lock'
 import { setCampaignStatus } from '@/lib/google-ads'
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     async function processJob(job: { brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }) {
       const { brand, keyword, recentDomains } = job
       try {
-        const { ads, taskId } = await checkSerpForBrand(keyword, 'United Kingdom', {
+        const { ads, taskId, adCheckDegraded } = await checkSerpForBrand(keyword, 'United Kingdom', {
           brandDomain: brand.domain ?? undefined,
         })
         let screenshotUrl: string | undefined
@@ -75,10 +75,10 @@ export async function GET(request: Request) {
           }
         }
 
-        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' as const }
+        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' as const, adCheckDegraded }
       } catch (err) {
         console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
-        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: String(err), competitorCount: 0 }
+        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: String(err), competitorCount: 0, adCheckDegraded: false }
       }
     }
 
@@ -97,8 +97,9 @@ export async function GET(request: Request) {
 
       const brandResults = results.filter(r => r.brandId === brand.id)
       const anyError = brandResults.some(r => r.status === 'error')
-      if (anyError) {
-        console.warn(`Skipping campaign toggle for ${brand.name} — one or more keyword checks failed`)
+      const anyDegraded = brandResults.some(r => r.adCheckDegraded)
+      if (anyError || anyDegraded) {
+        console.warn(`Skipping campaign toggle for ${brand.name} — checks were degraded or errored`)
         continue
       }
       const hasCompetitors = brandResults.some(r => r.competitorCount && r.competitorCount > 0)

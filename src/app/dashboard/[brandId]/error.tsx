@@ -15,7 +15,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="flex items-center justify-center max-w-5xl py-12">
       <div className="text-center space-y-4 max-w-md px-6">
         <p className="text-xs uppercase tracking-widest text-tech-blue font-mono">Error</p>
         <h1 className="text-2xl font-bold">Something went wrong</h1>

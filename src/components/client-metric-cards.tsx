@@ -34,14 +34,14 @@ export function ClientMetricCards({
       {/* Today */}
       <div
         className={`bg-card border border-border rounded-lg p-3.5 ${isClear ? 'metric-stripe-green' : ''}`}
-        style={!isClear ? { borderTop: '3px solid oklch(52% 0.22 15)' } : undefined}
+        style={!isClear ? { borderTop: '3px solid var(--color-destructive)' } : undefined}
       >
         <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
           Today
         </p>
         <p
           className={`text-2xl font-bold font-mono ${isClear ? 'text-tech-green' : ''}`}
-          style={!isClear ? { color: 'oklch(52% 0.22 15)' } : undefined}
+          style={!isClear ? { color: 'var(--color-destructive)' } : undefined}
         >
           {isClear ? 'Clear' : `${todayThreats} found`}
         </p>

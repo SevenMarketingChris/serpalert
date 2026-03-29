@@ -79,6 +79,7 @@ async function fetchSerp(
 export interface SerpCheckResult {
   ads: SerpAdResult[]
   taskId: string | null
+  adCheckDegraded: boolean
 }
 
 export async function checkSerpForBrand(
@@ -88,10 +89,12 @@ export async function checkSerpForBrand(
 ): Promise<SerpCheckResult> {
   // 1. Use SerpAPI for ad detection (reliable — returns actual paid ads)
   let ads: SerpAdResult[] = []
+  let adCheckDegraded = false
   try {
     ads = await checkSerpForAds(keyword, location, options)
   } catch (err) {
     console.error(`SerpAPI ad detection failed for "${keyword}":`, err)
+    adCheckDegraded = true
   }
 
   // 2. Use DataForSEO just for the taskId (for screenshots)
@@ -103,5 +106,5 @@ export async function checkSerpForBrand(
     console.error(`DataForSEO taskId fetch failed for "${keyword}":`, err)
   }
 
-  return { ads, taskId }
+  return { ads, taskId, adCheckDegraded }
 }

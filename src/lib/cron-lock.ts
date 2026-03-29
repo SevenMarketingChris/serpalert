@@ -26,10 +26,11 @@ export async function acquireLock(jobName: string): Promise<boolean> {
     `)
 
     // Delete stale locks older than the timeout
+    const minutes = Math.floor(Math.abs(LOCK_TIMEOUT_MINUTES))
     await db.execute(sql`
       DELETE FROM cron_locks
       WHERE job_name = ${jobName}
-        AND locked_at < now() - INTERVAL '${sql.raw(String(LOCK_TIMEOUT_MINUTES))} minutes'
+        AND locked_at < now() - (${minutes} * INTERVAL '1 minute')
     `)
 
     // Try to insert a new lock row; if it already exists the INSERT fails

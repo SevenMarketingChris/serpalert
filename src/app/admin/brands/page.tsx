@@ -3,6 +3,7 @@ import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
 import type { SerpCheck } from '@/lib/db/schema'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { Shield } from 'lucide-react'
 
 function formatRelativeTime(date: Date): string {
   const now = new Date()
@@ -80,8 +81,14 @@ export default async function AdminBrandsPage() {
         </div>
 
         {brands.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
-            No brands yet.
+          <div className="bg-card border border-border rounded-lg p-12 text-center space-y-3">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mx-auto">
+              <Shield className="h-6 w-6" />
+            </div>
+            <p className="font-semibold text-foreground">No brands yet</p>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Add your first brand to start monitoring for competitor ads on your keywords.
+            </p>
           </div>
         ) : (
           <>
@@ -140,12 +147,7 @@ export default async function AdminBrandsPage() {
                         <td className="px-4 py-3">
                           <span className="inline-flex items-center gap-1.5 text-xs">
                             <span
-                              className="inline-block w-2 h-2 rounded-full"
-                              style={{
-                                backgroundColor: hasThreat
-                                  ? 'oklch(65% 0.25 25)'
-                                  : 'oklch(72% 0.15 145)',
-                              }}
+                              className={`inline-block w-2 h-2 rounded-full ${hasThreat ? 'bg-red-500' : 'bg-emerald-500'}`}
                             />
                             {hasThreat ? 'Threats' : 'Clear'}
                           </span>
@@ -196,12 +198,7 @@ export default async function AdminBrandsPage() {
                       </div>
                       <span className="inline-flex items-center gap-1.5 text-xs">
                         <span
-                          className="inline-block w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor: hasThreat
-                              ? 'oklch(65% 0.25 25)'
-                              : 'oklch(72% 0.15 145)',
-                          }}
+                          className={`inline-block w-2 h-2 rounded-full ${hasThreat ? 'bg-red-500' : 'bg-emerald-500'}`}
                         />
                         {hasThreat ? 'Threats' : 'Clear'}
                       </span>

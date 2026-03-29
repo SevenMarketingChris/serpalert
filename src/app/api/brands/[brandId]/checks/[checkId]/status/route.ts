@@ -15,6 +15,11 @@ export async function PATCH(
 
   const { brandId, checkId } = await params
 
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!UUID_RE.test(brandId) || !UUID_RE.test(checkId)) {
+    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
+  }
+
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })

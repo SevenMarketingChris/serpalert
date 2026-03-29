@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
 import { getScreenshotUrlsOlderThan, nullifyScreenshotUrls } from '@/lib/db/queries'
-import { deleteScreenshotFiles } from '@/lib/supabase-storage'
+import { deleteScreenshotFiles } from '@/lib/blob-storage'
 
 export const maxDuration = 60
 

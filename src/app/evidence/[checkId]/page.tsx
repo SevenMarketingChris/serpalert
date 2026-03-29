@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getSerpCheckWithAds } from '@/lib/db/queries'
+import Image from 'next/image'
 import { CopyLinkButton } from '@/components/copy-link-button'
 
 function formatDateTime(date: Date): string {
@@ -44,12 +45,8 @@ export default async function EvidencePage({
 
           {/* Screenshot */}
           {check.screenshotUrl && (
-            <div className="relative rounded-lg overflow-hidden">
-              <img
-                src={check.screenshotUrl}
-                alt={`SERP screenshot for ${check.keyword}`}
-                className="w-full rounded-lg"
-              />
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+              <Image src={check.screenshotUrl} alt="SERP screenshot" fill className="object-cover object-top" sizes="(max-width: 768px) 100vw, 672px" />
               <span className="absolute bottom-2 right-2 bg-black/70 text-white font-mono text-xs px-2 py-1 rounded">
                 {formatDateTime(check.checkedAt)}
               </span>
@@ -91,7 +88,7 @@ export default async function EvidencePage({
         </div>
 
         {/* Copy Link */}
-        <CopyLinkButton checkId={checkId} />
+        <CopyLinkButton checkId={checkId} brandToken={brandClientToken} />
 
         {/* Footer */}
         <p className="text-center text-muted-foreground text-xs">

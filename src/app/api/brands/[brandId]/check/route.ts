@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
-import { uploadScreenshot } from '@/lib/supabase-storage'
+import { uploadScreenshot } from '@/lib/blob-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 import { rateLimit } from '@/lib/rate-limit'
 
@@ -32,7 +32,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
 
   for (const keyword of brand.keywords) {
     try {
-      const { ads, taskId } = await checkSerpForBrand(keyword, 'United Kingdom', {
+      const { ads, taskId, adCheckDegraded } = await checkSerpForBrand(keyword, 'United Kingdom', {
         brandDomain: brand.domain ?? undefined,
       })
 
@@ -79,7 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
       results.push({ keyword, competitorCount: ads.length, status: 'ok' })
     } catch (err) {
       console.error(`Manual check failed: ${brand.name}/${keyword}`, err)
-      results.push({ keyword, status: 'error', error: String(err) })
+      results.push({ keyword, status: 'error', error: 'Check failed' })
     }
   }
 

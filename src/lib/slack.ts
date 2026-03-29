@@ -6,6 +6,11 @@ export async function sendNewCompetitorAlert(params: {
 }): Promise<void> {
   if (!params.webhookUrl) return
 
+  if (!params.webhookUrl.startsWith('https://hooks.slack.com/')) {
+    console.error('Slack webhook URL does not look valid, skipping')
+    return
+  }
+
   const response = await fetch(params.webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

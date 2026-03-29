@@ -111,12 +111,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1.5 text-xs">
                           <span
-                            className="inline-block w-2 h-2 rounded-full"
-                            style={{
-                              backgroundColor: competitor.isActive
-                                ? 'oklch(72% 0.15 145)'
-                                : 'oklch(55% 0.02 250)',
-                            }}
+                            className={`inline-block w-2 h-2 rounded-full ${competitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`}
                           />
                           {competitor.isActive ? 'Active' : 'Inactive'}
                         </span>
@@ -139,12 +134,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                   <span className="font-mono font-bold text-sm">{competitor.domain}</span>
                   <span className="inline-flex items-center gap-1.5 text-xs">
                     <span
-                      className="inline-block w-2 h-2 rounded-full"
-                      style={{
-                        backgroundColor: competitor.isActive
-                          ? 'oklch(72% 0.15 145)'
-                          : 'oklch(55% 0.02 250)',
-                      }}
+                      className={`inline-block w-2 h-2 rounded-full ${competitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`}
                     />
                     {competitor.isActive ? 'Active' : 'Inactive'}
                   </span>

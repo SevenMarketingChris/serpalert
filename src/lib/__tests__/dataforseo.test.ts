@@ -17,11 +17,12 @@ describe('checkSerpForBrand', () => {
     process.env.DATAFORSEO_PASSWORD = 'pass'
   })
 
-  it('returns empty array when no paid ads', async () => {
+  it('returns empty ads array when no paid ads', async () => {
     mockFetch.mockResolvedValueOnce(makeResponse([
       { type: 'organic', domain: 'example.com' }
     ]))
-    expect(await checkSerpForBrand('TestBrand')).toEqual([])
+    const result = await checkSerpForBrand('TestBrand')
+    expect(result.ads).toEqual([])
   })
 
   it('returns competitor ads for paid items', async () => {
@@ -30,8 +31,8 @@ describe('checkSerpForBrand', () => {
       description: 'Desc', breadcrumb: 'rival.com', url: 'https://rival.com', rank_absolute: 1,
     }]))
     const result = await checkSerpForBrand('TestBrand')
-    expect(result).toHaveLength(1)
-    expect(result[0].domain).toBe('rival.com')
+    expect(result.ads).toHaveLength(1)
+    expect(result.ads[0].domain).toBe('rival.com')
   })
 
   it('excludes brand domain from results', async () => {
@@ -39,13 +40,12 @@ describe('checkSerpForBrand', () => {
       type: 'paid', domain: 'testbrand.com', title: 'Own Ad', rank_absolute: 1,
     }]))
     const result = await checkSerpForBrand('TestBrand', 'United Kingdom', { brandDomain: 'testbrand.com' })
-    expect(result).toEqual([])
+    expect(result.ads).toEqual([])
   })
 
-  it('throws when credentials missing', async () => {
-    const originalLogin = process.env.DATAFORSEO_LOGIN
+  it('returns empty ads when credentials missing', async () => {
     delete process.env.DATAFORSEO_LOGIN
-    await expect(checkSerpForBrand('test')).rejects.toThrow('Missing DataForSEO credentials')
-    process.env.DATAFORSEO_LOGIN = originalLogin
+    const result = await checkSerpForBrand('test')
+    expect(result.ads).toEqual([])
   })
 })

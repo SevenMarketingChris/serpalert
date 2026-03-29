@@ -266,6 +266,9 @@ export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
+  const ninetyDaysAgo = new Date()
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+
   // Get all competitor ads for this brand with their check keywords
   const rows = await db.select({
     domain: competitorAds.domain,
@@ -275,7 +278,7 @@ export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
   })
     .from(competitorAds)
     .innerJoin(serpChecks, eq(competitorAds.serpCheckId, serpChecks.id))
-    .where(eq(competitorAds.brandId, brandId))
+    .where(and(eq(competitorAds.brandId, brandId), gte(competitorAds.firstSeenAt, ninetyDaysAgo)))
 
   if (rows.length === 0) return []
 

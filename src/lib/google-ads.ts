@@ -31,7 +31,7 @@ export async function getAuctionInsights(customerId: string): Promise<AuctionIns
     refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN,
   })
 
-  let timer: ReturnType<typeof setTimeout>
+  let timer: ReturnType<typeof setTimeout> | undefined
   const actualQuery = customer.query(`
     SELECT
       auction_insight.domain,
@@ -48,7 +48,7 @@ export async function getAuctionInsights(customerId: string): Promise<AuctionIns
   try {
     rows = await Promise.race([actualQuery, timeout])
   } finally {
-    clearTimeout(timer!)
+    if (timer) clearTimeout(timer)
   }
 
   return (rows as GoogleAdsRow[]).map((row) => ({
@@ -90,7 +90,7 @@ export async function setCampaignStatus(
 
   console.log(`Google Ads: setting campaign ${campaignId} to ${statusLabel} for customer ${customerId}`)
 
-  let timer: ReturnType<typeof setTimeout>
+  let timer: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error('Google Ads campaign toggle timeout (15s)')), 15_000)
   })
@@ -107,6 +107,6 @@ export async function setCampaignStatus(
     ])
     console.log(`Google Ads: campaign ${campaignId} set to ${statusLabel}`)
   } finally {
-    clearTimeout(timer!)
+    if (timer) clearTimeout(timer)
   }
 }

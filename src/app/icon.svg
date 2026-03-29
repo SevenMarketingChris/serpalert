@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#c2410c"/>
+  <rect width="32" height="32" rx="6" fill="#1d4ed8"/>
   <!-- Bell -->
   <path d="M16 6 C12 6 9 9 9 13 L9 18 L7 20 L25 20 L23 18 L23 13 C23 9 20 6 16 6Z" fill="#fed7aa"/>
   <!-- Bell clapper -->

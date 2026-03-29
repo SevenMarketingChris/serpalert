@@ -42,7 +42,6 @@ export function getServerEnv() {
     serpapiKey: requireEnv("SERPAPI_KEY"),
     adminSecret: requireEnv("ADMIN_SECRET"),
     cronSecret: requireEnv("CRON_SECRET"),
-    chromiumUrl: optionalEnv("CHROMIUM_URL"),
     ahrefsApiToken: optionalEnv("AHREFS_API_TOKEN"),
   };
 }

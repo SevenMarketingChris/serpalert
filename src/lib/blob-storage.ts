@@ -13,5 +13,5 @@ export async function uploadScreenshot(
 
 export async function deleteScreenshotFiles(publicUrls: string[]): Promise<void> {
   if (publicUrls.length === 0) return
-  await Promise.all(publicUrls.map(url => del(url).catch(() => {})))
+  await Promise.all(publicUrls.map(url => del(url).catch(err => console.error('Blob delete failed:', url, err))))
 }

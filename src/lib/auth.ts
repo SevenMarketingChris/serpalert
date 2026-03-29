@@ -1,13 +1,9 @@
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual, createHash } from 'crypto'
 
 function safeCompare(a: string, b: string): boolean {
-  try {
-    const bufA = Buffer.from(a)
-    const bufB = Buffer.from(b)
-    return bufA.length === bufB.length && timingSafeEqual(bufA, bufB)
-  } catch {
-    return false
-  }
+  const hashA = createHash('sha256').update(a).digest()
+  const hashB = createHash('sha256').update(b).digest()
+  return timingSafeEqual(hashA, hashB)
 }
 
 export const isAdminRequest = (req: Request) => {
