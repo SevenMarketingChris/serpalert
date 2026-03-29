@@ -95,25 +95,33 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
           {run.checks.map(check => {
             if (check.competitorCount === 0) {
               return (
-                <div key={check.id} className="px-4 py-2.5 flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[10px] tracking-[0.5px] bg-emerald-500/10 text-emerald-500">
-                    CLEAR
-                  </span>
-                  <span className="text-tech-purple font-mono text-sm">{check.keyword}</span>
+                <div key={check.id} className="px-4 py-4 flex gap-4">
+                  {/* Left: details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[10px] tracking-[0.5px] bg-emerald-500/10 text-emerald-500">
+                        CLEAR
+                      </span>
+                      <span className="text-tech-purple font-mono text-sm">{check.keyword}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      No competitor ads detected for this keyword. Your organic listing is capturing all brand traffic.
+                    </p>
+                  </div>
+                  {/* Right: screenshot */}
                   {check.screenshotUrl && (
                     <a
                       href={check.screenshotUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="relative w-24 h-16 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity shrink-0"
-                      title="View SERP screenshot"
+                      className="relative w-48 h-32 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
                     >
                       <Image
                         src={check.screenshotUrl}
                         alt={`SERP for "${check.keyword}"`}
                         fill
                         className="object-cover object-top"
-                        sizes="96px"
+                        sizes="192px"
                       />
                     </a>
                   )}

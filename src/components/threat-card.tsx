@@ -25,13 +25,6 @@ interface ThreatCardProps {
   competitorCount: number
 }
 
-const borderColorMap: Record<string, string> = {
-  new: 'oklch(52% 0.22 15)',
-  acknowledged: 'oklch(62% 0.22 250)',
-  reported: 'oklch(72% 0.15 55)',
-  resolved: 'oklch(72% 0.15 195)',
-}
-
 const badgeClassMap: Record<string, string> = {
   new: 'badge-new',
   acknowledged: 'badge-acknowledged',
@@ -66,7 +59,6 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
   if (!firstAd) return null
 
   const status = firstAd.status
-  const borderColor = borderColorMap[status] ?? borderColorMap.new
   const badgeClass = badgeClassMap[status] ?? badgeClassMap.new
   const isResolved = status === 'resolved'
   const transition = nextStatusMap[status]
@@ -92,75 +84,83 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
   }
 
   return (
-    <div
-      className={`bg-card border border-border rounded-lg p-3.5 ${isResolved ? 'opacity-70' : ''}`}
-      style={{ borderLeftWidth: '3px', borderLeftColor: borderColor }}
-    >
-      {/* Row 1: Status + domain + keyword + screenshot + timestamp */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className={badgeClass}>{status.toUpperCase()}</span>
-        <span className="font-semibold text-sm">{firstAd.domain}</span>
-        <span className="text-muted-foreground text-xs">on</span>
-        <span className="text-tech-purple font-mono text-sm">{keyword}</span>
-        {screenshotUrl && (
-          <a
-            href={screenshotUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative w-16 h-10 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity shrink-0"
-            title="View SERP screenshot"
-          >
-            <Image
-              src={screenshotUrl}
-              alt={`SERP for "${keyword}"`}
-              fill
-              className="object-cover object-top"
-              sizes="64px"
-            />
-          </a>
-        )}
-        <span className="ml-auto text-muted-foreground font-mono text-xs">{formatTime(checkedAt)}</span>
-      </div>
-
-      {/* Row 2: Ad copy snippet */}
-      {(firstAd.headline || firstAd.position != null) && (
-        <div className="text-muted-foreground text-xs mt-1.5">
-          Ad: &ldquo;{firstAd.headline ?? 'No headline'}&rdquo;
-          {firstAd.position != null && <> &middot; Position {firstAd.position}</>}
+    <div className={`flex gap-4 ${isResolved ? 'opacity-60' : ''}`}>
+      {/* Left: details + context */}
+      <div className="flex-1 min-w-0 space-y-3">
+        {/* Header: status + keyword + time */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={badgeClass}>{status.toUpperCase()}</span>
+          <span className="text-tech-purple font-mono text-sm">{keyword}</span>
+          <span className="ml-auto text-muted-foreground font-mono text-xs">{formatTime(checkedAt)}</span>
         </div>
-      )}
 
-      {/* Row 3: Actions */}
-      <div className="flex items-center gap-2 mt-2.5 flex-wrap">
-        <ScreenshotModal screenshotUrl={screenshotUrl} keyword={keyword} />
-        <EvidenceModal
-          checkId={checkId}
-          brandToken={brandToken}
-          keyword={keyword}
-          checkedAt={checkedAt}
-          screenshotUrl={screenshotUrl}
-          ads={ads.map(a => ({
-            domain: a.domain,
-            headline: a.headline,
-            description: a.description,
-            displayUrl: a.displayUrl,
-            destinationUrl: null,
-            position: a.position,
-          }))}
-        />
-        {transition && (
-          <button
-            onClick={handleStatusChange}
-            disabled={patching}
-            className="action-btn disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {patching ? '...' : transition.label}
-          </button>
-        )}
-        <span className={`ml-auto ${badgeClass} ${status === 'new' ? 'neon-glow-hero' : ''}`}>
-          {status.toUpperCase()}
-        </span>
+        {/* Context summary */}
+        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+          <p className="text-sm font-medium text-foreground">
+            {competitorCount} competitor{competitorCount !== 1 ? 's' : ''} bidding on your brand
+          </p>
+          <div className="space-y-1.5">
+            {ads.map((ad, i) => (
+              <div key={ad.id || i} className="text-xs">
+                <span className="font-semibold text-foreground">{ad.domain}</span>
+                {ad.headline && (
+                  <span className="text-muted-foreground"> — &ldquo;{ad.headline}&rdquo;</span>
+                )}
+                {ad.position != null && (
+                  <span className="text-muted-foreground"> · Position {ad.position}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <ScreenshotModal screenshotUrl={screenshotUrl} keyword={keyword} />
+          <EvidenceModal
+            checkId={checkId}
+            brandToken={brandToken}
+            keyword={keyword}
+            checkedAt={checkedAt}
+            screenshotUrl={screenshotUrl}
+            ads={ads.map(a => ({
+              domain: a.domain,
+              headline: a.headline,
+              description: a.description,
+              displayUrl: a.displayUrl,
+              destinationUrl: null,
+              position: a.position,
+            }))}
+          />
+          {transition && (
+            <button
+              onClick={handleStatusChange}
+              disabled={patching}
+              className="action-btn disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {patching ? '...' : transition.label}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Right: screenshot */}
+      {screenshotUrl && (
+        <a
+          href={screenshotUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative w-48 h-32 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
+        >
+          <Image
+            src={screenshotUrl}
+            alt={`SERP for "${keyword}"`}
+            fill
+            className="object-cover object-top"
+            sizes="192px"
+          />
+        </a>
+      )}
     </div>
   )
 }
