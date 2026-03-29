@@ -76,7 +76,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
         }
       }
 
-      results.push({ keyword, competitorCount: ads.length, status: 'ok' })
+      results.push({ keyword, competitorCount: ads.length, status: 'ok', adCheckDegraded })
     } catch (err) {
       console.error(`Manual check failed: ${brand.name}/${keyword}`, err)
       results.push({ keyword, status: 'error', error: 'Check failed' })

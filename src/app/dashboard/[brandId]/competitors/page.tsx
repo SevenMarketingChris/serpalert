@@ -16,9 +16,9 @@ function formatRelativeTime(date: Date): string {
 }
 
 const rankBorderColors: Record<number, string> = {
-  1: 'oklch(75% 0.15 85)',
-  2: 'oklch(70% 0 0)',
-  3: 'oklch(65% 0.1 55)',
+  1: '#D4AF37',
+  2: '#A8A9AD',
+  3: '#CD7F32',
 }
 
 export default async function CompetitorsPage({ params }: { params: Promise<{ brandId: string }> }) {

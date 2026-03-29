@@ -19,8 +19,6 @@ export async function GET(request: Request) {
     })
   } catch (err) {
     console.error('[test-screenshot] Failed:', err)
-    return NextResponse.json({
-      error: err instanceof Error ? err.message : String(err),
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Screenshot failed' }, { status: 500 })
   }
 }

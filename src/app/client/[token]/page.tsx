@@ -145,7 +145,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                 <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1" style={{ height: '100%' }}>
                   <div className="flex flex-col items-center justify-end flex-1">
                     {hasThreats && (
-                      <span className="text-[10px] font-mono mb-0.5" style={{ color: 'oklch(52% 0.22 15)' }}>
+                      <span className="text-[10px] font-mono mb-0.5" style={{ color: '#dc2626' }}>
                         {day.threats}
                       </span>
                     )}
@@ -154,8 +154,8 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                       style={{
                         height: barHeight,
                         background: hasThreats
-                          ? 'oklch(52% 0.22 15 / 0.7)'
-                          : 'oklch(62% 0.22 250 / 0.3)',
+                          ? 'rgba(220, 38, 38, 0.7)'
+                          : 'rgba(59, 130, 246, 0.3)',
                       }}
                     />
                   </div>
@@ -166,10 +166,10 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           </div>
           <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border text-[10px] text-muted-foreground font-mono">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-sm" style={{ background: 'oklch(62% 0.22 250 / 0.3)' }} /> Clear
+              <span className="w-2 h-2 rounded-sm" style={{ background: 'rgba(59, 130, 246, 0.3)' }} /> Clear
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-sm" style={{ background: 'oklch(52% 0.22 15 / 0.7)' }} /> Threats
+              <span className="w-2 h-2 rounded-sm" style={{ background: 'rgba(220, 38, 38, 0.7)' }} /> Threats
             </span>
           </div>
         </section>
@@ -200,8 +200,8 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                           key={kw}
                           className="text-[10px] rounded px-1.5 py-0.5 font-mono"
                           style={{
-                            background: 'oklch(40% 0.15 300 / 0.15)',
-                            color: 'oklch(70% 0.15 300)',
+                            background: 'rgba(139, 92, 246, 0.15)',
+                            color: '#8b5cf6',
                           }}
                         >
                           {kw}
@@ -233,8 +233,8 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                           key={kw}
                           className="text-[10px] rounded px-1.5 py-0.5 font-mono"
                           style={{
-                            background: 'oklch(40% 0.15 300 / 0.15)',
-                            color: 'oklch(70% 0.15 300)',
+                            background: 'rgba(139, 92, 246, 0.15)',
+                            color: '#8b5cf6',
                           }}
                         >
                           {kw}
@@ -328,7 +328,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             {' '}&middot;{' '}
             Monitoring {brand.keywords.length} keyword{brand.keywords.length !== 1 ? 's' : ''}
             {' '}&middot;{' '}
-            3 checks per day
+            Monitored around the clock
           </p>
           <p className="text-xs text-muted-foreground">
             Brand monitoring report · Generated {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}

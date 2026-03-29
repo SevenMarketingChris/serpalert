@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getBrandById, getCompetitorAdById, updateCompetitorAdStatus } from '@/lib/db/queries'
 import { isAdminRequest } from '@/lib/auth'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
 type AdStatus = typeof VALID_STATUSES[number]
 
@@ -21,8 +23,6 @@ export async function PATCH(
   }
 
   const { brandId, adId } = await params
-
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
   if (!UUID_RE.test(brandId) || !UUID_RE.test(adId)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
   }
