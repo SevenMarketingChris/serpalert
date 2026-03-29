@@ -88,7 +88,7 @@ export async function setCampaignStatus(
     : enums.CampaignStatus.PAUSED
   const statusLabel = enabled ? 'ENABLED' : 'PAUSED'
 
-  console.log(`Google Ads: setting campaign ${campaignId} to ${statusLabel} for customer ${customerId}`)
+  console.info(`Google Ads: setting campaign ${campaignId} to ${statusLabel} for customer ${customerId}`)
 
   let timer: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
@@ -105,7 +105,7 @@ export async function setCampaignStatus(
       ]),
       timeout,
     ])
-    console.log(`Google Ads: campaign ${campaignId} set to ${statusLabel}`)
+    console.info(`Google Ads: campaign ${campaignId} set to ${statusLabel}`)
   } finally {
     if (timer) clearTimeout(timer)
   }

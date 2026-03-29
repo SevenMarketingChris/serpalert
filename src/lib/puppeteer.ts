@@ -13,7 +13,7 @@ export async function screenshotSerp(taskId: string): Promise<Buffer> {
     `${process.env.DATAFORSEO_LOGIN}:${process.env.DATAFORSEO_PASSWORD}`
   ).toString('base64')
 
-  console.log(`DataForSEO screenshot: requesting for task ${taskId}`)
+  console.info(`DataForSEO screenshot: requesting for task ${taskId}`)
 
   const response = await fetch(
     'https://api.dataforseo.com/v3/serp/screenshot',
@@ -47,7 +47,7 @@ export async function screenshotSerp(taskId: string): Promise<Buffer> {
     throw new Error(`DataForSEO screenshot: no image returned for task ${taskId}`)
   }
 
-  console.log(`DataForSEO screenshot: downloading from ${imageUrl.slice(0, 80)}...`)
+  console.info(`DataForSEO screenshot: downloading from ${imageUrl.slice(0, 80)}...`)
 
   const imgResponse = await fetch(imageUrl, { signal: AbortSignal.timeout(15_000) })
   if (!imgResponse.ok) {

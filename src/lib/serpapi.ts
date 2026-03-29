@@ -30,13 +30,14 @@ export async function checkSerpForAds(
     ? 'London, England, United Kingdom'
     : location
 
+  // SerpAPI requires api_key as a query parameter — their API does not support header-based auth
   const params = new URLSearchParams({
     q: keyword,
     location: serpLocation,
     gl: 'uk',
     hl: 'en',
     engine: 'google',
-    api_key: apiKey,
+    api_key: apiKey,  // Must be in query string per SerpAPI docs
   })
 
   const response = await fetch(`https://serpapi.com/search.json?${params}`, {
@@ -60,7 +61,7 @@ export async function checkSerpForAds(
     tracking_link?: string
   }> = data.ads ?? []
 
-  console.log(`SerpAPI "${keyword}": ${ads.length} paid ads found`)
+  console.info(`SerpAPI "${keyword}": ${ads.length} paid ads found`)
 
   return ads
     .filter(ad => {

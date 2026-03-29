@@ -78,7 +78,7 @@ export async function GET(request: Request) {
         return { brandId: brand.id, brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' as const, adCheckDegraded }
       } catch (err) {
         console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
-        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: String(err), competitorCount: 0, adCheckDegraded: false }
+        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: 'Check failed', competitorCount: 0, adCheckDegraded: false }
       }
     }
 
@@ -106,10 +106,10 @@ export async function GET(request: Request) {
 
       try {
         if (hasCompetitors) {
-          console.log(`Auto-enabling brand campaign for ${brand.name} — competitors detected`)
+          console.info(`Auto-enabling brand campaign for ${brand.name} — competitors detected`)
           await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, true)
         } else {
-          console.log(`Auto-pausing brand campaign for ${brand.name} — no competitors`)
+          console.info(`Auto-pausing brand campaign for ${brand.name} — no competitors`)
           await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, false)
         }
       } catch (err) {

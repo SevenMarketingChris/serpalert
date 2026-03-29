@@ -72,7 +72,7 @@ async function fetchSerp(
 
   const items: DataForSeoItem[] = result.items ?? []
   const types = [...new Set(items.map((i) => i.type))].join(', ')
-  console.log(`DataForSEO [${endpoint}] "${keyword}": ${items.length} items, types: ${types}`)
+  console.info(`DataForSEO [${endpoint}] "${keyword}": ${items.length} items, types: ${types}`)
   return { items, taskId }
 }
 
