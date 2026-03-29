@@ -37,6 +37,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
             monthlyBrandSpend={brand.monthlyBrandSpend ?? ''}
             brandRoas={brand.brandRoas ?? ''}
             googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
+            brandCampaignId={brand.brandCampaignId ?? ''}
             slackWebhookUrl={brand.slackWebhookUrl ?? ''}
             active={brand.active}
           />

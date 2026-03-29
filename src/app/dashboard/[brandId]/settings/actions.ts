@@ -51,6 +51,7 @@ export async function updateAdminSettings(
   const monthlyBrandSpend = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || null
   const brandRoas = ((formData.get('brandRoas') as string) ?? '').trim() || null
   const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null
+  const brandCampaignId = ((formData.get('brandCampaignId') as string) ?? '').trim() || null
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const active = formData.get('active') === 'on'
 
@@ -63,6 +64,7 @@ export async function updateAdminSettings(
       monthlyBrandSpend,
       brandRoas,
       googleAdsCustomerId,
+      brandCampaignId,
       slackWebhookUrl,
       active,
     })

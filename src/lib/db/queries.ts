@@ -152,6 +152,7 @@ export async function updateBrand(
     name?: string; keywords?: string[]; domain?: string | null
     googleAdsCustomerId?: string | null; slackWebhookUrl?: string | null
     monthlyBrandSpend?: string | null; brandRoas?: string | null
+    brandCampaignId?: string | null
     active?: boolean
   },
 ): Promise<Brand> {

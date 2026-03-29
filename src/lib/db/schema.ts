@@ -7,6 +7,7 @@ export const brands = pgTable('brands', {
   clientToken: uuid('client_token').notNull().defaultRandom().unique(),
   domain: text('domain'),
   googleAdsCustomerId: text('google_ads_customer_id'),
+  brandCampaignId: text('brand_campaign_id'),
   keywords: text('keywords').array().notNull().default([]),
   active: boolean('active').notNull().default(true),
   slackWebhookUrl: text('slack_webhook_url'),

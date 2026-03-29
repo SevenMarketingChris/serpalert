@@ -6,6 +6,7 @@ import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 import { acquireLock, releaseLock } from '@/lib/cron-lock'
+import { setCampaignStatus } from '@/lib/google-ads'
 
 export const maxDuration = 300
 
@@ -88,6 +89,26 @@ export async function GET(request: Request) {
       const batch = jobs.slice(i, i + CONCURRENCY)
       const batchResults = await Promise.all(batch.map(processJob))
       results.push(...batchResults)
+    }
+
+    // Auto-toggle brand campaigns based on competitor detection
+    for (const brand of allBrands) {
+      if (!brand.googleAdsCustomerId || !brand.brandCampaignId) continue
+
+      const brandResults = results.filter(r => r.brand === brand.name)
+      const hasCompetitors = brandResults.some(r => r.competitorCount && r.competitorCount > 0)
+
+      try {
+        if (hasCompetitors) {
+          console.log(`Auto-enabling brand campaign for ${brand.name} — competitors detected`)
+          await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, true)
+        } else {
+          console.log(`Auto-pausing brand campaign for ${brand.name} — no competitors`)
+          await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, false)
+        }
+      } catch (err) {
+        console.error(`Campaign toggle failed for ${brand.name}:`, err)
+      }
     }
 
     return NextResponse.json({ results, timestamp: new Date().toISOString() })

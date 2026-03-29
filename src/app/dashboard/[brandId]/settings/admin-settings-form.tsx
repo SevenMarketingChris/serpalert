@@ -12,6 +12,7 @@ interface Props {
   monthlyBrandSpend: string
   brandRoas: string
   googleAdsCustomerId: string
+  brandCampaignId: string
   slackWebhookUrl: string
   active: boolean
 }
@@ -21,6 +22,7 @@ export function AdminSettingsForm({
   monthlyBrandSpend,
   brandRoas,
   googleAdsCustomerId,
+  brandCampaignId,
   slackWebhookUrl,
   active,
 }: Props) {
@@ -66,6 +68,19 @@ export function AdminSettingsForm({
             defaultValue={googleAdsCustomerId}
             placeholder="123-456-7890"
           />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="brandCampaignId">Brand Campaign ID</Label>
+          <Input
+            id="brandCampaignId"
+            name="brandCampaignId"
+            defaultValue={brandCampaignId}
+            placeholder="e.g. 12345678"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            The Google Ads campaign ID for your brand campaign. SerpAlert will automatically enable this campaign when competitors are detected and pause it when clear.
+          </p>
         </div>
 
         <div className="space-y-1.5">

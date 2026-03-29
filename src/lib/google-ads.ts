@@ -1,4 +1,4 @@
-import { GoogleAdsApi } from 'google-ads-api'
+import { GoogleAdsApi, enums } from 'google-ads-api'
 
 export interface AuctionInsightRow {
   competitorDomain: string
@@ -57,4 +57,56 @@ export async function getAuctionInsights(customerId: string): Promise<AuctionIns
     overlapRate: row.metrics?.auction_insight_search_overlap_rate ?? null,
     outrankingShare: row.metrics?.auction_insight_search_outranking_share ?? null,
   }))
+}
+
+/**
+ * Enable or pause a Google Ads campaign.
+ * Used to automatically toggle brand campaigns when competitors are detected.
+ */
+export async function setCampaignStatus(
+  customerId: string,
+  campaignId: string,
+  enabled: boolean
+): Promise<void> {
+  if (!process.env.GOOGLE_ADS_CLIENT_ID || !process.env.GOOGLE_ADS_CLIENT_SECRET || !process.env.GOOGLE_ADS_DEVELOPER_TOKEN || !process.env.GOOGLE_ADS_REFRESH_TOKEN) {
+    console.warn('Missing Google Ads credentials — skipping campaign toggle')
+    return
+  }
+
+  const client = new GoogleAdsApi({
+    client_id: process.env.GOOGLE_ADS_CLIENT_ID,
+    client_secret: process.env.GOOGLE_ADS_CLIENT_SECRET,
+    developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+  })
+  const customer = client.Customer({
+    customer_id: customerId.replace(/-/g, ''),
+    refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN,
+  })
+
+  const status = enabled
+    ? enums.CampaignStatus.ENABLED
+    : enums.CampaignStatus.PAUSED
+  const statusLabel = enabled ? 'ENABLED' : 'PAUSED'
+
+  console.log(`Google Ads: setting campaign ${campaignId} to ${statusLabel} for customer ${customerId}`)
+
+  let timer: ReturnType<typeof setTimeout>
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Google Ads campaign toggle timeout (15s)')), 15_000)
+  })
+
+  try {
+    await Promise.race([
+      customer.campaigns.update([
+        {
+          resource_name: `customers/${customerId.replace(/-/g, '')}/campaigns/${campaignId}`,
+          status,
+        },
+      ]),
+      timeout,
+    ])
+    console.log(`Google Ads: campaign ${campaignId} set to ${statusLabel}`)
+  } finally {
+    clearTimeout(timer!)
+  }
 }
