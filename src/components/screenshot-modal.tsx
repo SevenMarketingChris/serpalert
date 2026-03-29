@@ -25,7 +25,7 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
           )
         }
       />
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <p className="text-sm font-medium mb-2 font-mono">
           SERP: <span className="text-primary">{keyword}</span>
         </p>
@@ -51,6 +51,14 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
             </>
           )}
         </div>
+        <a
+          href={screenshotUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-primary hover:underline mt-1 inline-block"
+        >
+          Open full size
+        </a>
       </DialogContent>
     </Dialog>
   )

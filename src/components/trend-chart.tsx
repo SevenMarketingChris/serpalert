@@ -7,7 +7,7 @@ interface TrendChartProps {
 export function TrendChart({ data }: TrendChartProps) {
   if (data.length === 0) return null
 
-  const maxChecks = Math.max(...data.map(d => d.checks), 1)
+  const maxValue = Math.max(...data.map(d => Math.max(d.checks, d.threats)), 1)
 
   return (
     <div className="bg-card border border-border rounded-lg p-4">
@@ -16,19 +16,17 @@ export function TrendChart({ data }: TrendChartProps) {
       </h3>
       <div className="flex items-end gap-px h-20">
         {data.map((day) => {
-          const height = Math.max((day.checks / maxChecks) * 100, 4)
-          const hasThreat = day.threats > 0
+          const checkHeight = Math.max((day.checks / maxValue) * 100, 4)
+          const threatHeight = day.threats > 0 ? Math.max((day.threats / maxValue) * 100, 4) : 0
           return (
             <div
               key={day.date}
-              className="flex-1 group relative"
+              className="flex-1 group relative flex flex-col justify-end"
               title={`${day.date}: ${day.checks} checks, ${day.threats} threats`}
             >
               <div
-                className={`w-full rounded-sm transition-colors ${
-                  hasThreat ? 'bg-red-500' : 'bg-primary/30 group-hover:bg-primary/50'
-                }`}
-                style={{ height: `${height}%` }}
+                className={`w-full rounded-sm ${day.threats > 0 ? 'bg-red-500' : 'bg-primary/30 group-hover:bg-primary/50'}`}
+                style={{ height: `${day.threats > 0 ? Math.max(checkHeight, threatHeight) : checkHeight}%` }}
               />
             </div>
           )

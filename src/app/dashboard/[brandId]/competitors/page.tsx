@@ -51,8 +51,11 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                 <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase tracking-wider">
                   <th className="px-4 py-3 font-medium">Rank</th>
                   <th className="px-4 py-3 font-medium">Domain</th>
-                  <th className="px-4 py-3 font-medium">Detections</th>
+                  <th className="px-4 py-3 font-medium">Avg Position</th>
+                  <th className="px-4 py-3 font-medium">Last 30d</th>
+                  <th className="px-4 py-3 font-medium">Total</th>
                   <th className="px-4 py-3 font-medium">Keywords</th>
+                  <th className="px-4 py-3 font-medium">First Seen</th>
                   <th className="px-4 py-3 font-medium">Last Seen</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
@@ -68,8 +71,20 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                       style={borderColor ? { borderLeftWidth: '3px', borderLeftColor: borderColor } : undefined}
                     >
                       <td className="px-4 py-3 text-sm text-muted-foreground">#{rank}</td>
-                      <td className="px-4 py-3 font-mono text-sm">{competitor.domain}</td>
-                      <td className="px-4 py-3 font-mono font-bold text-sm">{competitor.detectionCount}</td>
+                      <td className="px-4 py-3 font-mono text-sm font-bold">{competitor.domain}</td>
+                      <td className="px-4 py-3">
+                        {competitor.avgPosition != null ? (
+                          <span className={`font-mono text-xs px-2 py-0.5 rounded ${
+                            competitor.avgPosition <= 2 ? 'bg-red-500/10 text-red-500' : 'bg-muted text-muted-foreground'
+                          }`}>
+                            Pos {competitor.avgPosition}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">&mdash;</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-bold text-sm">{competitor.recentCount}</td>
+                      <td className="px-4 py-3 font-mono text-sm text-muted-foreground">{competitor.totalCount}</td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {competitor.keywords.slice(0, 3).map((kw) => (
@@ -86,6 +101,9 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                        {new Date(competitor.firstSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                         {formatRelativeTime(competitor.lastSeen)}
@@ -133,7 +151,9 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                 </div>
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>
-                    <span className="font-mono font-bold text-foreground">{competitor.detectionCount}</span> detections
+                    <span className="font-mono font-bold text-foreground">{competitor.recentCount}</span> last 30d
+                    <span className="mx-1">&middot;</span>
+                    <span className="font-mono text-foreground">{competitor.totalCount}</span> total
                   </span>
                   <span className="font-mono text-xs">{formatRelativeTime(competitor.lastSeen)}</span>
                 </div>

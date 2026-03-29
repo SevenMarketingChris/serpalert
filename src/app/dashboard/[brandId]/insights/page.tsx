@@ -36,16 +36,6 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
           </Link>
         </div>
       )}
-
-      {/* Future sections */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-lg p-6">
-          <p className="text-muted-foreground text-sm">SEO Metrics — Coming soon</p>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-6">
-          <p className="text-muted-foreground text-sm">Monthly Reports — Coming soon</p>
-        </div>
-      </div>
     </div>
   )
 }

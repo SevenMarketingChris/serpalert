@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { getBrandByToken, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { ScreenshotModal } from '@/components/screenshot-modal'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -331,11 +330,8 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             {' '}&middot;{' '}
             3 checks per day
           </p>
-          <p className="text-[10px] text-muted-foreground/60 font-mono">
-            Protected by{' '}
-            <Link href="/" className="underline underline-offset-2 hover:text-muted-foreground transition-colors">
-              SerpAlert
-            </Link>
+          <p className="text-xs text-muted-foreground">
+            Brand monitoring report · Generated {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </footer>
 

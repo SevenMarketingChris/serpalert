@@ -84,7 +84,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
   }
 
   return (
-    <div className={`flex gap-4 ${isResolved ? 'opacity-60' : ''}`}>
+    <div className={`flex flex-col sm:flex-row gap-4 ${isResolved ? 'opacity-60' : ''}`}>
       {/* Left: details + context */}
       <div className="flex-1 min-w-0 space-y-3">
         {/* Header: status + keyword + time */}
@@ -101,13 +101,21 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
           </p>
           <div className="space-y-1.5">
             {ads.map((ad, i) => (
-              <div key={ad.id || i} className="text-xs">
-                <span className="font-semibold text-foreground">{ad.domain}</span>
+              <div key={ad.id || i} className="text-xs space-y-0.5">
+                <div>
+                  <span className="font-semibold text-foreground">{ad.domain}</span>
+                  {ad.position != null && (
+                    <span className="text-muted-foreground"> · Position {ad.position}</span>
+                  )}
+                </div>
                 {ad.headline && (
-                  <span className="text-muted-foreground"> — &ldquo;{ad.headline}&rdquo;</span>
+                  <p className="text-muted-foreground">&ldquo;{ad.headline}&rdquo;</p>
                 )}
-                {ad.position != null && (
-                  <span className="text-muted-foreground"> · Position {ad.position}</span>
+                {ad.description && (
+                  <p className="text-muted-foreground text-[11px]">{ad.description}</p>
+                )}
+                {ad.displayUrl && (
+                  <p className="text-muted-foreground text-[11px] font-mono">{ad.displayUrl}</p>
                 )}
               </div>
             ))}
@@ -150,7 +158,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
           href={screenshotUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative w-48 h-32 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
+          className="relative w-full sm:w-64 h-44 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
         >
           <Image
             src={screenshotUrl}

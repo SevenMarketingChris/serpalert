@@ -81,8 +81,8 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         keywordCount={brand.keywords.length}
         last7DaysThreats={last7Days}
       />
-      <TrendChart data={last30Days} />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
+      <TrendChart data={last30Days} />
       <ActivityFeed checks={checksWithAds} brandId={brandId} brandToken={brand.clientToken} />
     </div>
   )

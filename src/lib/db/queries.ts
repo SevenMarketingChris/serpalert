@@ -253,46 +253,80 @@ export async function getSerpCheckWithAds(checkId: string): Promise<{
 
 export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
   domain: string
-  detectionCount: number
+  totalCount: number
+  recentCount: number
   keywords: string[]
+  firstSeen: Date
   lastSeen: Date
+  avgPosition: number | null
   isActive: boolean
 }[]> {
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-  const rows = await db
-    .select({
-      domain: competitorAds.domain,
-      detectionCount: count(competitorAds.id),
-      lastSeen: max(competitorAds.firstSeenAt),
-    })
+  // Get all competitor ads for this brand with their check keywords
+  const rows = await db.select({
+    domain: competitorAds.domain,
+    keyword: serpChecks.keyword,
+    position: competitorAds.position,
+    firstSeenAt: competitorAds.firstSeenAt,
+  })
     .from(competitorAds)
+    .innerJoin(serpChecks, eq(competitorAds.serpCheckId, serpChecks.id))
     .where(eq(competitorAds.brandId, brandId))
-    .groupBy(competitorAds.domain)
-    .orderBy(desc(count(competitorAds.id)))
 
-  // For each domain, get the distinct keywords from the associated serp_checks
-  const results = await Promise.all(
-    rows.map(async (row) => {
-      const keywordRows = await db
-        .selectDistinct({ keyword: serpChecks.keyword })
-        .from(competitorAds)
-        .innerJoin(serpChecks, eq(competitorAds.serpCheckId, serpChecks.id))
-        .where(and(eq(competitorAds.brandId, brandId), eq(competitorAds.domain, row.domain)))
+  if (rows.length === 0) return []
 
-      const lastSeen = row.lastSeen ? new Date(row.lastSeen) : new Date(0)
-      return {
-        domain: row.domain,
-        detectionCount: row.detectionCount,
-        keywords: keywordRows.map((k) => k.keyword),
-        lastSeen,
-        isActive: lastSeen >= sevenDaysAgo,
-      }
-    })
-  )
+  // Group by domain in JS (avoids N+1)
+  const domainMap = new Map<string, {
+    count: number
+    recentCount: number
+    keywords: Set<string>
+    positions: number[]
+    firstSeen: Date
+    lastSeen: Date
+  }>()
 
-  return results
+  for (const row of rows) {
+    const existing = domainMap.get(row.domain)
+    const date = new Date(row.firstSeenAt)
+    const isRecent = date >= thirtyDaysAgo
+
+    if (existing) {
+      existing.count++
+      if (isRecent) existing.recentCount++
+      existing.keywords.add(row.keyword)
+      if (row.position != null) existing.positions.push(row.position)
+      if (date < existing.firstSeen) existing.firstSeen = date
+      if (date > existing.lastSeen) existing.lastSeen = date
+    } else {
+      domainMap.set(row.domain, {
+        count: 1,
+        recentCount: isRecent ? 1 : 0,
+        keywords: new Set([row.keyword]),
+        positions: row.position != null ? [row.position] : [],
+        firstSeen: date,
+        lastSeen: date,
+      })
+    }
+  }
+
+  return [...domainMap.entries()]
+    .map(([domain, stats]) => ({
+      domain,
+      totalCount: stats.count,
+      recentCount: stats.recentCount,
+      keywords: [...stats.keywords],
+      firstSeen: stats.firstSeen,
+      lastSeen: stats.lastSeen,
+      avgPosition: stats.positions.length > 0
+        ? Math.round((stats.positions.reduce((a, b) => a + b, 0) / stats.positions.length) * 10) / 10
+        : null,
+      isActive: stats.lastSeen >= sevenDaysAgo,
+    }))
+    .sort((a, b) => b.recentCount - a.recentCount || b.totalCount - a.totalCount)
 }
 
 export async function deleteBrand(id: string): Promise<void> {

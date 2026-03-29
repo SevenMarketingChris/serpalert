@@ -66,24 +66,6 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
           </span>
         )}
 
-        {!expanded && screenshots.length > 0 && (
-          <div className="hidden sm:flex items-center gap-1 ml-1">
-            {screenshots.slice(0, 3).map(c => (
-              <div key={c.id} className="relative w-12 h-8 rounded border border-border overflow-hidden shrink-0">
-                <Image
-                  src={c.screenshotUrl!}
-                  alt={c.keyword}
-                  fill
-                  className="object-cover object-top"
-                  sizes="48px"
-                />
-              </div>
-            ))}
-            {screenshots.length > 3 && (
-              <span className="text-[10px] text-muted-foreground">+{screenshots.length - 3}</span>
-            )}
-          </div>
-        )}
 
         <span className="ml-auto text-muted-foreground font-mono text-xs shrink-0">
           {formatScanTime(run.timestamp)}
@@ -95,7 +77,7 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
           {run.checks.map(check => {
             if (check.competitorCount === 0) {
               return (
-                <div key={check.id} className="px-4 py-4 flex gap-4">
+                <div key={check.id} className="px-4 py-4 flex flex-col sm:flex-row gap-4">
                   {/* Left: details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
@@ -114,14 +96,14 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
                       href={check.screenshotUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="relative w-48 h-32 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
+                      className="relative w-full sm:w-64 h-44 rounded-lg border border-border overflow-hidden hover:opacity-90 transition-opacity shrink-0 bg-muted"
                     >
                       <Image
                         src={check.screenshotUrl}
                         alt={`SERP for "${check.keyword}"`}
                         fill
                         className="object-cover object-top"
-                        sizes="192px"
+                        sizes="256px"
                       />
                     </a>
                   )}
@@ -163,7 +145,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
       case 'new':
         return run.totalThreats > 0 && run.checks.some(c => c.ads.some(a => a.status === 'new'))
       case 'unresolved':
-        return run.totalThreats === 0 || run.hasUnresolved
+        return run.hasUnresolved
       case 'resolved':
         return run.totalThreats > 0 && !run.hasUnresolved
       default:

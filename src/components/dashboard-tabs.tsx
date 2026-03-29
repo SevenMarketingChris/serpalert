@@ -22,7 +22,7 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
   ]
 
   return (
-    <nav className="flex flex-row border-b border-border">
+    <nav className="flex flex-row border-b border-border overflow-x-auto">
       {tabs.map(tab => {
         const isActive = tab.exact
           ? pathname === tab.href
