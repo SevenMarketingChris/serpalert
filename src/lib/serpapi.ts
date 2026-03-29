@@ -23,9 +23,16 @@ export async function checkSerpForAds(
     return []
   }
 
+  // SerpAPI needs a specific location to return ads reliably
+  // "United Kingdom" (country-level) often returns no ads
+  // "London, England, United Kingdom" matches how most UK ads are targeted
+  const serpLocation = location === 'United Kingdom'
+    ? 'London, England, United Kingdom'
+    : location
+
   const params = new URLSearchParams({
     q: keyword,
-    location,
+    location: serpLocation,
     gl: 'uk',
     hl: 'en',
     engine: 'google',
