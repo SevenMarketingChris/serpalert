@@ -17,16 +17,16 @@ export function ClientMetricCards({
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {/* Keywords Monitored */}
       <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-purple">
-        <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
-          Keywords
+        <p className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5">
+          Keywords Monitored
         </p>
         <p className="text-2xl font-bold font-mono text-tech-purple">{keywordCount}</p>
       </div>
 
       {/* Total Checks */}
       <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-blue">
-        <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
-          Total Checks
+        <p className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5">
+          Total Scans
         </p>
         <p className="text-2xl font-bold font-mono text-tech-blue">{totalChecks}</p>
       </div>
@@ -36,8 +36,8 @@ export function ClientMetricCards({
         className={`bg-card border border-border rounded-lg p-3.5 ${isClear ? 'metric-stripe-green' : ''}`}
         style={!isClear ? { borderTop: '3px solid var(--color-destructive)' } : undefined}
       >
-        <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
-          Today
+        <p className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5">
+          Today's Status
         </p>
         <p
           className={`text-2xl font-bold font-mono ${isClear ? 'text-tech-green' : ''}`}
@@ -49,8 +49,8 @@ export function ClientMetricCards({
 
       {/* All-Time Competitors */}
       <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-orange">
-        <p className="text-[9px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1">
-          Competitors
+        <p className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5">
+          Competitors (All Time)
         </p>
         <p className="text-2xl font-bold font-mono text-tech-orange">{allTimeCompetitors}</p>
       </div>

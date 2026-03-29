@@ -1,3 +1,4 @@
+import { ShieldCheck, AlertTriangle } from 'lucide-react'
 import { ManualCheckButton } from '@/components/manual-check-button'
 
 interface StatusHeroProps {
@@ -48,10 +49,13 @@ export function StatusHero({
     }`}>
       <div className="p-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className={`w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${
-            isProtected ? 'bg-emerald-500/20' : 'bg-red-500/20'
+          <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${
+            isProtected ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
           }`}>
-            {isProtected ? '🛡' : '⚠'}
+            {isProtected
+              ? <ShieldCheck className="w-5 h-5" />
+              : <AlertTriangle className="w-5 h-5" />
+            }
           </div>
           <div>
             <p className={`text-lg font-bold ${isProtected ? 'text-emerald-500' : 'text-red-500'}`}>
