@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, hasScreenshotToday } from '@/lib/db/queries'
+import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
@@ -37,16 +37,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
       })
 
       let screenshotUrl: string | undefined
-      if (taskId && !(await hasScreenshotToday(brand.id, keyword))) {
+      if (taskId) {
         try {
           const buffer = await screenshotSerp(taskId)
           screenshotUrl = await uploadScreenshot(
             buffer,
-            `${brand.id}/${new Date().toISOString().split('T')[0]}-${encodeURIComponent(keyword)}.png`
+            `${brand.id}/${new Date().toISOString().replace(/[:.]/g, '-')}-${encodeURIComponent(keyword)}.png`
           )
         } catch (ssErr) {
           console.error(`Screenshot failed for "${keyword}":`, ssErr)
         }
+      } else {
+        console.warn(`No taskId for "${keyword}" — screenshot skipped`)
       }
 
       const check = await insertSerpCheck({

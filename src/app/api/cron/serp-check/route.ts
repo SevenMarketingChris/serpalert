@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
-import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, hasScreenshotToday } from '@/lib/db/queries'
+import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/puppeteer'
 import { uploadScreenshot } from '@/lib/supabase-storage'
@@ -38,17 +38,19 @@ export async function GET(request: Request) {
         })
         let screenshotUrl: string | undefined
 
-        // Always take a screenshot (once per day per keyword) so results can be verified
-        if (taskId && !(await hasScreenshotToday(brand.id, keyword))) {
+        // Take a screenshot on every check
+        if (taskId) {
           try {
             const buffer = await screenshotSerp(taskId)
             screenshotUrl = await uploadScreenshot(
               buffer,
-              `${brand.id}/${new Date().toISOString().split('T')[0]}-${encodeURIComponent(keyword)}.png`
+              `${brand.id}/${new Date().toISOString().replace(/[:.]/g, '-')}-${encodeURIComponent(keyword)}.png`
             )
           } catch (ssErr) {
             console.error(`Screenshot failed for "${keyword}":`, ssErr)
           }
+        } else {
+          console.warn(`No taskId for "${keyword}" — screenshot skipped`)
         }
 
         const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
