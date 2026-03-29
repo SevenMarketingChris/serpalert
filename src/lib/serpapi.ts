@@ -63,12 +63,16 @@ export async function checkSerpForAds(
 
   console.info(`SerpAPI "${keyword}": ${ads.length} paid ads found`)
 
+  // Normalize domain: strip www. prefix and lowercase for comparison
+  const normalizeDomain = (d: string) => d.toLowerCase().replace(/^www\./, '')
+
   return ads
     .filter(ad => {
       const adDomain = ad.domain ?? (() => {
         try { return new URL(ad.link ?? '').hostname } catch { return '' }
       })()
-      return !options.brandDomain || adDomain !== options.brandDomain
+      if (!options.brandDomain) return true
+      return normalizeDomain(adDomain) !== normalizeDomain(options.brandDomain)
     })
     .map((ad, i) => {
       const domain = ad.domain ?? (() => {
