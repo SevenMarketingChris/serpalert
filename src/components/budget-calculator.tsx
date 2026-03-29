@@ -3,7 +3,9 @@
 import { useState } from 'react'
 
 function formatFull(value: number): string {
-  return `£${value.toLocaleString('en-GB', { maximumFractionDigits: 0 })}`
+  const abs = Math.abs(value)
+  const formatted = `£${abs.toLocaleString('en-GB', { maximumFractionDigits: 0 })}`
+  return value < 0 ? `-${formatted}` : formatted
 }
 
 export function BudgetCalculator() {
@@ -34,10 +36,10 @@ export function BudgetCalculator() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-white">Monthly brand campaign spend</label>
+              <label htmlFor="brandSpend" className="text-sm font-medium text-white">Monthly brand campaign spend</label>
               <span className="font-mono text-sm font-bold text-emerald-400">{formatFull(brandSpend)}</span>
             </div>
-            <input type="range" min={500} max={20000} step={250} value={brandSpend}
+            <input id="brandSpend" type="range" min={500} max={20000} step={250} value={brandSpend}
               onChange={(e) => setBrandSpend(Number(e.target.value))}
               className="w-full accent-emerald-500" />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
@@ -47,10 +49,10 @@ export function BudgetCalculator() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-white">Current brand ROAS</label>
+              <label htmlFor="brandRoas" className="text-sm font-medium text-white">Current brand ROAS</label>
               <span className="font-mono text-sm font-bold text-emerald-400">{brandRoas}x</span>
             </div>
-            <input type="range" min={2} max={30} step={1} value={brandRoas}
+            <input id="brandRoas" type="range" min={2} max={30} step={1} value={brandRoas}
               onChange={(e) => setBrandRoas(Number(e.target.value))}
               className="w-full accent-emerald-500" />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
@@ -63,10 +65,10 @@ export function BudgetCalculator() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-white">Expected non-brand ROAS</label>
+              <label htmlFor="nonBrandRoas" className="text-sm font-medium text-white">Expected non-brand ROAS</label>
               <span className="font-mono text-sm font-bold text-emerald-400">{nonBrandRoas}x</span>
             </div>
-            <input type="range" min={1} max={15} step={0.5} value={nonBrandRoas}
+            <input id="nonBrandRoas" type="range" min={1} max={15} step={0.5} value={nonBrandRoas}
               onChange={(e) => setNonBrandRoas(Number(e.target.value))}
               className="w-full accent-emerald-500" />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
@@ -79,10 +81,10 @@ export function BudgetCalculator() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-white">Brand traffic retained organically</label>
+              <label htmlFor="retentionRate" className="text-sm font-medium text-white">Brand traffic retained organically</label>
               <span className="font-mono text-sm font-bold text-emerald-400">{retentionRate}%</span>
             </div>
-            <input type="range" min={50} max={95} step={5} value={retentionRate}
+            <input id="retentionRate" type="range" min={50} max={95} step={5} value={retentionRate}
               onChange={(e) => setRetentionRate(Number(e.target.value))}
               className="w-full accent-emerald-500" />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
@@ -201,7 +203,7 @@ export function BudgetCalculator() {
         </div>
       </div>
 
-      <details className="text-xs text-slate-500">
+      <details className="text-xs text-slate-400">
         <summary className="cursor-pointer font-mono uppercase tracking-widest hover:text-slate-300 transition-colors">
           Assumptions & methodology
         </summary>

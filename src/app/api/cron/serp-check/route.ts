@@ -75,10 +75,10 @@ export async function GET(request: Request) {
           }
         }
 
-        return { brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' }
+        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' as const }
       } catch (err) {
         console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
-        return { brand: brand.name, keyword, status: 'error', error: String(err) }
+        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: String(err), competitorCount: 0 }
       }
     }
 
@@ -95,7 +95,12 @@ export async function GET(request: Request) {
     for (const brand of allBrands) {
       if (!brand.googleAdsCustomerId || !brand.brandCampaignId) continue
 
-      const brandResults = results.filter(r => r.brand === brand.name)
+      const brandResults = results.filter(r => r.brandId === brand.id)
+      const anyError = brandResults.some(r => r.status === 'error')
+      if (anyError) {
+        console.warn(`Skipping campaign toggle for ${brand.name} — one or more keyword checks failed`)
+        continue
+      }
       const hasCompetitors = brandResults.some(r => r.competitorCount && r.competitorCount > 0)
 
       try {

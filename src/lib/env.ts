@@ -10,7 +10,7 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'ADMIN_SECRET', 'CRON_SECRET'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
   for (const name of critical) {
     const val = process.env[name];
     if (!val || val.trim() === '') {

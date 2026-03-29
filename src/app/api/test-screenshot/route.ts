@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { isCronRequest } from '@/lib/auth'
+import { isAdminRequest } from '@/lib/auth'
 import { screenshotSerp } from '@/lib/puppeteer'
 
 export async function GET(request: Request) {
-  if (!isCronRequest(request)) {
+  if (!isAdminRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
