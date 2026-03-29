@@ -4,6 +4,7 @@ import { StatusHero } from '@/components/status-hero'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { ActivityFeed } from '@/components/activity-feed'
 import { TrendChart } from '@/components/trend-chart'
+import { toUTCDate } from '@/lib/time'
 
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -14,13 +15,13 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   const isAdmin = true
 
   const checks = await getRecentSerpChecks(brandId, 100)
-  const todayStr = new Date().toDateString()
-  const checksToday = checks.filter(c => new Date(c.checkedAt).toDateString() === todayStr)
+  const todayStr = toUTCDate(new Date())
+  const checksToday = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === todayStr)
   const allAds = await getCompetitorAdsForChecks(checks.map(c => c.id))
   const threatsToday = new Set(
     allAds.filter(a => {
       const check = checks.find(c => c.id === a.serpCheckId)
-      return check && new Date(check.checkedAt).toDateString() === todayStr
+      return check && toUTCDate(new Date(check.checkedAt)) === todayStr
     }).map(a => a.domain)
   ).size
 
@@ -29,8 +30,8 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    const dayStr = d.toDateString()
-    const dayChecks = checks.filter(c => new Date(c.checkedAt).toDateString() === dayStr)
+    const dayStr = toUTCDate(d)
+    const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
     const dayCheckIds = dayChecks.map(c => c.id)
     last7Days.push(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length)
   }
@@ -40,8 +41,8 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   for (let i = 29; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    const dayStr = d.toDateString()
-    const dayChecks = checks.filter(c => new Date(c.checkedAt).toDateString() === dayStr)
+    const dayStr = toUTCDate(d)
+    const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
     const dayCheckIds = dayChecks.map(c => c.id)
     const dayThreats = allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length
     last30Days.push({

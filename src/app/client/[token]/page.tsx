@@ -4,13 +4,11 @@ import { ScreenshotModal } from '@/components/screenshot-modal'
 import { StatusHero } from '@/components/status-hero'
 import { ClientMetricCards } from '@/components/client-metric-cards'
 import { Badge } from '@/components/ui/badge'
+import { getRelativeTime, toUTCDate } from '@/lib/time'
+import { BarChart3 } from 'lucide-react'
 import type { CompetitorAd, SerpCheck } from '@/lib/db/schema'
 
 type CheckWithAds = SerpCheck & { ads: CompetitorAd[] }
-
-function toUTCDate(d: Date): string {
-  return d.toISOString().slice(0, 10)
-}
 
 function getDailyStats(checks: CheckWithAds[], days: number) {
   const stats: { date: string; checks: number; threats: number }[] = []
@@ -30,25 +28,12 @@ function getDailyStats(checks: CheckWithAds[], days: number) {
   return stats
 }
 
-function getRelativeTime(date: Date | null): string {
-  if (!date) return 'Never'
-  const now = new Date()
-  const diffMs = now.getTime() - new Date(date).getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'just now'
-  if (diffMin < 60) return `${diffMin} min ago`
-  const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
-
 export default async function ClientPortal({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
   const brand = await getBrandByToken(token)
   if (!brand) notFound()
 
-  const checks = await getRecentSerpChecks(brand.id, 500)
+  const checks = await getRecentSerpChecks(brand.id, 100)
   const allAds = await getCompetitorAdsForChecks(checks.map(c => c.id))
   const adsByCheckId = allAds.reduce<Record<string, CompetitorAd[]>>((acc, ad) => {
     if (!acc[ad.serpCheckId]) acc[ad.serpCheckId] = []
@@ -67,6 +52,15 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 
   // Recent threats only (checks with competitors)
   const recentThreats = checksWithAds.filter(c => c.competitorCount > 0).slice(0, 10)
+
+  // Count 7-day competitors from actual checks data
+  const last7DayChecks = checksWithAds.filter(c => {
+    const checkDate = new Date(c.checkedAt)
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    return checkDate >= sevenDaysAgo
+  })
+  const competitors7d = new Set(last7DayChecks.flatMap(c => c.ads.map(a => a.domain))).size
 
   // Count days with actual data for chart visibility
   const daysWithData = last7Days.filter(d => d.checks > 0).length
@@ -109,10 +103,10 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             Summary
           </h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {competitorStats.length === 0 ? (
+            {competitors7d === 0 ? (
               `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
             ) : (
-              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitorStats.length} competitor${competitorStats.length !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount || competitorStats[0].totalCount} time${(competitorStats[0].recentCount || competitorStats[0].totalCount) !== 1 ? 's' : ''}.`
+              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount || competitorStats[0].totalCount} time${(competitorStats[0].recentCount || competitorStats[0].totalCount) !== 1 ? 's' : ''}.`
             )}
           </p>
         </div>
@@ -146,7 +140,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
                   {check.ads.map(ad => (
                     <div key={ad.id} className="ml-4 mt-1.5 flex items-start gap-3 text-xs">
                       <span className="font-mono font-medium text-foreground shrink-0">{ad.domain}</span>
-                      <span className="text-muted-foreground truncate">{ad.headline}</span>
+                      <span className="text-muted-foreground truncate" title={ad.headline ?? undefined}>{ad.headline}</span>
                       {ad.position != null && (
                         <span className="ml-auto shrink-0 font-mono text-amber-500">Pos {ad.position}</span>
                       )}
@@ -237,8 +231,11 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             Each day we scan Google for competitors advertising on your brand name.
           </p>
           {daysWithData < 3 ? (
-            <div className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-md">
-              Not enough data yet — the chart will appear after a few days of monitoring.
+            <div className="text-center py-10 space-y-2">
+              <BarChart3 className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+              <p className="text-sm text-muted-foreground">
+                Not enough data yet — the chart will appear after a few days of monitoring.
+              </p>
             </div>
           ) : (
             <>

@@ -1,5 +1,6 @@
 import { ShieldCheck, AlertTriangle } from 'lucide-react'
 import { ManualCheckButton } from '@/components/manual-check-button'
+import { getRelativeTime } from '@/lib/time'
 
 interface StatusHeroProps {
   brandId: string
@@ -10,19 +11,6 @@ interface StatusHeroProps {
   checksToday?: number
   keywordCount?: number
   last7DaysThreats?: number[]
-}
-
-function getRelativeTime(date: string | null): string {
-  if (!date) return 'No checks yet'
-  const now = new Date()
-  const diffMs = now.getTime() - new Date(date).getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'Last check just now'
-  if (diffMin < 60) return `Last check ${diffMin} min ago`
-  const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `Last check ${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `Last check ${diffDays}d ago`
 }
 
 const BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
@@ -38,7 +26,7 @@ export function StatusHero({
   checksToday = 0, keywordCount = 0, last7DaysThreats = [],
 }: StatusHeroProps) {
   const isProtected = threatsToday === 0
-  const relativeTime = getRelativeTime(lastCheckAt)
+  const relativeTime = lastCheckAt ? `Last check ${getRelativeTime(lastCheckAt)}` : 'No checks yet'
   const sparkline = buildSparkline(last7DaysThreats)
 
   return (

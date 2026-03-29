@@ -14,19 +14,7 @@ import {
   Globe,
 } from 'lucide-react'
 import { BrandSwitcher } from './brand-switcher'
-
-function getRelativeTime(date: string | null): string {
-  if (!date) return ''
-  const now = new Date()
-  const diffMs = now.getTime() - new Date(date).getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'just now'
-  if (diffMin < 60) return `${diffMin}m ago`
-  const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
+import { getRelativeTime } from '@/lib/time'
 
 interface SidebarProps {
   brandId: string
