@@ -52,7 +52,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
       }
 
       const check = await insertSerpCheck({
-        brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl,
+        brandId: brand.id, keyword, competitorCount: new Set(ads.map(a => a.domain)).size, screenshotUrl,
       })
 
       if (ads.length > 0) {
@@ -76,7 +76,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
         }
       }
 
-      results.push({ keyword, competitorCount: ads.length, status: 'ok', adCheckDegraded })
+      results.push({ keyword, competitorCount: new Set(ads.map(a => a.domain)).size, status: 'ok', adCheckDegraded })
     } catch (err) {
       console.error(`Manual check failed: ${brand.name}/${keyword}`, err)
       results.push({ keyword, status: 'error', error: 'Check failed' })

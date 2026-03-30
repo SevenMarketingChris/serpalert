@@ -54,7 +54,8 @@ export async function GET(request: Request) {
           console.warn(`No taskId for "${keyword}" — screenshot skipped`)
         }
 
-        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: ads.length, screenshotUrl })
+        const uniqueCompetitors = new Set(ads.map(a => a.domain)).size
+        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: uniqueCompetitors, screenshotUrl })
 
         if (ads.length > 0) {
           const now = new Date()
@@ -75,7 +76,7 @@ export async function GET(request: Request) {
           }
         }
 
-        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: ads.length, status: 'ok' as const, adCheckDegraded }
+        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: uniqueCompetitors, status: 'ok' as const, adCheckDegraded }
       } catch (err) {
         console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
         return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: 'Check failed', competitorCount: 0, adCheckDegraded: false }
