@@ -20,7 +20,16 @@ export async function getBrandByToken(token: string): Promise<Brand | null> {
 }
 
 export async function getAllActiveBrands(): Promise<Brand[]> {
-  return db.select().from(brands).where(eq(brands.active, true))
+  const allBrands = await db.select().from(brands).where(eq(brands.active, true))
+  const now = new Date()
+  return allBrands.filter(b => {
+    if (b.agencyManaged) return true
+    if (b.subscriptionStatus === 'active') return true
+    if (b.subscriptionStatus === 'past_due') return true
+    if (b.subscriptionStatus === 'agency') return true
+    if (b.subscriptionStatus === 'trialing' && b.trialEndsAt && b.trialEndsAt > now) return true
+    return false
+  })
 }
 
 export async function getRecentSerpChecks(brandId: string, limit = 50): Promise<SerpCheck[]> {
@@ -90,6 +99,8 @@ export async function createBrandForUser(
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
+  const trialEndsAt = new Date()
+  trialEndsAt.setDate(trialEndsAt.getDate() + 7)
   const rows = await db.insert(brands).values({
     name: data.name,
     slug,
@@ -97,6 +108,8 @@ export async function createBrandForUser(
     domain: data.domain,
     plan: 'free',
     userId,
+    subscriptionStatus: 'trialing',
+    trialEndsAt,
   }).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
@@ -353,6 +366,7 @@ export async function createBrand(data: {
   domain?: string
   googleAdsCustomerId?: string; slackWebhookUrl?: string
   monthlyBrandSpend?: string; brandRoas?: string
+  agencyManaged?: boolean; subscriptionStatus?: string
 }): Promise<Brand> {
   const rows = await db.insert(brands).values(data).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
@@ -414,4 +428,31 @@ export async function getUnresolvedThreatCount(brandId: string): Promise<number>
       inArray(competitorAds.status, ['new', 'acknowledged', 'reported']),
     ))
   return rows[0]?.count ?? 0
+}
+
+export async function updateBrandSubscription(
+  brandId: string,
+  data: {
+    stripeCustomerId?: string
+    stripeSubscriptionId?: string
+    subscriptionStatus?: string
+  },
+): Promise<void> {
+  await db.update(brands)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(brands.id, brandId))
+}
+
+export async function getBrandByStripeSubscriptionId(subscriptionId: string): Promise<Brand | null> {
+  const rows = await db.select().from(brands)
+    .where(eq(brands.stripeSubscriptionId, subscriptionId))
+    .limit(1)
+  return rows[0] ?? null
+}
+
+export async function getBrandByStripeCustomerId(customerId: string): Promise<Brand | null> {
+  const rows = await db.select().from(brands)
+    .where(eq(brands.stripeCustomerId, customerId))
+    .limit(1)
+  return rows[0] ?? null
 }
