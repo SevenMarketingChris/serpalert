@@ -10,7 +10,7 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'] as const;
   for (const name of critical) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
@@ -43,5 +43,8 @@ export function getServerEnv() {
     adminSecret: requireEnv("ADMIN_SECRET"),
     cronSecret: requireEnv("CRON_SECRET"),
     ahrefsApiToken: optionalEnv("AHREFS_API_TOKEN"),
+    stripeSecretKey: requireEnv("STRIPE_SECRET_KEY"),
+    stripeWebhookSecret: requireEnv("STRIPE_WEBHOOK_SECRET"),
+    stripePriceId: requireEnv("STRIPE_PRICE_ID"),
   };
 }
