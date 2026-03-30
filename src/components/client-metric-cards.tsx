@@ -50,7 +50,7 @@ export function ClientMetricCards({
       {/* All-Time Competitors */}
       <div className="bg-card border border-border rounded-lg p-3.5 metric-stripe-orange">
         <p className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5">
-          Competitors (All Time)
+          Competitors (90 Days)
         </p>
         <p className="text-2xl font-bold font-mono text-tech-orange">{allTimeCompetitors}</p>
       </div>

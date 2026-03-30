@@ -75,11 +75,11 @@ export async function checkSerpForAds(
       return normalizeDomain(adDomain) !== normalizeDomain(options.brandDomain)
     })
     .map((ad, i) => {
-      const domain = ad.domain ?? (() => {
+      const rawDomain = ad.domain ?? (() => {
         try { return new URL(ad.link ?? '').hostname } catch { return 'unknown' }
       })()
       return {
-        domain,
+        domain: normalizeDomain(rawDomain),
         headline: ad.title ?? null,
         description: ad.description ?? null,
         displayUrl: ad.displayed_link ?? null,

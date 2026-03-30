@@ -3,18 +3,7 @@ import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Shield } from 'lucide-react'
 import { WastedSpendBadge } from '@/components/wasted-spend-badge'
-
-function formatRelativeTime(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - new Date(date).getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
+import { getRelativeTime } from '@/lib/time'
 
 const rankBorderColors: Record<number, string> = {
   1: '#D4AF37',
@@ -110,7 +99,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                         {new Date(competitor.firstSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                        {formatRelativeTime(competitor.lastSeen)}
+                        {getRelativeTime(competitor.lastSeen)}
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1.5 text-xs">
@@ -149,7 +138,7 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                     <span className="mx-1">&middot;</span>
                     <span className="font-mono text-foreground">{competitor.totalCount}</span> total
                   </span>
-                  <span className="font-mono text-xs">{formatRelativeTime(competitor.lastSeen)}</span>
+                  <span className="font-mono text-xs">{getRelativeTime(competitor.lastSeen)}</span>
                 </div>
               </div>
             ))}

@@ -19,7 +19,7 @@ function getDailyStats(checks: CheckWithAds[], days: number) {
     d.setDate(d.getDate() - i)
     const dateStr = toUTCDate(d)
     const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dateStr)
-    const dayThreats = dayChecks.filter(c => c.competitorCount > 0).length
+    const dayThreats = new Set(dayChecks.flatMap(c => c.ads.map(a => a.domain))).size
     stats.push({
       date: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
       checks: dayChecks.length,
@@ -110,7 +110,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             {competitors7d === 0 ? (
               `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
             ) : (
-              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount || competitorStats[0].totalCount} time${(competitorStats[0].recentCount || competitorStats[0].totalCount) !== 1 ? 's' : ''}.`
+              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount} time${competitorStats[0].recentCount !== 1 ? 's' : ''}.`
             )}
           </p>
         </div>

@@ -95,6 +95,12 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
               {ad.displayUrl && (
                 <p className="font-mono text-xs text-muted-foreground">{ad.displayUrl}</p>
               )}
+              {ad.destinationUrl && (
+                <a href={ad.destinationUrl} target="_blank" rel="noopener noreferrer"
+                   className="font-mono text-xs text-primary/70 hover:text-primary hover:underline truncate block">
+                  {ad.destinationUrl}
+                </a>
+              )}
             </div>
           ))}
         </div>

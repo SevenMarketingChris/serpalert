@@ -362,7 +362,7 @@ export async function createBrand(data: {
 export async function getThreatCountLast7Days(brandId: string): Promise<number> {
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - 7)
-  const rows = await db.select({ count: count() })
+  const rows = await db.select({ count: countDistinct(competitorAds.domain) })
     .from(competitorAds)
     .where(and(
       eq(competitorAds.brandId, brandId),

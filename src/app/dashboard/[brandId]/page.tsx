@@ -35,7 +35,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     const dayStr = toUTCDate(d)
     const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
     const dayCheckIds = dayChecks.map(c => c.id)
-    last7Days.push(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length)
+    last7Days.push(new Set(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).map(a => a.domain)).size)
   }
 
   // Build 30-day activity data for trend chart
@@ -46,7 +46,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     const dayStr = toUTCDate(d)
     const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
     const dayCheckIds = dayChecks.map(c => c.id)
-    const dayThreats = allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).length
+    const dayThreats = new Set(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).map(a => a.domain)).size
     last30Days.push({
       date: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
       checks: dayChecks.length,

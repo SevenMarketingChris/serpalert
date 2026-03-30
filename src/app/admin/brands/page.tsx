@@ -4,18 +4,7 @@ import type { SerpCheck } from '@/lib/db/schema'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Shield } from 'lucide-react'
-
-function formatRelativeTime(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
+import { getRelativeTime } from '@/lib/time'
 
 export default async function AdminBrandsPage() {
 
@@ -153,7 +142,7 @@ export default async function AdminBrandsPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs font-mono text-muted-foreground">
-                          {lastCheck ? formatRelativeTime(new Date(lastCheck.checkedAt)) : 'Never'}
+                          {lastCheck ? getRelativeTime(lastCheck.checkedAt) : 'Never'}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">

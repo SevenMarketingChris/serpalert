@@ -58,7 +58,7 @@ function buildRun(checks: CheckItem[]): ScanRun {
     timestamp: checks[0].checkedAt,
     checks,
     totalKeywords: checks.length,
-    totalThreats: checks.reduce((sum, c) => sum + c.competitorCount, 0),
+    totalThreats: new Set(checks.flatMap(c => c.ads.map(a => a.domain))).size,
     screenshotCount: checks.filter(c => c.screenshotUrl).length,
     hasUnresolved: checks.some(c =>
       c.ads.some(a => ['new', 'acknowledged', 'reported'].includes(a.status))

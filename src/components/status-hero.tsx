@@ -53,7 +53,7 @@ export function StatusHero({
             </p>
             <p className="text-xs text-muted-foreground">
               {isProtected
-                ? `No competitors detected in last 24h · ${relativeTime}`
+                ? `No competitors detected today · ${relativeTime}`
                 : `${threatsToday} competitor${threatsToday !== 1 ? 's' : ''} bidding on your brand · ${relativeTime}`}
             </p>
           </div>
