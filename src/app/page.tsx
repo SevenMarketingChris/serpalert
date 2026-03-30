@@ -20,12 +20,20 @@ export default function HomePage() {
           <span className="text-gradient-tech font-extrabold text-xl">
             SerpAlert
           </span>
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/sign-up"
+              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Start Free Trial
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -48,10 +56,10 @@ export default function HomePage() {
           </p>
           <div className="mt-10 flex flex-col items-center gap-3">
             <Link
-              href="/dashboard"
+              href="/sign-up"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Start Monitoring Free
+              Start Your Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
             <span className="text-sm text-muted-foreground">
@@ -274,10 +282,10 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3">
             <Link
-              href="/dashboard"
+              href="/sign-up"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Start Monitoring Free
+              Start Your Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
             <span className="text-sm text-muted-foreground">
