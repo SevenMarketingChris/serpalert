@@ -19,6 +19,7 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
   const slack = ((formData.get('slack') as string) ?? '').trim() || undefined
   const spendRaw = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || undefined
   const roasRaw = ((formData.get('brandRoas') as string) ?? '').trim() || undefined
+  const agencyManaged = formData.get('agencyManaged') === 'on'
 
   if (!name) return { error: 'Brand name is required' }
 
@@ -33,6 +34,8 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
       slackWebhookUrl: slack,
       monthlyBrandSpend: spendRaw,
       brandRoas: roasRaw,
+      agencyManaged,
+      subscriptionStatus: agencyManaged ? 'agency' : 'trialing',
     })
     revalidatePath('/admin/brands')
     return { clientToken: brand.clientToken }

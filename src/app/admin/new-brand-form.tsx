@@ -94,6 +94,18 @@ export function NewBrandForm() {
             <Input id="slack" name="slack" placeholder="https://hooks.slack.com/…" />
           </div>
 
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="agencyManaged"
+              name="agencyManaged"
+              className="h-4 w-4 rounded border-input"
+            />
+            <Label htmlFor="agencyManaged" className="font-normal">
+              Agency managed <span className="text-muted-foreground">(always active, no Stripe subscription needed)</span>
+            </Label>
+          </div>
+
           <Button type="submit" disabled={isPending} className="neon-glow-cta w-full">
             {isPending ? 'Creating…' : 'Create Brand'}
           </Button>
