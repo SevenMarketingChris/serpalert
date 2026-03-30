@@ -1,7 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createBrandForUser, PLAN_LIMITS } from '@/lib/db/queries'
+import { auth } from '@clerk/nextjs/server'
+import { createBrandForUser, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
 
 export type CreateUserBrandState = {
   error?: string
@@ -11,6 +12,14 @@ export async function createBrand(
   _prev: CreateUserBrandState,
   formData: FormData,
 ): Promise<CreateUserBrandState> {
+  const { userId } = await auth()
+  if (!userId) return { error: 'Not authenticated' }
+
+  const brandCount = await getUserBrandCount(userId)
+  if (brandCount >= PLAN_LIMITS.free.brands) {
+    return { error: `You can only create ${PLAN_LIMITS.free.brands} brand on the free plan` }
+  }
+
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
 
@@ -23,7 +32,7 @@ export async function createBrand(
     .slice(0, PLAN_LIMITS.free.keywords)
 
   try {
-    await createBrandForUser({ name, domain, keywords }, 'admin')
+    await createBrandForUser({ name, domain, keywords }, userId)
   } catch (err) {
     const msg = err instanceof Error ? err.message : ''
     if (msg.includes('unique') || msg.includes('duplicate')) {
