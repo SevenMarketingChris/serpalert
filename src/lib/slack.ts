@@ -1,6 +1,7 @@
 export async function sendNewCompetitorAlert(params: {
   webhookUrl: string | null
   brandName: string
+  brandId?: string
   domain: string
   keyword: string
 }): Promise<void> {
@@ -35,7 +36,9 @@ export async function sendNewCompetitorAlert(params: {
             {
               type: 'button',
               text: { type: 'plain_text', text: 'View Dashboard' },
-              url: `https://serpalert.vercel.app/dashboard`,
+              url: params.brandId
+                ? `https://serpalert.vercel.app/dashboard/${params.brandId}`
+                : `https://serpalert.vercel.app/dashboard`,
               style: 'primary'
             }
           ]

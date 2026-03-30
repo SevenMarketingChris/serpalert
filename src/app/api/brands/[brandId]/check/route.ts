@@ -69,7 +69,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
             try {
               await sendNewCompetitorAlert({
                 webhookUrl: brand.slackWebhookUrl, brandName: brand.name,
-                domain: ad.domain, keyword,
+                brandId: brand.id, domain: ad.domain, keyword,
               })
             } catch {}
           }

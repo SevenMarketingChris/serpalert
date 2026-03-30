@@ -8,11 +8,16 @@ export async function GET(
   const { checkId } = await params
   const token = new URL(request.url).searchParams.get('token')
 
+  // Validate token before DB fetch
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const result = await getSerpCheckWithAds(checkId)
   if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const { check, ads, brandClientToken } = result
-  if (!token || token !== brandClientToken) {
+  if (token !== brandClientToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

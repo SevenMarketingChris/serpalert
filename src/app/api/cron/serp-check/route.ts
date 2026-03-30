@@ -68,7 +68,7 @@ export async function GET(request: Request) {
           for (const ad of ads) {
             if (!recentDomains.includes(ad.domain)) {
               try {
-                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, domain: ad.domain, keyword })
+                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, brandId: brand.id, domain: ad.domain, keyword })
               } catch (alertErr) {
                 console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
               }

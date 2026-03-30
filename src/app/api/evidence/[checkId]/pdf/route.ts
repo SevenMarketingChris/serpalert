@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server'
 import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ checkId: string }> }
@@ -8,11 +17,16 @@ export async function GET(
   const { checkId } = await params
   const token = new URL(request.url).searchParams.get('token')
 
+  // Validate token BEFORE any DB fetch
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const result = await getSerpCheckWithAds(checkId)
   if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const { check, ads, brandClientToken } = result
-  if (!token || token !== brandClientToken) {
+  if (token !== brandClientToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -53,7 +67,7 @@ export async function GET(
   <div class="section">
     <h2>Check Details</h2>
     <table>
-      <tr><th>Keyword</th><td>${check.keyword}</td></tr>
+      <tr><th>Keyword</th><td>${escapeHtml(check.keyword)}</td></tr>
       <tr><th>Date & Time</th><td>${checkDate}</td></tr>
       <tr><th>Location</th><td>United Kingdom</td></tr>
       <tr><th>Device</th><td>Desktop</td></tr>
@@ -66,10 +80,10 @@ export async function GET(
     <h2>Competitor Ads Detected</h2>
     ${ads.map(ad => `
       <div class="ad-card">
-        <div class="ad-domain">${ad.domain}${ad.position != null ? ` · Position ${ad.position}` : ''}</div>
-        ${ad.headline ? `<div class="ad-headline">${ad.headline}</div>` : ''}
-        ${ad.description ? `<div class="ad-desc">${ad.description}</div>` : ''}
-        ${ad.displayUrl ? `<div class="ad-url">${ad.displayUrl}</div>` : ''}
+        <div class="ad-domain">${escapeHtml(ad.domain)}${ad.position != null ? ` · Position ${ad.position}` : ''}</div>
+        ${ad.headline ? `<div class="ad-headline">${escapeHtml(ad.headline)}</div>` : ''}
+        ${ad.description ? `<div class="ad-desc">${escapeHtml(ad.description)}</div>` : ''}
+        ${ad.displayUrl ? `<div class="ad-url">${escapeHtml(ad.displayUrl)}</div>` : ''}
       </div>
     `).join('')}
   </div>
