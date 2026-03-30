@@ -83,7 +83,7 @@ export async function GET(request: Request) {
     }
 
     // Process in parallel with concurrency limit
-    const CONCURRENCY = 1 // Keep at 1: 768MB RAM with Chromium is tight
+    const CONCURRENCY = 3 // No Chromium — all HTTP API calls, safe to parallelize
     const results = []
     for (let i = 0; i < jobs.length; i += CONCURRENCY) {
       const batch = jobs.slice(i, i + CONCURRENCY)
