@@ -16,6 +16,11 @@ export const brands = pgTable('brands', {
   userId: text('user_id'),
   watchlistDomains: text('watchlist_domains').array().default([]),
   plan: text('plan').notNull().default('free'),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  agencyManaged: boolean('agency_managed').notNull().default(false),
+  trialEndsAt: timestamp('trial_ends_at'),
+  subscriptionStatus: text('subscription_status').notNull().default('trialing'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => [
