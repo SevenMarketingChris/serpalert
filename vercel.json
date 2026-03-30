@@ -1,6 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/serp-check", "schedule": "0 * * * *" },
+    { "path": "/api/cron/serp-check", "schedule": "0 */3 * * *" },
     { "path": "/api/cron/auction-insights", "schedule": "0 6 * * *" },
     { "path": "/api/cron/cleanup-screenshots", "schedule": "0 3 * * 0" }
   ]
