@@ -1,0 +1,3 @@
+{
+  "/api/evidence/[checkId]/cease-desist/route": "app/api/evidence/[checkId]/cease-desist/route.js"
+}

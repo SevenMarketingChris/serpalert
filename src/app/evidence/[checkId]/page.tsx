@@ -87,6 +87,32 @@ export default async function EvidencePage({
           </div>
         </div>
 
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={`/api/evidence/${check.id}/pdf?token=${brandClientToken}`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
+          >
+            Download Report
+          </a>
+          <a
+            href={`/api/evidence/${check.id}/cease-desist?token=${brandClientToken}`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
+          >
+            Generate C&D Letter
+          </a>
+          <a
+            href="https://support.google.com/google-ads/troubleshooter/4578507?sjid=&ref_topic=24937&hl=en-GB"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
+          >
+            Report to Google
+          </a>
+        </div>
+
         {/* Copy Link */}
         <CopyLinkButton checkId={checkId} brandToken={brandClientToken} />
 

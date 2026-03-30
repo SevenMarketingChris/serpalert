@@ -16,6 +16,7 @@ interface ThreatCardProps {
     headline: string | null
     description: string | null
     displayUrl: string | null
+    destinationUrl: string | null
     position: number | null
     status: string
   }[]
@@ -117,6 +118,12 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
                 {ad.displayUrl && (
                   <p className="text-muted-foreground text-[11px] font-mono">{ad.displayUrl}</p>
                 )}
+                {ad.destinationUrl && (
+                  <a href={ad.destinationUrl} target="_blank" rel="noopener noreferrer"
+                     className="text-[11px] text-primary/70 hover:text-primary hover:underline truncate block">
+                    {ad.destinationUrl}
+                  </a>
+                )}
               </div>
             ))}
           </div>
@@ -136,7 +143,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
               headline: a.headline,
               description: a.description,
               displayUrl: a.displayUrl,
-              destinationUrl: null,
+              destinationUrl: a.destinationUrl,
               position: a.position,
             }))}
           />

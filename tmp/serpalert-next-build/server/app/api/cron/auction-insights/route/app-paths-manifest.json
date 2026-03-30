@@ -1,0 +1,3 @@
+{
+  "/api/cron/auction-insights/route": "app/api/cron/auction-insights/route.js"
+}

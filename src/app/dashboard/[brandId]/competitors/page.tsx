@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Shield } from 'lucide-react'
+import { WastedSpendBadge } from '@/components/wasted-spend-badge'
 
 function formatRelativeTime(date: Date): string {
   const now = new Date()
@@ -71,7 +72,10 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
                       style={borderColor ? { borderLeftWidth: '3px', borderLeftColor: borderColor } : undefined}
                     >
                       <td className="px-4 py-3 text-sm text-muted-foreground">#{rank}</td>
-                      <td className="px-4 py-3 font-mono text-sm font-bold">{competitor.domain}</td>
+                      <td className="px-4 py-3">
+                        <span className="font-mono text-sm font-bold">{competitor.domain}</span>
+                        <WastedSpendBadge detections={competitor.recentCount} avgPosition={competitor.avgPosition} />
+                      </td>
                       <td className="px-4 py-3">
                         {competitor.avgPosition != null ? (
                           <span className={`font-mono text-xs px-2 py-0.5 rounded ${

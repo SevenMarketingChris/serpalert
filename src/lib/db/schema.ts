@@ -14,6 +14,7 @@ export const brands = pgTable('brands', {
   monthlyBrandSpend: numeric('monthly_brand_spend'),
   brandRoas: numeric('brand_roas'),
   userId: text('user_id'),
+  watchlistDomains: text('watchlist_domains').array().default([]),
   plan: text('plan').notNull().default('free'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

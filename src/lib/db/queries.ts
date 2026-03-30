@@ -153,6 +153,7 @@ export async function updateBrand(
     googleAdsCustomerId?: string | null; slackWebhookUrl?: string | null
     monthlyBrandSpend?: string | null; brandRoas?: string | null
     brandCampaignId?: string | null
+    watchlistDomains?: string[]
     active?: boolean
   },
 ): Promise<Brand> {
@@ -368,6 +369,41 @@ export async function getThreatCountLast7Days(brandId: string): Promise<number> 
       gte(competitorAds.firstSeenAt, cutoff),
     ))
   return rows[0]?.count ?? 0
+}
+
+export async function getAdCopyHistory(brandId: string, domain: string): Promise<{
+  headline: string | null
+  description: string | null
+  displayUrl: string | null
+  firstSeen: Date
+  lastSeen: Date
+  count: number
+}[]> {
+  const rows = await db.select({
+    headline: competitorAds.headline,
+    description: competitorAds.description,
+    displayUrl: competitorAds.displayUrl,
+    firstSeen: sql<Date>`min(${competitorAds.firstSeenAt})`,
+    lastSeen: sql<Date>`max(${competitorAds.firstSeenAt})`,
+    count: count(),
+  })
+    .from(competitorAds)
+    .where(and(
+      eq(competitorAds.brandId, brandId),
+      eq(competitorAds.domain, domain),
+    ))
+    .groupBy(competitorAds.headline, competitorAds.description, competitorAds.displayUrl)
+    .orderBy(desc(sql`max(${competitorAds.firstSeenAt})`))
+    .limit(20)
+
+  return rows.map(r => ({
+    headline: r.headline,
+    description: r.description,
+    displayUrl: r.displayUrl,
+    firstSeen: r.firstSeen,
+    lastSeen: r.lastSeen,
+    count: r.count,
+  }))
 }
 
 export async function getUnresolvedThreatCount(brandId: string): Promise<number> {

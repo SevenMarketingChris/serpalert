@@ -1,0 +1,3 @@
+{
+  "/api/cron/serp-check/route": "app/api/cron/serp-check/route.js"
+}

@@ -15,7 +15,33 @@ export async function sendNewCompetitorAlert(params: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      text: `🚨 New competitor bidding on *${params.brandName}*\n*Domain:* ${params.domain}\n*Keyword:* ${params.keyword}`,
+      blocks: [
+        {
+          type: 'header',
+          text: { type: 'plain_text', text: `🚨 New Competitor on "${params.keyword}"` }
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Brand:*\n${params.brandName}` },
+            { type: 'mrkdwn', text: `*Competitor:*\n${params.domain}` },
+            { type: 'mrkdwn', text: `*Keyword:*\n${params.keyword}` },
+            { type: 'mrkdwn', text: `*Detected:*\n${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}` },
+          ]
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'View Dashboard' },
+              url: `https://serpalert.vercel.app/dashboard`,
+              style: 'primary'
+            }
+          ]
+        }
+      ],
+      text: `New competitor ${params.domain} detected on "${params.keyword}" for ${params.brandName}`,
     }),
     signal: AbortSignal.timeout(10_000),
   })

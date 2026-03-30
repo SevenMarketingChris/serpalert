@@ -6,6 +6,7 @@ import { ClientMetricCards } from '@/components/client-metric-cards'
 import { Badge } from '@/components/ui/badge'
 import { getRelativeTime, toUTCDate } from '@/lib/time'
 import { BarChart3 } from 'lucide-react'
+import { ShareReportButton } from '@/components/share-report-button'
 import type { CompetitorAd, SerpCheck } from '@/lib/db/schema'
 
 type CheckWithAds = SerpCheck & { ads: CompetitorAd[] }
@@ -78,6 +79,9 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           <p className="text-sm text-muted-foreground">
             Monitoring {brand.keywords.length} branded search{brand.keywords.length !== 1 ? 'es' : ''} for competitor ads
           </p>
+          <div className="pt-2 flex justify-center">
+            <ShareReportButton brandName={brand.name} portalUrl={`https://serpalert.vercel.app/client/${token}`} />
+          </div>
         </header>
 
         {/* 2. Status Hero */}

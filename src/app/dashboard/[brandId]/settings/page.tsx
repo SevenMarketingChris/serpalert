@@ -5,6 +5,7 @@ import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
 import { ClientPortalSection } from './client-portal-section'
 import { DangerZone } from './danger-zone'
+import { KeywordSuggestions } from '@/components/keyword-suggestions'
 
 export default async function SettingsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -30,6 +31,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
           keywordLimit={limits.keywords}
         />
 
+        <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
+
         {/* Section 2: Admin Settings */}
         {isAdmin && (
           <AdminSettingsForm
@@ -39,6 +42,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
             googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
             brandCampaignId={brand.brandCampaignId ?? ''}
             slackWebhookUrl={brand.slackWebhookUrl ?? ''}
+            watchlistDomains={(brand.watchlistDomains ?? []).join(', ')}
             active={brand.active}
           />
         )}

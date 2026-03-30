@@ -1,0 +1,66 @@
+{
+  "node": {
+    "6017bd7b10ad315ae7c49955dd45f7c9faab663502": {
+      "workers": {
+        "app/dashboard/[brandId]/settings/page": {
+          "moduleId": 30754,
+          "async": false,
+          "exportedName": "updateBrandDetails",
+          "filename": "src/app/dashboard/[brandId]/settings/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/[brandId]/settings/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/[brandId]/settings/actions.ts",
+      "exportedName": "updateBrandDetails"
+    },
+    "60d0f4c8ff3457b0cad88815aa9ce0c589c40d30ca": {
+      "workers": {
+        "app/dashboard/[brandId]/settings/page": {
+          "moduleId": 30754,
+          "async": false,
+          "exportedName": "updateAdminSettings",
+          "filename": "src/app/dashboard/[brandId]/settings/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/[brandId]/settings/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/[brandId]/settings/actions.ts",
+      "exportedName": "updateAdminSettings"
+    },
+    "40d88cb53bb79be8f5b093c43f49335a95ccf5a977": {
+      "workers": {
+        "app/dashboard/[brandId]/settings/page": {
+          "moduleId": 30754,
+          "async": false,
+          "exportedName": "deleteBrandAction",
+          "filename": "src/app/dashboard/[brandId]/settings/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/[brandId]/settings/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/[brandId]/settings/actions.ts",
+      "exportedName": "deleteBrandAction"
+    },
+    "60a8e4dcb1acc042b29ee314506b53fa5e081d16f4": {
+      "workers": {
+        "app/dashboard/new/page": {
+          "moduleId": 1416,
+          "async": false,
+          "exportedName": "createBrand",
+          "filename": "src/app/dashboard/new/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/new/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/new/actions.ts",
+      "exportedName": "createBrand"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "5gpk6hJKnDys6BaMhypvpabzbZ3/7y1yZxOJqF5Hj6Q="
+}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../../src/app/admin/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation'\n\nexport default function AdminPage() {\n  redirect('/admin/brands')\n}\n"],"names":[],"mappings":"2cAAA,EAAA,CAAA,CAAA,OAAA,IAAA,EAAA,EAAA,CAAA,CAAA,OAEe,SAAS,IACtB,CAAA,EAAA,EAAA,QAAA,AAAQ,EAAC,gBACX"}

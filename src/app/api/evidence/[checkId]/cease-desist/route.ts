@@ -1,0 +1,85 @@
+import { NextResponse } from 'next/server'
+import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ checkId: string }> }
+) {
+  const { checkId } = await params
+  const token = new URL(request.url).searchParams.get('token')
+
+  const result = await getSerpCheckWithAds(checkId)
+  if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  const { check, ads, brandClientToken } = result
+  if (!token || token !== brandClientToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const brand = await getBrandById(check.brandId)
+  const brandName = brand?.name ?? '[Brand Name]'
+  const checkDate = new Date(check.checkedAt).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
+
+  const competitors = [...new Set(ads.map(a => a.domain))]
+
+  const letter = `CEASE AND DESIST NOTICE
+
+Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+To: [Competitor Name / Legal Department]
+Re: Unauthorised use of "${brandName}" trademark in Google Ads
+
+Dear Sir/Madam,
+
+We write on behalf of ${brandName} regarding your unauthorised use of our registered trademark "${brandName}" in Google Ads advertising.
+
+On ${checkDate}, our monitoring systems detected that your organisation (${competitors.join(', ')}) is running paid advertisements on Google that are triggered by searches for our trademark "${brandName}".
+
+Specifically, the following was observed:
+
+${ads.map(ad => `• Domain: ${ad.domain}
+  Headline: "${ad.headline ?? 'N/A'}"
+  Description: "${ad.description ?? 'N/A'}"
+  Ad Position: ${ad.position ?? 'N/A'}
+  Keyword Targeted: "${check.keyword}"
+`).join('\n')}
+
+This conduct constitutes trademark infringement under the Trade Marks Act 1994 (UK) and/or passing off at common law. Your use of our trademark as a Google Ads keyword to trigger your advertisements is likely to cause confusion among consumers and diverts traffic that would otherwise reach our website.
+
+We hereby demand that you:
+
+1. Immediately cease bidding on the keyword "${check.keyword}" and any variations of our trademark "${brandName}" in Google Ads or any other pay-per-click advertising platform.
+
+2. Confirm in writing within 14 days of receipt of this letter that you have complied with this demand.
+
+3. Provide an undertaking not to repeat this conduct in the future.
+
+Evidence of this infringement, including timestamped screenshots of the search engine results page, has been preserved and is available upon request.
+
+If we do not receive a satisfactory response within 14 days, we reserve the right to:
+• Report the trademark violation to Google under their Ads trademark policy
+• Pursue legal action for trademark infringement and/or passing off
+• Seek damages and an injunction
+
+We trust this matter can be resolved without the need for further action.
+
+Yours faithfully,
+
+[Name]
+[Title]
+${brandName}
+
+---
+Evidence Reference: ${check.id}
+Screenshots and full evidence available at: [Evidence URL]
+This letter was generated using automated brand monitoring data.`
+
+  return new NextResponse(letter, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Content-Disposition': `attachment; filename="cease-desist-${check.keyword}-${check.id.slice(0, 8)}.txt"`,
+    },
+  })
+}

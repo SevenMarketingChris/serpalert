@@ -10,6 +10,7 @@ export interface CheckItem {
     headline: string | null
     description: string | null
     displayUrl: string | null
+    destinationUrl: string | null
     position: number | null
     status: string
   }[]

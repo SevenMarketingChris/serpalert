@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { StatusHero } from '@/components/status-hero'
+import { GoogleAdsStatus } from '@/components/google-ads-status'
+import { BudgetRedirectSummary } from '@/components/budget-redirect-summary'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { ActivityFeed } from '@/components/activity-feed'
 import { TrendChart } from '@/components/trend-chart'
@@ -66,6 +68,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
       headline: a.headline,
       description: a.description,
       displayUrl: a.displayUrl,
+      destinationUrl: a.destinationUrl,
       position: a.position,
       status: a.status,
     })),
@@ -81,6 +84,16 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         checksToday={checksToday.length}
         keywordCount={brand.keywords.length}
         last7DaysThreats={last7Days}
+      />
+      <GoogleAdsStatus
+        googleAdsCustomerId={brand.googleAdsCustomerId}
+        brandCampaignId={brand.brandCampaignId}
+        hasCompetitors={threatsToday > 0}
+      />
+      <BudgetRedirectSummary
+        monthlyBrandSpend={brand.monthlyBrandSpend ?? null}
+        brandRoas={brand.brandRoas ?? null}
+        competitorCount={threatsToday}
       />
       <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
       <TrendChart data={last30Days} />

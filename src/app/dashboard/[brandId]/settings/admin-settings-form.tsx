@@ -14,6 +14,7 @@ interface Props {
   googleAdsCustomerId: string
   brandCampaignId: string
   slackWebhookUrl: string
+  watchlistDomains: string
   active: boolean
 }
 
@@ -24,6 +25,7 @@ export function AdminSettingsForm({
   googleAdsCustomerId,
   brandCampaignId,
   slackWebhookUrl,
+  watchlistDomains,
   active,
 }: Props) {
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAdminSettings, null)
@@ -91,6 +93,19 @@ export function AdminSettingsForm({
             defaultValue={slackWebhookUrl}
             placeholder="https://hooks.slack.com/..."
           />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="watchlistDomains">Competitor Watchlist</Label>
+          <Input
+            id="watchlistDomains"
+            name="watchlistDomains"
+            defaultValue={watchlistDomains}
+            placeholder="rival.com, competitor.co.uk"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Comma-separated domains to watch for. Get priority alerts when these specific competitors appear.
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
