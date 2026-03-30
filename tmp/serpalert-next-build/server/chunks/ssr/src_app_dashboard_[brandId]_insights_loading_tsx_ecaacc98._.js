@@ -1,3 +1,0 @@
-module.exports=[4431,a=>{"use strict";var b=a.i(7997);function c(){return(0,b.jsx)("div",{className:"flex items-center justify-center py-12",children:(0,b.jsxs)("div",{className:"flex items-center gap-3",children:[(0,b.jsx)("span",{className:"inline-block h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"}),(0,b.jsx)("span",{className:"text-sm text-muted-foreground",children:"Loading..."})]})})}a.s(["default",()=>c])}];
-
-//# sourceMappingURL=src_app_dashboard_%5BbrandId%5D_insights_loading_tsx_ecaacc98._.js.map
