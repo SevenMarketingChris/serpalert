@@ -10,7 +10,16 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
+
+  // Stripe vars are optional at startup — only needed for billing routes
+  const recommended = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID'] as const;
+  for (const name of recommended) {
+    const val = process.env[name];
+    if (!val || val.trim() === '') {
+      console.warn(`Warning: ${name} is not set — billing features will not work`);
+    }
+  }
   for (const name of critical) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
@@ -43,8 +52,8 @@ export function getServerEnv() {
     adminSecret: requireEnv("ADMIN_SECRET"),
     cronSecret: requireEnv("CRON_SECRET"),
     ahrefsApiToken: optionalEnv("AHREFS_API_TOKEN"),
-    stripeSecretKey: requireEnv("STRIPE_SECRET_KEY"),
-    stripeWebhookSecret: requireEnv("STRIPE_WEBHOOK_SECRET"),
-    stripePriceId: requireEnv("STRIPE_PRICE_ID"),
+    stripeSecretKey: optionalEnv("STRIPE_SECRET_KEY"),
+    stripeWebhookSecret: optionalEnv("STRIPE_WEBHOOK_SECRET"),
+    stripePriceId: optionalEnv("STRIPE_PRICE_ID"),
   };
 }
