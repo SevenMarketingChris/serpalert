@@ -111,8 +111,8 @@ export async function getScreenshotsForBrand(brandId: string, limit = 50): Promi
 }
 
 export async function hasScreenshotToday(brandId: string, keyword: string): Promise<boolean> {
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  const todayStr = new Date().toISOString().slice(0, 10) // UTC date string
+  const todayStart = new Date(todayStr + 'T00:00:00.000Z')
   const rows = await db.select({ id: serpChecks.id })
     .from(serpChecks)
     .where(and(

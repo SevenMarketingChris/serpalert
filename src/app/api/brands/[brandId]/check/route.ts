@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
-import { screenshotSerp } from '@/lib/puppeteer'
+import { screenshotSerp } from '@/lib/screenshot'
 import { uploadScreenshot } from '@/lib/blob-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 import { rateLimit } from '@/lib/rate-limit'

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isAdminRequest } from '@/lib/auth'
-import { screenshotSerp } from '@/lib/puppeteer'
+import { screenshotSerp } from '@/lib/screenshot'
 
 export async function GET(request: Request) {
   if (!isAdminRequest(request)) {
