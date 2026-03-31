@@ -170,6 +170,96 @@ export async function getUserEmail(userId: string): Promise<string | null> {
   }
 }
 
+export async function sendMonthlyReport(
+  to: string,
+  brandName: string,
+  data: {
+    totalChecks: number
+    newCompetitors: { domain: string; count: number }[]
+    mostActiveCompetitor: string | null
+    keywordsMonitored: number
+    screenshotCount: number
+    screenshotUrls: string[] // top 3 screenshots
+  }
+) {
+  const resend = getResend()
+
+  const competitorRows = data.newCompetitors.length > 0
+    ? data.newCompetitors.slice(0, 10).map(c =>
+        `<tr><td style="padding: 8px 12px; border-bottom: 1px solid #f3f4f6; font-family: monospace; font-size: 13px;">${escapeHtml(c.domain)}</td><td style="padding: 8px 12px; border-bottom: 1px solid #f3f4f6; text-align: right; font-family: monospace; font-size: 13px;">${c.count}x</td></tr>`
+      ).join('')
+    : '<tr><td colspan="2" style="padding: 12px; color: #22c55e; text-align: center;">No competitors detected this month</td></tr>'
+
+  const screenshotImgs = data.screenshotUrls.slice(0, 3).map(url =>
+    `<img src="${escapeHtml(url)}" alt="SERP screenshot" style="width: 100%; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 12px;" />`
+  ).join('')
+
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    to,
+    subject: `Monthly Report — ${escapeHtml(brandName)} — ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Monthly Report</h1>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Here's your brand protection summary for <strong>${escapeHtml(brandName)}</strong> over the last 30 days.
+        </p>
+
+        <!-- Stats -->
+        <div style="display: flex; gap: 12px; margin: 20px 0;">
+          <div style="flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Checks</div>
+            <div style="font-size: 24px; font-weight: 700; font-family: monospace; color: #111;">${data.totalChecks}</div>
+          </div>
+          <div style="flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Competitors</div>
+            <div style="font-size: 24px; font-weight: 700; font-family: monospace; color: ${data.newCompetitors.length > 0 ? '#dc2626' : '#22c55e'};">${data.newCompetitors.length}</div>
+          </div>
+          <div style="flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Keywords</div>
+            <div style="font-size: 24px; font-weight: 700; font-family: monospace; color: #111;">${data.keywordsMonitored}</div>
+          </div>
+        </div>
+
+        ${data.mostActiveCompetitor ? `
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 16px 0;">
+          <p style="margin: 0; font-size: 13px; color: #555;">Most active competitor: <strong style="color: #dc2626; font-family: monospace;">${escapeHtml(data.mostActiveCompetitor)}</strong></p>
+        </div>
+        ` : ''}
+
+        <!-- Competitor table -->
+        <h2 style="font-size: 14px; color: #111; margin-top: 24px;">Competitors Detected</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+          <thead>
+            <tr style="background: #f9fafb;">
+              <th style="padding: 8px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Domain</th>
+              <th style="padding: 8px 12px; text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Times Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${competitorRows}
+          </tbody>
+        </table>
+
+        ${screenshotImgs ? `
+        <h2 style="font-size: 14px; color: #111; margin-top: 24px;">Recent Screenshots</h2>
+        <p style="color: #999; font-size: 12px; margin-bottom: 12px;">Latest SERP captures showing competitor activity</p>
+        ${screenshotImgs}
+        ` : ''}
+
+        <p style="margin-top: 24px;">
+          <a href="https://serpalert.co.uk/dashboard" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            View Full Dashboard
+          </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
