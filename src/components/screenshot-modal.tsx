@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { isSafeUrl } from '@/lib/utils'
 
 export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: string | null; keyword: string }) {
   const [imageError, setImageError] = useState(false)
@@ -51,14 +52,16 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
             </>
           )}
         </div>
-        <a
-          href={screenshotUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-primary hover:underline mt-1 inline-block"
-        >
-          Open full size
-        </a>
+        {isSafeUrl(screenshotUrl) && (
+          <a
+            href={screenshotUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline mt-1 inline-block"
+          >
+            Open full size
+          </a>
+        )}
       </DialogContent>
     </Dialog>
   )

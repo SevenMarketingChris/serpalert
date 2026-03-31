@@ -1,3 +1,5 @@
+'use client'
+
 import type { Brand } from '@/lib/db/schema'
 import { SubscribeButton } from './subscribe-button'
 

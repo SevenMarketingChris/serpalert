@@ -137,7 +137,9 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
       </div>
 
       {/* Modal */}
-      <Dialog open={!!modalImage} onOpenChange={() => setModalImage(null)}>
+      <Dialog open={!!modalImage} onOpenChange={(open) => {
+        if (!open) { setModalImage(null); setImageStatus('loading') }
+      }}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           {modalImage && (
             <>

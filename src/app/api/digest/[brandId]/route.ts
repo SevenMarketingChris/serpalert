@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { isAdminRequest } from '@/lib/auth'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ brandId: string }> }
@@ -31,7 +35,7 @@ export async function GET(
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
 <body style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a1a;">
   <div style="text-align: center; margin-bottom: 24px;">
-    <h1 style="font-size: 20px; margin: 0;">${brand.name}</h1>
+    <h1 style="font-size: 20px; margin: 0;">${escapeHtml(brand.name)}</h1>
     <p style="color: #888; font-size: 13px; margin: 4px 0;">Daily Brand Protection Digest · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
   </div>
 
@@ -55,7 +59,7 @@ export async function GET(
       </tr>
       ${competitors.slice(0, 5).map(c => `
       <tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px; font-weight: 600;">${c.domain}</td>
+        <td style="padding: 8px; font-weight: 600;">${escapeHtml(c.domain)}</td>
         <td style="padding: 8px; text-align: right;">${c.recentCount}</td>
         <td style="padding: 8px; text-align: right;">${c.avgPosition ?? '—'}</td>
       </tr>

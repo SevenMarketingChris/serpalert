@@ -96,10 +96,16 @@ export async function createBrandForUser(
   data: { name: string; keywords: string[]; domain?: string },
   userId: string,
 ): Promise<Brand> {
-  const slug = data.name
+  // Enforce brand limit
+  const currentCount = await getUserBrandCount(userId)
+  if (currentCount >= PLAN_LIMITS.free.brands) {
+    throw new Error('Brand limit reached for your plan')
+  }
+  const baseSlug = data.name
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
+  const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
   const trialEndsAt = new Date()
   trialEndsAt.setDate(trialEndsAt.getDate() + 7)
   const rows = await db.insert(brands).values({
@@ -319,10 +325,12 @@ export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
 }
 
 export async function deleteBrand(id: string): Promise<void> {
-  await db.delete(competitorAds).where(eq(competitorAds.brandId, id))
-  await db.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
-  await db.delete(serpChecks).where(eq(serpChecks.brandId, id))
-  await db.delete(brands).where(eq(brands.id, id))
+  await db.transaction(async (tx) => {
+    await tx.delete(competitorAds).where(eq(competitorAds.brandId, id))
+    await tx.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
+    await tx.delete(serpChecks).where(eq(serpChecks.brandId, id))
+    await tx.delete(brands).where(eq(brands.id, id))
+  })
 }
 
 export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck | null> {
@@ -341,7 +349,12 @@ export async function createBrand(data: {
   agencyManaged?: boolean; subscriptionStatus?: string
   trialEndsAt?: Date
 }): Promise<Brand> {
-  const rows = await db.insert(brands).values(data).returning()
+  const baseSlug = data.slug
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+  const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
+  const rows = await db.insert(brands).values({ ...data, slug }).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
 }

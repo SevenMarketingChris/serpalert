@@ -15,12 +15,11 @@ export async function GET(
   }
 
   const result = await getSerpCheckWithAds(checkId)
-  if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
-  const { check, ads, brandClientToken } = result
-  if (!safeCompare(token, brandClientToken)) {
+  if (!result || !safeCompare(token, result.brandClientToken)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const { check, ads } = result
 
   const brand = await getBrandById(check.brandId)
   const brandName = brand?.name ?? '[Brand Name]'

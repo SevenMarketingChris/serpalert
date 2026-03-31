@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 const COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
 
@@ -19,6 +19,7 @@ function formatWait(ms: number): string {
 }
 
 export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
+  const inFlight = useRef(false)
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [result, setResult] = useState<string>('')
   const [cooldownEnd, setCooldownEnd] = useState<number | null>(null)
@@ -63,6 +64,8 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
   const onCooldown = cooldownEnd !== null && cooldownEnd > Date.now()
 
   async function handleCheck() {
+    if (inFlight.current) return
+    inFlight.current = true
     setStatus('running')
     setResult('')
     try {
@@ -75,12 +78,14 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
         if (data.cooldownMs) {
           setCooldownEnd(Date.now() + data.cooldownMs)
         }
+        inFlight.current = false
         return
       }
 
       if (!res.ok) {
         setStatus('error')
         setResult(data.error || 'Check failed')
+        inFlight.current = false
         return
       }
 
@@ -100,6 +105,7 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
     } catch {
       setStatus('error')
       setResult('Network error')
+      inFlight.current = false
     }
   }
 
