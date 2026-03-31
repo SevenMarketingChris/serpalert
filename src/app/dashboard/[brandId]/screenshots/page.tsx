@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import Image from 'next/image'
 import { getBrandById, getScreenshotsForBrand } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Camera } from 'lucide-react'
 
@@ -19,11 +20,12 @@ export default async function ScreenshotsPage({ params }: { params: Promise<{ br
   const { brandId } = await params
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+  const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged) notFound()
-  if (brand.userId !== userId) notFound()
+  if (brand.agencyManaged && !isAdmin) notFound()
+  if (!brand.agencyManaged && brand.userId !== userId) notFound()
 
   const screenshots = await getScreenshotsForBrand(brandId, 100)
 

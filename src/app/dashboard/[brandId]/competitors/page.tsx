@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Shield } from 'lucide-react'
 import { WastedSpendBadge } from '@/components/wasted-spend-badge'
@@ -16,10 +17,11 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
   const { brandId } = await params
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+  const isAdmin = await checkIsAdmin()
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged) notFound() // agency brands are admin-only via admin panel
-  if (brand.userId !== userId) notFound()
+  if (brand.agencyManaged && !isAdmin) notFound()
+  if (!brand.agencyManaged && brand.userId !== userId) notFound()
 
   const competitors = await getCompetitorSummaryForBrand(brandId)
 
