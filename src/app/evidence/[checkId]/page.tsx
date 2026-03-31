@@ -107,6 +107,9 @@ export default async function EvidencePage({
           >
             Generate C&D Letter
           </a>
+          <p className="text-[11px] text-gray-400 mt-1">
+            Template only — not legal advice. Consult a solicitor before sending.
+          </p>
           <a
             href="https://support.google.com/google-ads/troubleshooter/4578507?sjid=&ref_topic=24937&hl=en-GB"
             target="_blank"

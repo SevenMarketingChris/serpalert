@@ -298,6 +298,15 @@ export default function HomePage() {
               7-day free trial &middot; No credit card required
             </span>
           </div>
+          <div className="mt-8 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
+            <span>&middot;</span>
+            <Link href="/terms" className="hover:text-foreground transition-colors">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </section>
     </div>
