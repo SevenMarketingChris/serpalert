@@ -10,6 +10,7 @@ import {
   Shield,
 } from "lucide-react";
 import { BudgetCalculator } from "@/components/budget-calculator";
+import { ExitIntentPopup } from "@/components/exit-intent-popup";
 
 export default function HomePage() {
   return (
@@ -57,7 +58,7 @@ export default function HomePage() {
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Turn off brand campaigns and redirect that budget to winning new
-            customers. SerpAlert watches your brand keywords every hour and
+            customers. SerpAlert watches your brand keyword every hour and
             alerts you the moment a competitor moves in.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3">
@@ -179,9 +180,9 @@ export default function HomePage() {
             {[
               {
                 step: "01",
-                title: "Add your brand keywords",
+                title: "Add your brand keyword",
                 description:
-                  "Enter the brand terms you want to protect. We'll start monitoring them immediately.",
+                  "Enter the brand term you want to protect. We'll start monitoring it immediately.",
               },
               {
                 step: "02",
@@ -309,6 +310,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <ExitIntentPopup />
     </div>
   );
 }

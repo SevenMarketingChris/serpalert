@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { ExitIntentPopup } from "@/components/exit-intent-popup";
 
 export const metadata = {
   title: "Pricing — SerpAlert",
   description:
-    "Simple, transparent pricing for brand keyword monitoring. £149/mo with a 7-day free trial.",
+    "Brand keyword monitoring from £149/mo. Agency plans from £69/brand. 7-day free trial.",
 };
 
 const features = [
-  "Monitor up to 2 brand keywords",
+  "Monitor your brand keyword",
   "Hourly SERP checks (24x daily)",
   "SERP screenshot evidence",
   "Competitor ad copy tracking",
@@ -18,6 +19,15 @@ const features = [
   "Google Ads auto-toggle",
   "Cease & desist letter templates",
   "PDF evidence reports",
+];
+
+const agencyFeatures = [
+  "All standard monitoring features",
+  "White-label client portals",
+  "Bulk brand management",
+  "Dedicated onboarding support",
+  "Volume discounts from day one",
+  "Cancel or add brands anytime",
 ];
 
 const faqs = [
@@ -31,8 +41,8 @@ const faqs = [
       "Monitoring pauses but you can still view all historical data. Subscribe from your dashboard to resume monitoring instantly.",
   },
   {
-    question: "Can I monitor more keywords?",
-    answer: "Contact us for custom plans.",
+    question: "Can I monitor more than one keyword?",
+    answer: "The standard plan includes 1 brand keyword. Contact us if you need additional keywords.",
   },
   {
     question: "How often are checks run?",
@@ -41,6 +51,14 @@ const faqs = [
   {
     question: "Do you support other countries?",
     answer: "Currently UK only. More coming soon.",
+  },
+  {
+    question: "Do you offer agency pricing?",
+    answer: "Yes — agencies monitoring multiple client brands get volume discounts starting at £109/brand/month. Contact us to set up an agency account.",
+  },
+  {
+    question: "Can my clients see their own reports?",
+    answer: "Yes, every brand gets a client portal with a unique link. Clients get read-only access to their monitoring data without needing a login.",
   },
 ];
 
@@ -115,6 +133,68 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Agency Partners */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-2xl text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
+            Agency Partners
+          </h2>
+          <p className="mt-4 text-gray-500 max-w-lg mx-auto">
+            Monitor all your clients&apos; brands from one account. Volume pricing that scales with you.
+          </p>
+        </div>
+
+        <div className="mx-auto max-w-xl bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+          <table className="w-full text-sm mb-8">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="text-left font-semibold text-gray-900 px-4 py-3 rounded-tl-lg">Brands</th>
+                <th className="text-left font-semibold text-gray-900 px-4 py-3">Price</th>
+                <th className="text-right font-semibold text-gray-900 px-4 py-3 rounded-tr-lg">Saving</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              <tr>
+                <td className="px-4 py-3 text-gray-700">1 &ndash; 5</td>
+                <td className="px-4 py-3 text-gray-900 font-semibold">&pound;109<span className="text-gray-500 font-normal">/brand/mo</span></td>
+                <td className="px-4 py-3 text-right text-indigo-600 font-medium">27% off</td>
+              </tr>
+              <tr className="bg-indigo-50/30">
+                <td className="px-4 py-3 text-gray-700">6 &ndash; 15</td>
+                <td className="px-4 py-3 text-gray-900 font-semibold">&pound;89<span className="text-gray-500 font-normal">/brand/mo</span></td>
+                <td className="px-4 py-3 text-right text-indigo-600 font-medium">40% off</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-gray-700">16+</td>
+                <td className="px-4 py-3 text-gray-900 font-semibold">&pound;69<span className="text-gray-500 font-normal">/brand/mo</span></td>
+                <td className="px-4 py-3 text-right text-indigo-600 font-medium">54% off</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ul className="space-y-3 mb-8">
+            {agencyFeatures.map((feature) => (
+              <li key={feature} className="flex items-start gap-3">
+                <Check className="h-5 w-5 shrink-0 text-indigo-600 mt-0.5" />
+                <span className="text-sm text-gray-700">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="text-center">
+            <a
+              href="mailto:hello@serpalert.co.uk"
+              className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-indigo-600 px-6 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+            >
+              Get in Touch
+            </a>
+            <p className="mt-3 text-xs text-gray-400">
+              We&apos;ll set up your agency account within 24 hours
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="bg-white border-t border-gray-200 px-6 py-16 md:py-20">
         <div className="mx-auto max-w-2xl">
@@ -145,6 +225,7 @@ export default function PricingPage() {
           </Link>
         </div>
       </footer>
+      <ExitIntentPopup />
     </div>
   );
 }

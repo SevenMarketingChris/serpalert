@@ -260,6 +260,130 @@ export async function sendMonthlyReport(
   })
 }
 
+export async function sendAuditReportEmail(
+  to: string,
+  keyword: string,
+  competitors: Array<{ domain: string; headline: string | null; description: string | null; position: number }>
+) {
+  const resend = getResend()
+
+  const competitorRows = competitors.length > 0
+    ? competitors.map(c =>
+        `<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 8px 0;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <strong style="font-family: monospace; font-size: 13px; color: #dc2626;">${escapeHtml(c.domain)}</strong>
+            <span style="background: #eef2ff; color: #4f46e5; font-size: 11px; padding: 2px 8px; border-radius: 12px;">Position ${c.position}</span>
+          </div>
+          ${c.headline ? `<p style="margin: 4px 0 0; font-size: 13px; color: #111; font-weight: 600;">${escapeHtml(c.headline)}</p>` : ''}
+          ${c.description ? `<p style="margin: 4px 0 0; font-size: 12px; color: #555;">${escapeHtml(c.description)}</p>` : ''}
+        </div>`
+      ).join('')
+    : '<p style="color: #22c55e; font-size: 14px;">No competitors are currently bidding on this keyword.</p>'
+
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    to,
+    subject: `Brand Audit: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} found on "${escapeHtml(keyword)}"`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Your Brand Audit Report</h1>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Here are the results for <strong>${escapeHtml(keyword)}</strong>. We found <strong>${competitors.length}</strong> competitor${competitors.length !== 1 ? 's' : ''} bidding on your brand keyword.
+        </p>
+        ${competitorRows}
+        <p style="color: #555; font-size: 14px; line-height: 1.6; margin-top: 16px;">
+          We'll send you weekly updates for the next 8 weeks so you can track changes.
+        </p>
+        <p style="margin-top: 24px;">
+          <a href="https://serpalert.co.uk/sign-up" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            Start 7-Day Free Trial
+          </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
+export async function sendWeeklyAuditEmail(
+  to: string,
+  keyword: string,
+  competitors: Array<{ domain: string; headline: string | null; description: string | null; position: number }>,
+  checksRemaining: number
+) {
+  const resend = getResend()
+
+  const competitorRows = competitors.length > 0
+    ? competitors.map(c =>
+        `<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 8px 0;">
+          <strong style="font-family: monospace; font-size: 13px; color: #dc2626;">${escapeHtml(c.domain)}</strong>
+          <span style="background: #eef2ff; color: #4f46e5; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Position ${c.position}</span>
+        </div>`
+      ).join('')
+    : '<p style="color: #22c55e; font-size: 14px;">No competitors found this week.</p>'
+
+  const finalCheckNote = checksRemaining <= 1
+    ? `<div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; margin: 16px 0;">
+        <p style="margin: 0; font-size: 13px; color: #92400e; font-weight: 600;">This is your last free weekly check.</p>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #92400e;">Start a free trial to continue monitoring with hourly checks and instant alerts.</p>
+      </div>`
+    : `<p style="color: #999; font-size: 12px;">${checksRemaining} weekly check${checksRemaining !== 1 ? 's' : ''} remaining on your free audit.</p>`
+
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    to,
+    subject: `Weekly Update: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} on "${escapeHtml(keyword)}"`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Weekly Brand Check</h1>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Your weekly check for <strong>${escapeHtml(keyword)}</strong> found <strong>${competitors.length}</strong> competitor${competitors.length !== 1 ? 's' : ''}.
+        </p>
+        ${competitorRows}
+        ${finalCheckNote}
+        <p style="margin-top: 24px;">
+          <a href="https://serpalert.co.uk/sign-up" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            Start 7-Day Free Trial
+          </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
+export async function sendAuditMonitoringEndedEmail(to: string, keyword: string) {
+  const resend = getResend()
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    to,
+    subject: `Free monitoring ended for "${escapeHtml(keyword)}"`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Your free monitoring has ended</h1>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Your 8 weeks of free weekly checks for <strong>${escapeHtml(keyword)}</strong> have finished.
+        </p>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Competitors can start bidding on your brand at any time. Start a free trial to get hourly monitoring with instant alerts — so you never miss a threat.
+        </p>
+        <p style="margin-top: 24px;">
+          <a href="https://serpalert.co.uk/sign-up" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            Start Your Free Trial
+          </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }

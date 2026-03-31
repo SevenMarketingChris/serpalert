@@ -35,18 +35,15 @@ export function NewUserBrandForm({ keywordLimit }: Props) {
 
           <div className="space-y-1.5">
             <Label htmlFor="keywords">
-              Keywords{' '}
-              <span className="text-muted-foreground font-normal">
-                (optional, comma-separated, up to {keywordLimit})
-              </span>
+              Brand Keyword
             </Label>
             <Input
               id="keywords"
               name="keywords"
-              placeholder="Acme Corp, Acme Corp reviews, buy Acme"
+              placeholder="e.g. Acme Corp"
             />
             <p className="text-xs text-muted-foreground">
-              Up to {keywordLimit} keywords on your current plan
+              The search term to monitor — typically your brand name as customers would search for it
             </p>
           </div>
 

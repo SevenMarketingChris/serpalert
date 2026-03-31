@@ -1,0 +1,3 @@
+{"type":"server-started","port":54793,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:54793","screen_dir":"/Users/chris/Claude Code/serpalert/.superpowers/brainstorm/82097-1774983444/content","state_dir":"/Users/chris/Claude Code/serpalert/.superpowers/brainstorm/82097-1774983444/state"}
+{"type":"screen-added","file":"/Users/chris/Claude Code/serpalert/.superpowers/brainstorm/82097-1774983444/content/email-previews.html"}
+{"type":"server-stopped","reason":"idle timeout"}
