@@ -97,7 +97,7 @@ export async function GET(request: Request) {
                       1, // first time seen
                       new Date().toISOString().slice(0, 10),
                     )
-                  } catch {}
+                  } catch (err) { console.error('[cron/serp-check] Failed to generate AI summary:', err) }
                   await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null, aiSummary)
                 }
               }
