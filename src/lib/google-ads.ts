@@ -69,8 +69,7 @@ export async function setCampaignStatus(
   enabled: boolean
 ): Promise<void> {
   if (!process.env.GOOGLE_ADS_CLIENT_ID || !process.env.GOOGLE_ADS_CLIENT_SECRET || !process.env.GOOGLE_ADS_DEVELOPER_TOKEN || !process.env.GOOGLE_ADS_REFRESH_TOKEN) {
-    console.warn('Missing Google Ads credentials — skipping campaign toggle')
-    return
+    throw new Error('Missing Google Ads credentials')
   }
 
   const client = new GoogleAdsApi({

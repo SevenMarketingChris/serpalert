@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { getSerpCheckWithAds } from '@/lib/db/queries'
 import Image from 'next/image'
 import { CopyLinkButton } from '@/components/copy-link-button'
+import { safeCompare } from '@/lib/auth'
+import { isSafeUrl } from '@/lib/utils'
 
 function formatDateTime(date: Date): string {
   const d = new Date(date)
@@ -29,7 +31,7 @@ export default async function EvidencePage({
 
   const { token } = await searchParams
   const { check, ads, brandClientToken } = result
-  if (!token || token !== brandClientToken) notFound()
+  if (!token || !safeCompare(token, brandClientToken)) notFound()
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-4 py-8">
@@ -44,7 +46,7 @@ export default async function EvidencePage({
           <h1 className="font-semibold text-lg">Evidence Report</h1>
 
           {/* Screenshot */}
-          {check.screenshotUrl && (
+          {check.screenshotUrl && isSafeUrl(check.screenshotUrl) && (
             <div className="relative w-full aspect-video rounded-lg overflow-hidden">
               <Image src={check.screenshotUrl} alt="SERP screenshot" fill className="object-cover object-top" sizes="(max-width: 768px) 100vw, 672px" />
               <span className="absolute bottom-2 right-2 bg-black/70 text-white font-mono text-xs px-2 py-1 rounded">

@@ -65,8 +65,6 @@ export async function updateAdminSettings(
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
-
   const monthlyBrandSpend = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || null
   const brandRoas = ((formData.get('brandRoas') as string) ?? '').trim() || null
   const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null

@@ -71,6 +71,9 @@ export async function POST(request: Request) {
         case 'past_due': status = 'past_due'; break
         case 'canceled': status = 'canceled'; break
         case 'unpaid': status = 'canceled'; break
+        case 'trialing': status = 'trialing'; break
+        case 'incomplete':
+        case 'incomplete_expired': status = 'canceled'; break
         default: status = subscription.status; break
       }
 
