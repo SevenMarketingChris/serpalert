@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
 import { safeCompare } from '@/lib/auth'
 
+const sanitise = (s: string) => s.replace(/[\r\n]+/g, ' ').trim()
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ checkId: string }> }
@@ -44,9 +46,9 @@ On ${checkDate}, our monitoring systems detected that your organisation (${compe
 
 Specifically, the following was observed:
 
-${ads.map(ad => `• Domain: ${ad.domain}
-  Headline: "${ad.headline ?? 'N/A'}"
-  Description: "${ad.description ?? 'N/A'}"
+${ads.map(ad => `• Domain: ${sanitise(ad.domain)}
+  Headline: "${ad.headline ? sanitise(ad.headline) : 'N/A'}"
+  Description: "${ad.description ? sanitise(ad.description) : 'N/A'}"
   Ad Position: ${ad.position ?? 'N/A'}
   Keyword Targeted: "${check.keyword}"
 `).join('\n')}
