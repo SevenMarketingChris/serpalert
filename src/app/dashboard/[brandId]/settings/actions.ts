@@ -94,6 +94,67 @@ export async function updateAdminSettings(
   }
 }
 
+export async function updateAlertConfig(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const { userId } = await auth()
+  if (!userId) return { error: 'Not authenticated' }
+
+  const brandId = formData.get('brandId') as string
+  if (!brandId) return { error: 'Missing brand ID' }
+
+  const brand = await getBrandById(brandId)
+  if (!brand) return { error: 'Brand not found' }
+
+  const isAdmin = await checkIsAdmin()
+  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
+  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+
+  const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
+
+  if (slackWebhookUrl && !slackWebhookUrl.startsWith('https://hooks.slack.com/')) {
+    return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
+  }
+
+  try {
+    await updateBrand(brandId, { slackWebhookUrl })
+    revalidatePath(`/dashboard/${brandId}`)
+    return { success: 'Alert settings updated' }
+  } catch {
+    return { error: 'Failed to update alert settings' }
+  }
+}
+
+export async function updateGoogleAds(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const { userId } = await auth()
+  if (!userId) return { error: 'Not authenticated' }
+
+  const brandId = formData.get('brandId') as string
+  if (!brandId) return { error: 'Missing brand ID' }
+
+  const brand = await getBrandById(brandId)
+  if (!brand) return { error: 'Brand not found' }
+
+  const isAdmin = await checkIsAdmin()
+  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
+  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+
+  const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null
+  const brandCampaignId = ((formData.get('brandCampaignId') as string) ?? '').trim() || null
+
+  try {
+    await updateBrand(brandId, { googleAdsCustomerId, brandCampaignId })
+    revalidatePath(`/dashboard/${brandId}`)
+    return { success: 'Google Ads settings updated' }
+  } catch {
+    return { error: 'Failed to update Google Ads settings' }
+  }
+}
+
 export async function deleteBrandAction(brandId: string): Promise<{ error?: string } | void> {
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }

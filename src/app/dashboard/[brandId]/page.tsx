@@ -6,7 +6,7 @@ import { ManualCheckButton } from '@/components/manual-check-button'
 import { ActivityFeed } from '@/components/activity-feed'
 import { TrendChart } from '@/components/trend-chart'
 import { RecentScan } from '@/components/recent-scan'
-import { CompetitorTable } from '@/components/competitor-table'
+import { CompetitorSummary } from '@/components/competitor-summary'
 import { SparklineBars } from '@/components/sparkline-bars'
 import { toUTCDate, getRelativeTime } from '@/lib/time'
 import { ShieldCheck, AlertTriangle } from 'lucide-react'
@@ -200,7 +200,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
       {/* (f) Competitor Summary Table */}
       {topCompetitors.length > 0 && (
-        <CompetitorTable competitors={topCompetitors} brandId={brandId} />
+        <CompetitorSummary competitors={topCompetitors} brandId={brandId} />
       )}
     </div>
   )

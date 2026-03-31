@@ -19,8 +19,8 @@ export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateBrandDetails, null)
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">
         Brand Details
       </h3>
       <form action={formAction} className="space-y-4">
