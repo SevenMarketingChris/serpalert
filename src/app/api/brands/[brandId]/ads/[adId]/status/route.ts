@@ -18,10 +18,12 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ brandId: string; adId: string }> },
 ) {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
 
   const { brandId, adId } = await params
   if (!UUID_RE.test(brandId) || !UUID_RE.test(adId)) {

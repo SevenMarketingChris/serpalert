@@ -19,13 +19,22 @@ export function SubscribeButton({ brandId }: { brandId: string }) {
       const data = await res.json()
       if (!res.ok || !data.url) {
         setError(data.error ?? 'Something went wrong. Please try again.')
+        setLoading(false)
+        return
+      }
+      try {
+        const parsed = new URL(data.url)
+        if (parsed.protocol !== 'https:') throw new Error('Invalid')
+      } catch {
+        setError('Invalid checkout URL received.')
+        setLoading(false)
         return
       }
       window.location.href = data.url
+      // Don't reset loading — page is navigating away
     } catch (err) {
       console.error('Failed to create checkout session:', err)
       setError('Network error. Please try again.')
-    } finally {
       setLoading(false)
     }
   }

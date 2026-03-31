@@ -18,10 +18,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
     return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
   }
 
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
 
   const { ok } = rateLimit(`manual-check:${brandId}`, { limit: 3, windowMs: 300_000 })
   if (!ok) {
@@ -30,10 +32,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
 
   const brand = await getBrandById(brandId)
   if (!brand) {
-    return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-
-  if (brand.userId !== userId && !brand.agencyManaged) {
+  if (brand.agencyManaged && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  if (!brand.agencyManaged && brand.userId !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

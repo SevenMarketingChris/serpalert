@@ -25,6 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
 
+  if (brand.stripeSubscriptionId && brand.subscriptionStatus !== 'canceled') {
+    return NextResponse.json({ error: 'Already subscribed. Use the billing portal to manage your subscription.' }, { status: 409 })
+  }
+
   const stripe = getStripe()
   const priceId = process.env.STRIPE_PRICE_ID
   if (!priceId) {

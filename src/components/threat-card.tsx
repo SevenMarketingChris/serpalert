@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ScreenshotModal } from '@/components/screenshot-modal'
 import { EvidenceModal } from '@/components/evidence-modal'
+import { isSafeUrl } from '@/lib/utils'
 
 interface ThreatCardProps {
   checkId: string
@@ -118,12 +119,14 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
                 {ad.displayUrl && (
                   <p className="text-muted-foreground text-[11px] font-mono">{ad.displayUrl}</p>
                 )}
-                {ad.destinationUrl && (
+                {ad.destinationUrl && isSafeUrl(ad.destinationUrl) ? (
                   <a href={ad.destinationUrl} target="_blank" rel="noopener noreferrer"
                      className="text-[11px] text-primary/70 hover:text-primary hover:underline truncate block">
                     {ad.destinationUrl}
                   </a>
-                )}
+                ) : ad.destinationUrl ? (
+                  <span className="text-muted-foreground text-[11px] truncate block">{ad.destinationUrl}</span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -160,7 +163,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
       </div>
 
       {/* Right: screenshot */}
-      {screenshotUrl && (
+      {screenshotUrl && isSafeUrl(screenshotUrl) ? (
         <a
           href={screenshotUrl}
           target="_blank"
@@ -175,7 +178,11 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
             sizes="192px"
           />
         </a>
-      )}
+      ) : screenshotUrl ? (
+        <div className="relative w-full sm:w-64 h-44 rounded-lg border border-border overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-xs">Invalid screenshot URL</span>
+        </div>
+      ) : null}
     </div>
   )
 }

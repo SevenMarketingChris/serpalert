@@ -24,7 +24,9 @@ export default async function BrandDashboardLayout({
   const { brandId } = await params
 
   const brand = await getBrandById(brandId)
-  if (!brand || (brand.userId !== userId && !brand.agencyManaged)) notFound()
+  if (!brand) notFound()
+  if (brand.agencyManaged && !isAdmin) notFound()
+  if (!brand.agencyManaged && brand.userId !== userId) notFound()
 
   const userBrands = await getBrandsForUser(userId)
 

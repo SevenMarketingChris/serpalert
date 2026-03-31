@@ -19,8 +19,7 @@ export async function checkSerpForAds(
 ): Promise<SerpAdResult[]> {
   const apiKey = process.env.SERPAPI_KEY
   if (!apiKey) {
-    console.warn('SERPAPI_KEY not set — cannot detect paid ads')
-    return []
+    throw new Error('SERPAPI_KEY not set — cannot detect paid ads')
   }
 
   // SerpAPI needs a specific location to return ads reliably

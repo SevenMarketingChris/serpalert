@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { StatusFilter } from '@/components/status-filter'
 import { ThreatCard } from '@/components/threat-card'
 import { groupChecksIntoRuns, type CheckItem, type ScanRun } from '@/lib/group-checks'
+import { isSafeUrl } from '@/lib/utils'
 
 interface ActivityFeedProps {
   checks: CheckItem[]
@@ -91,7 +92,7 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
                     </p>
                   </div>
                   {/* Right: screenshot */}
-                  {check.screenshotUrl && (
+                  {check.screenshotUrl && isSafeUrl(check.screenshotUrl) ? (
                     <a
                       href={check.screenshotUrl}
                       target="_blank"
@@ -106,7 +107,11 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
                         sizes="256px"
                       />
                     </a>
-                  )}
+                  ) : check.screenshotUrl ? (
+                    <div className="relative w-full sm:w-64 h-44 rounded-lg border border-border overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground text-xs">Invalid screenshot URL</span>
+                    </div>
+                  ) : null}
                 </div>
               )
             }

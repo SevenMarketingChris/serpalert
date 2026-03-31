@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
     metadata: { brandId },
+    subscription_data: { metadata: { brandId } },
     success_url: `${origin}/client/${brand.clientToken}`,
     cancel_url: origin,
   })

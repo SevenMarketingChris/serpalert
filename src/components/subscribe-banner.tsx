@@ -2,9 +2,10 @@ import type { Brand } from '@/lib/db/schema'
 import { SubscribeButton } from './subscribe-button'
 
 export function SubscribeBanner({ brand }: { brand: Brand }) {
-  const isExpired = brand.subscriptionStatus === 'trialing' && brand.trialEndsAt && brand.trialEndsAt <= new Date()
+  const now = new Date()
+  const isExpired = brand.subscriptionStatus === 'trialing' && brand.trialEndsAt && brand.trialEndsAt <= now
   const isCanceled = brand.subscriptionStatus === 'canceled'
-  const isTrialing = brand.subscriptionStatus === 'trialing' && brand.trialEndsAt && brand.trialEndsAt > new Date()
+  const isTrialing = brand.subscriptionStatus === 'trialing' && brand.trialEndsAt && brand.trialEndsAt > now
 
   if (isCanceled) {
     return (

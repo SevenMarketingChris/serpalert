@@ -51,8 +51,10 @@ export async function updateAdminSettings(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) return { error: 'Not authenticated' }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  if (role !== 'admin') return { error: 'Admin access required' }
 
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
