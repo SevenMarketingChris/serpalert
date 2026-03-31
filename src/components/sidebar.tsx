@@ -117,7 +117,7 @@ export function Sidebar({
 
         {/* Brand name or switcher */}
         <div className="px-2 pb-2">
-          {brands.length > 1 ? (
+          {brands.length > 1 || isAdmin ? (
             <BrandSwitcher
               currentBrandId={brandId}
               currentBrandName={brandName}

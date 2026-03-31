@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import {
   getBrandById,
   getBrandsForUser,
+  getAllActiveBrands,
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
@@ -27,6 +28,11 @@ export default async function BrandDashboardLayout({
   if (!brand.agencyManaged && brand.userId !== userId) notFound()
 
   const userBrands = await getBrandsForUser(userId)
+  // Admin sees all brands (personal + agency) in the switcher
+  const allBrands = isAdmin
+    ? await getAllActiveBrands()
+    : userBrands
+  const sidebarBrands = allBrands.map(b => ({ id: b.id, name: b.name }))
 
   const lastCheck = await getLastCheckForBrand(brandId)
 
@@ -35,7 +41,7 @@ export default async function BrandDashboardLayout({
       <Sidebar
         brandId={brandId}
         brandName={brand.name}
-        brands={userBrands.map((b) => ({ id: b.id, name: b.name }))}
+        brands={sidebarBrands}
         lastCheckTime={lastCheck ? new Date(lastCheck.checkedAt) : null}
         isAdmin={isAdmin}
         subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
