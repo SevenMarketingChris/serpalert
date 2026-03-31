@@ -33,6 +33,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
 
+  if (brand.userId !== userId && !brand.agencyManaged) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
   const results = []
 

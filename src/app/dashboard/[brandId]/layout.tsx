@@ -1,7 +1,8 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import {
   getBrandById,
-  getAllActiveBrands,
+  getBrandsForUser,
   PLAN_LIMITS,
   getUnresolvedThreatCount,
   getLastCheckForBrand,
@@ -15,12 +16,17 @@ export default async function BrandDashboardLayout({
   children: React.ReactNode
   params: Promise<{ brandId: string }>
 }) {
+  const { userId, sessionClaims } = await auth()
+  if (!userId) redirect('/sign-in')
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
+
   const { brandId } = await params
 
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || (brand.userId !== userId && !brand.agencyManaged)) notFound()
 
-  const userBrands = await getAllActiveBrands()
+  const userBrands = await getBrandsForUser(userId)
 
   const [unresolvedCount, lastCheck] = await Promise.all([
     getUnresolvedThreatCount(brandId),
@@ -39,7 +45,7 @@ export default async function BrandDashboardLayout({
         plan={plan}
         keywordCount={brand.keywords.length}
         keywordLimit={limits.keywords}
-        isAdmin={true}
+        isAdmin={isAdmin}
         unresolvedCount={unresolvedCount}
         lastCheckAt={lastCheck ? new Date(lastCheck.checkedAt).toISOString() : null}
       />
