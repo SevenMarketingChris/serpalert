@@ -3,9 +3,13 @@ import { Check } from "lucide-react";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
 
 export const metadata = {
-  title: "Pricing — SerpAlert",
+  title: "Pricing",
   description:
     "Brand keyword monitoring from £149/mo. Agency plans from £69/brand. 7-day free trial.",
+  openGraph: {
+    title: "Pricing — SerpAlert",
+    description: "Brand keyword monitoring from £149/mo. Agency plans from £69/brand. 7-day free trial.",
+  },
 };
 
 const features = [
