@@ -36,7 +36,7 @@ export default async function NewBrandPage() {
         <div className="space-y-1 text-center">
           <h2 className="text-2xl font-black tracking-tight text-gradient-tech">Create New Brand</h2>
           <p className="text-sm text-muted-foreground">
-            Set up a brand to start monitoring competitor ads on your keyword.
+            Set up a brand to start monitoring competitor ads on your keywords.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export default async function NewBrandPage() {
           <ol className="list-decimal list-inside space-y-1 text-indigo-600">
             <li><strong>Brand name</strong> — enter your brand exactly as customers would search for it</li>
             <li><strong>Domain</strong> — your website (e.g. yourbrand.com) so we don&apos;t flag your own ads</li>
-            <li><strong>Keyword</strong> — the search term to monitor (typically your brand name)</li>
+            <li><strong>Keywords</strong> — the search terms to monitor (e.g. your brand name, common misspellings)</li>
           </ol>
           <p className="text-indigo-500 text-xs">Your first check will run within the hour. You&apos;ll get alerts if any competitors are bidding on your brand.</p>
         </div>
