@@ -1,6 +1,6 @@
 import { timingSafeEqual, createHash } from 'crypto'
 
-function safeCompare(a: string, b: string): boolean {
+export function safeCompare(a: string, b: string): boolean {
   const hashA = createHash('sha256').update(a).digest()
   const hashB = createHash('sha256').update(b).digest()
   return timingSafeEqual(hashA, hashB)

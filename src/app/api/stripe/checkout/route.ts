@@ -33,13 +33,20 @@ export async function POST(request: Request) {
 
   const origin = new URL(request.url).origin
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
+  const sessionParams: any = {
+    mode: 'subscription' as const,
     line_items: [{ price: priceId, quantity: 1 }],
     metadata: { brandId, userId },
+    subscription_data: { metadata: { brandId } },
     success_url: `${origin}/dashboard?subscribed=true`,
     cancel_url: `${origin}/dashboard`,
-  })
+  }
+
+  if (brand.stripeCustomerId) {
+    sessionParams.customer = brand.stripeCustomerId
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams)
 
   return NextResponse.json({ url: session.url })
 }
