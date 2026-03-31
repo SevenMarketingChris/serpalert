@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   const stripe = getStripe()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
-    console.log('[Webhook] body length:', body.length, 'secret prefix:', process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10))
 
   if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
@@ -42,12 +41,16 @@ export async function POST(request: Request) {
         ? session.customer
         : session.customer?.id
 
+      // Only mark active if payment was actually collected
+      const paymentStatus = session.payment_status
+      const newStatus = paymentStatus === 'paid' ? 'active' : 'trialing'
+
       await updateBrandSubscription(brandId, {
         stripeCustomerId: customerId ?? undefined,
         stripeSubscriptionId: subscriptionId ?? undefined,
-        subscriptionStatus: 'active',
+        subscriptionStatus: newStatus,
       })
-      console.info(`Brand ${brandId} activated via Stripe checkout`)
+      console.info(`Brand ${brandId} ${newStatus} via Stripe checkout (payment: ${paymentStatus})`)
       break
     }
 

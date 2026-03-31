@@ -155,7 +155,7 @@ export async function nullifyScreenshotUrls(ids: string[]): Promise<void> {
 }
 
 export async function getUserBrandCount(userId: string): Promise<number> {
-  const rows = await db.select({ count: count() }).from(brands).where(eq(brands.userId, userId))
+  const rows = await db.select({ count: count() }).from(brands).where(and(eq(brands.userId, userId), eq(brands.active, true)))
   return rows[0]?.count ?? 0
 }
 
