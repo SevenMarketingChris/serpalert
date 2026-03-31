@@ -65,13 +65,30 @@ export async function GET(request: Request) {
             displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
             position: ad.position, firstSeenAt: now,
           })))
+          const newDomains: string[] = []
           for (const ad of ads) {
             if (!recentDomains.includes(ad.domain)) {
+              newDomains.push(ad.domain)
               try {
                 await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, brandId: brand.id, domain: ad.domain, keyword })
               } catch (alertErr) {
                 console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
               }
+            }
+          }
+
+          // Email alert for new competitor (non-blocking)
+          if (brand.userId && newDomains.length > 0) {
+            try {
+              const { getUserEmail, sendNewCompetitorEmail } = await import('@/lib/email')
+              const email = await getUserEmail(brand.userId)
+              if (email) {
+                for (const domain of newDomains) {
+                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null)
+                }
+              }
+            } catch (emailErr) {
+              console.error('Competitor email failed:', emailErr)
             }
           }
         }

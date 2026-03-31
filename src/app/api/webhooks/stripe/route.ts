@@ -107,6 +107,20 @@ export async function POST(request: Request) {
 
       await updateBrandSubscription(brand.id, { subscriptionStatus: 'past_due' })
       console.info(`Brand ${brand.id} payment failed — marked past_due`)
+
+      // Send payment failed email (non-blocking)
+      try {
+        if (brand.userId) {
+          const { getUserEmail, sendPaymentFailedEmail } = await import('@/lib/email')
+          const email = await getUserEmail(brand.userId)
+          if (email) {
+            await sendPaymentFailedEmail(email, brand.name)
+          }
+        }
+      } catch (emailErr) {
+        console.error('Payment failed email error:', emailErr)
+      }
+
       break
     }
 
