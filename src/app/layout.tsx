@@ -45,10 +45,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.ico", sizes: "48x48" },
     ],
-    apple: "/apple-touch-icon.png",
   },
 };
 
@@ -76,7 +74,7 @@ export default function RootLayout({
             defaultTheme="light"
             disableTransitionOnChange
           >
-            <main id="main-content">{children}</main>
+            <div id="main-content">{children}</div>
           </ThemeProvider>
           <script
             type="application/ld+json"
@@ -104,7 +102,7 @@ export default function RootLayout({
                   "@type": "Organization",
                   name: "SerpAlert",
                   url: "https://serpalert.co.uk",
-                  logo: "https://serpalert.co.uk/favicon.svg",
+                  logo: "https://serpalert.co.uk/favicon.ico",
                 },
               }),
             }}
