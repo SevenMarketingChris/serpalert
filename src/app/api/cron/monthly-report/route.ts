@@ -50,6 +50,20 @@ export async function GET(request: Request) {
         .slice(0, 3)
         .map(s => s.screenshotUrl!)
 
+      // Generate AI monthly insights
+      let aiInsights: string | null = null
+      try {
+        const { generateMonthlyInsights } = await import('@/lib/ai')
+        aiInsights = await generateMonthlyInsights(brand.name, {
+          totalChecks: recentChecks.length,
+          competitors: competitorList,
+          previousMonthCompetitors: 0, // simplified — could query prev month
+          keywordsMonitored: brand.keywords.length,
+        })
+      } catch {
+        // AI unavailable
+      }
+
       await sendMonthlyReport(email, brand.name, {
         totalChecks: recentChecks.length,
         newCompetitors: competitorList,
@@ -57,7 +71,7 @@ export async function GET(request: Request) {
         keywordsMonitored: brand.keywords.length,
         screenshotCount: screenshots.length,
         screenshotUrls,
-      })
+      }, aiInsights)
 
       results.push({ brand: brand.name, status: 'sent' })
     } catch (err) {

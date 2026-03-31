@@ -14,7 +14,7 @@ export async function generateCompetitorSummary(
 ): Promise<string> {
   const { text } = await generateText({
     model,
-    maxTokens: 200,
+    maxOutputTokens: 200,
     prompt: `You are a brand protection analyst. Write a brief 2-3 sentence summary about this competitor ad detection.
 
 Brand: ${brandName}
@@ -45,7 +45,7 @@ export async function generateMonthlyInsights(
 
   const { text } = await generateText({
     model,
-    maxTokens: 300,
+    maxOutputTokens: 300,
     prompt: `You are a brand protection analyst writing a monthly summary for a client. Write 3-4 sentences summarising this month's brand keyword monitoring.
 
 Brand: ${brandName}
@@ -67,7 +67,7 @@ export async function generateAdCopyAnalysis(
 ): Promise<string> {
   const { text } = await generateText({
     model,
-    maxTokens: 200,
+    maxOutputTokens: 200,
     prompt: `You are a PPC strategist. Analyse this competitor's ad copy targeting the brand "${brandName}" and explain their strategy in 2-3 sentences.
 
 Competitor: ${competitorDomain}
@@ -87,7 +87,7 @@ export async function generateActionRecommendation(
 ): Promise<string> {
   const { text } = await generateText({
     model,
-    maxTokens: 150,
+    maxOutputTokens: 150,
     prompt: `You are a PPC strategist. Give a one-sentence recommendation based on current competitor activity.
 
 Brand: ${brandName}

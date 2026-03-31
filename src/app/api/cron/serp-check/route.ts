@@ -84,7 +84,21 @@ export async function GET(request: Request) {
               const email = await getUserEmail(brand.userId)
               if (email) {
                 for (const domain of newDomains) {
-                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null)
+                  const ad = ads.find(a => a.domain === domain)
+                  let aiSummary: string | null = null
+                  try {
+                    const { generateCompetitorSummary } = await import('@/lib/ai')
+                    aiSummary = await generateCompetitorSummary(
+                      brand.name,
+                      domain,
+                      keyword,
+                      ad?.headline ?? null,
+                      ad?.description ?? null,
+                      1, // first time seen
+                      new Date().toISOString().slice(0, 10),
+                    )
+                  } catch {}
+                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null, aiSummary)
                 }
               }
             } catch (emailErr) {

@@ -10,7 +10,7 @@ import { RecentScan } from '@/components/recent-scan'
 import { CompetitorSummary } from '@/components/competitor-summary'
 import { SparklineBars } from '@/components/sparkline-bars'
 import { toUTCDate, getRelativeTime } from '@/lib/time'
-import { ShieldCheck, AlertTriangle } from 'lucide-react'
+import { ShieldCheck, AlertTriangle, Sparkles } from 'lucide-react'
 import { groupChecksIntoRuns } from '@/lib/group-checks'
 
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
@@ -45,6 +45,20 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
       return check && new Date(check.checkedAt) >= sevenDaysAgo
     }).map(a => a.domain)
   ).size
+
+  // AI recommendation (non-blocking)
+  let aiRecommendation: string | null = null
+  try {
+    const { generateActionRecommendation } = await import('@/lib/ai')
+    aiRecommendation = await generateActionRecommendation(
+      brand.name,
+      activeCompetitors,
+      !!brand.googleAdsCustomerId,
+      !!brand.brandCampaignId,
+    )
+  } catch {
+    // AI unavailable — skip recommendation
+  }
 
   // Build 7-day threat counts for sparkline
   const last7Days: number[] = []
@@ -187,6 +201,19 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
           </div>
         </div>
       </div>
+
+      {/* AI Recommendation */}
+      {aiRecommendation && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="shrink-0 mt-0.5">
+            <Sparkles className="h-4 w-4 text-indigo-500" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400 font-mono mb-1">AI Recommendation</p>
+            <p className="text-sm text-indigo-700">{aiRecommendation}</p>
+          </div>
+        </div>
+      )}
 
       {/* Getting Started card for new brands */}
       {checks.length === 0 && (

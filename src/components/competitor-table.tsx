@@ -57,6 +57,7 @@ export function CompetitorTable({
   const [adCopyCache, setAdCopyCache] = useState<Record<string, AdCopy[]>>({})
   const [loading, setLoading] = useState<string | null>(null)
   const [fetchErrors, setFetchErrors] = useState<Record<string, boolean>>({})
+  const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>({})
 
   async function toggleRow(domain: string) {
     if (expandedDomain === domain) {
@@ -72,6 +73,15 @@ export function CompetitorTable({
         if (res.ok) {
           const data = await res.json()
           setAdCopyCache((prev) => ({ ...prev, [domain]: data }))
+          // Fetch AI analysis (non-blocking)
+          fetch(`/api/brands/${brandId}/ai-analysis?domain=${encodeURIComponent(domain)}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(aiData => {
+              if (aiData?.analysis) {
+                setAiAnalysis(prev => ({ ...prev, [domain]: aiData.analysis }))
+              }
+            })
+            .catch(() => {}) // silently fail
         } else {
           setFetchErrors((prev) => ({ ...prev, [domain]: true }))
         }
@@ -221,6 +231,12 @@ export function CompetitorTable({
                                 ))}
                               </tbody>
                             </table>
+                          {aiAnalysis[competitor.domain] && (
+                            <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 8, padding: 12, marginTop: 8 }}>
+                              <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#818cf8', marginBottom: 4 }}>AI Analysis</p>
+                              <p style={{ fontSize: 13, color: '#4338ca', lineHeight: 1.5 }}>{aiAnalysis[competitor.domain]}</p>
+                            </div>
+                          )}
                           </div>
                         ) : (
                           <p className="text-sm text-gray-400">No ad copy history found.</p>
@@ -314,6 +330,12 @@ export function CompetitorTable({
                           </p>
                         </div>
                       ))}
+                    {aiAnalysis[competitor.domain] && (
+                      <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 8, padding: 12, marginTop: 8 }}>
+                        <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#818cf8', marginBottom: 4 }}>AI Analysis</p>
+                        <p style={{ fontSize: 13, color: '#4338ca', lineHeight: 1.5 }}>{aiAnalysis[competitor.domain]}</p>
+                      </div>
+                    )}
                     </div>
                   ) : (
                     <p className="text-sm text-gray-400">No ad copy history found.</p>

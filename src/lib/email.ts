@@ -72,7 +72,7 @@ export async function sendTrialExpiringEmail(to: string, brandName: string, days
   })
 }
 
-export async function sendNewCompetitorEmail(to: string, brandName: string, competitorDomain: string, keyword: string, screenshotUrl: string | null) {
+export async function sendNewCompetitorEmail(to: string, brandName: string, competitorDomain: string, keyword: string, screenshotUrl: string | null, aiSummary: string | null = null) {
   const resend = getResend()
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
@@ -89,6 +89,12 @@ export async function sendNewCompetitorEmail(to: string, brandName: string, comp
           <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Keyword:</strong> <span style="font-family: monospace;">${escapeHtml(keyword)}</span></p>
           <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Brand:</strong> ${escapeHtml(brandName)}</p>
         </div>
+        ${aiSummary ? `
+        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #818cf8; margin: 0 0 8px;">AI Insights</p>
+          <p style="font-size: 14px; color: #4338ca; line-height: 1.6; margin: 0;">${escapeHtml(aiSummary)}</p>
+        </div>
+        ` : ''}
         ${screenshotUrl ? `<p style="margin: 16px 0;"><img src="${escapeHtml(screenshotUrl)}" alt="SERP screenshot" style="width: 100%; border-radius: 8px; border: 1px solid #e5e7eb;" /></p>` : ''}
         <p style="margin-top: 24px;">
           <a href="https://serpalert.co.uk/dashboard" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
@@ -180,7 +186,8 @@ export async function sendMonthlyReport(
     keywordsMonitored: number
     screenshotCount: number
     screenshotUrls: string[] // top 3 screenshots
-  }
+  },
+  aiInsights: string | null = null,
 ) {
   const resend = getResend()
 
@@ -224,6 +231,13 @@ export async function sendMonthlyReport(
         ${data.mostActiveCompetitor ? `
         <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 16px 0;">
           <p style="margin: 0; font-size: 13px; color: #555;">Most active competitor: <strong style="color: #dc2626; font-family: monospace;">${escapeHtml(data.mostActiveCompetitor)}</strong></p>
+        </div>
+        ` : ''}
+
+        ${aiInsights ? `
+        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 20px 0;">
+          <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #818cf8; margin: 0 0 8px;">AI Insights</p>
+          <p style="font-size: 14px; color: #4338ca; line-height: 1.6; margin: 0;">${escapeHtml(aiInsights)}</p>
         </div>
         ` : ''}
 
