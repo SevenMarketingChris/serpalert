@@ -66,8 +66,8 @@ export async function POST(request: Request) {
       switch (subscription.status) {
         case 'active': status = 'active'; break
         case 'past_due': status = 'past_due'; break
-        case 'canceled':
-        case 'unpaid': status = 'canceled'; break
+        case 'canceled': status = 'canceled'; break
+        case 'unpaid': status = 'past_due'; break
         default: status = subscription.status; break
       }
 
@@ -88,6 +88,7 @@ export async function POST(request: Request) {
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object
+      if (!invoice.subscription) break  // not a subscription invoice
       const customerId = typeof invoice.customer === 'string'
         ? invoice.customer
         : invoice.customer?.id
