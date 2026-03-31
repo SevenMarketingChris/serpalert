@@ -13,7 +13,7 @@ export function validateEnv(): void {
   const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN', 'CLERK_SECRET_KEY'] as const;
 
   // Stripe vars are optional at startup — only needed for billing routes
-  const recommended = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'RESEND_API_KEY'] as const;
+  const recommended = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'RESEND_API_KEY', 'ANTHROPIC_API_KEY'] as const;
   for (const name of recommended) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
