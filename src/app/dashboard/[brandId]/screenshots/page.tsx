@@ -17,9 +17,11 @@ function formatDateTime(date: Date): string {
 
 export default async function ScreenshotsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
 
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || brand.userId !== userId) notFound()
 
   const screenshots = await getScreenshotsForBrand(brandId, 100)
 

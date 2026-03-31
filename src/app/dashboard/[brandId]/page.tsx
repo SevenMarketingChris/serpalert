@@ -18,7 +18,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   const isAdmin = role === 'admin'
 
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || brand.userId !== userId) notFound()
 
   const checks = await getRecentSerpChecks(brandId, 100)
   const todayStr = toUTCDate(new Date())

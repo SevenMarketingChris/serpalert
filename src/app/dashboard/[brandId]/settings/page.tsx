@@ -17,7 +17,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
   const isAdmin = role === 'admin'
 
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || brand.userId !== userId) notFound()
   const plan = brand.plan ?? 'free'
   const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
 
