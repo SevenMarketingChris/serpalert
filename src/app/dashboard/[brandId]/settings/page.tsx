@@ -7,6 +7,7 @@ import { AdminSettingsForm } from './admin-settings-form'
 import { ClientPortalSection } from './client-portal-section'
 import { AlertConfigForm } from './alert-config-form'
 import { GoogleAdsForm } from './google-ads-form'
+import { BillingSection } from './billing-section'
 import { DeleteBrandLink } from './delete-brand-link'
 import { KeywordSuggestions } from '@/components/keyword-suggestions'
 
@@ -36,7 +37,16 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
           keywordLimit={limits.keywords}
         />
 
-        {/* 2. Keyword Suggestions */}
+        {/* 2. Billing */}
+        <BillingSection
+          brandId={brand.id}
+          subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
+          trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt).toISOString() : null}
+          agencyManaged={brand.agencyManaged ?? false}
+          hasStripeCustomer={!!brand.stripeCustomerId}
+        />
+
+        {/* 3. Keyword Suggestions */}
         <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
 
         {/* 3. Alert Configuration */}
