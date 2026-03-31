@@ -1,9 +1,18 @@
 import Link from 'next/link'
-import { PLAN_LIMITS } from '@/lib/db/queries'
+import { auth } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
+import { PLAN_LIMITS, getBrandsForUser } from '@/lib/db/queries'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NewUserBrandForm } from './new-user-brand-form'
 
 export default async function NewBrandPage() {
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
+
+  const userBrands = await getBrandsForUser(userId)
+  const currentPlan = (userBrands[0]?.plan ?? 'free') as keyof typeof PLAN_LIMITS
+  const keywordLimit = PLAN_LIMITS[currentPlan]?.keywords ?? PLAN_LIMITS.free.keywords
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -32,7 +41,7 @@ export default async function NewBrandPage() {
         </div>
 
         <div className="max-w-lg mx-auto">
-          <NewUserBrandForm keywordLimit={PLAN_LIMITS.free.keywords} />
+          <NewUserBrandForm keywordLimit={keywordLimit} />
         </div>
       </div>
     </div>

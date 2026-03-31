@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorAdById, updateCompetitorAdStatus } from '@/lib/db/queries'
-import { isAdminRequest } from '@/lib/auth'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -18,7 +18,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ brandId: string; adId: string }> },
 ) {
-  if (!isAdminRequest(request)) {
+  const { userId } = await auth()
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -27,9 +28,10 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
   }
 
+  // Verify brand ownership
   const brand = await getBrandById(brandId)
-  if (!brand) {
-    return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  if (!brand || (brand.userId !== userId && !brand.agencyManaged)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   let body: unknown
