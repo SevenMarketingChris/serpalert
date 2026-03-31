@@ -1,0 +1,223 @@
+---
+title: "How to Run a Brand Campaign Incrementality Test (Step-by-Step)"
+description: "A practical, step-by-step guide to testing whether your Google Ads brand campaigns are actually driving incremental revenue."
+date: "2026-03-08"
+author: "SerpAlert"
+category: "guide"
+---
+
+# How to Run a Brand Campaign Incrementality Test (Step-by-Step)
+
+An incrementality test answers the most important question in brand advertising: if you turned off your brand campaign, how much traffic and revenue would you actually lose?
+
+Most advertisers assume the answer is "all of it." The reality is usually very different. Studies and practitioner tests consistently show that 50% to 80% of brand campaign conversions would have happened organically anyway. But assumptions are not data — and the only way to know your specific number is to test it.
+
+This guide walks you through setting up, running, and interpreting a brand campaign incrementality test. No advanced statistical knowledge required.
+
+## What is an incrementality test?
+
+An incrementality test (sometimes called a lift test or holdout test) measures the causal impact of an advertising campaign by comparing a group that sees ads against a group that does not.
+
+For brand campaigns specifically, you are measuring what happens when you stop showing brand ads to a subset of your audience. If those people still find your website and convert at roughly the same rate, the brand campaign was not driving incremental results — it was taking credit for traffic that would have arrived anyway.
+
+If there is a meaningful drop in traffic and conversions for the group that no longer sees brand ads, the campaign has genuine incrementality and is worth the spend.
+
+## Before you start: prerequisites
+
+To run a reliable test, you need a few things in place.
+
+**Sufficient volume:** Your brand campaign needs enough clicks and conversions to produce statistically meaningful results. As a rough guide, you need at least 100 conversions per week in the test region and 100 in the control region. If your total brand campaign conversions are under 50 per week, you will need a longer test period or a different testing approach.
+
+**Geographic targeting capability:** The most practical method for most advertisers is a geo-based test, where you pause brand ads in certain regions while keeping them active in others. This requires that your brand campaign uses geographic targeting (most do by default).
+
+**Access to Google Analytics or equivalent:** You need to be able to measure total site traffic and conversions from all sources (not just Google Ads) in both test and control regions. This is essential because the traffic you lose from paid should show up in organic if the campaign is non-incremental.
+
+**Stable baseline:** Do not run this test during seasonal peaks, product launches, or other periods of unusual activity. You need a stable baseline to detect the effect of pausing brand ads. At least two weeks of stable performance before the test is ideal.
+
+**Auction Insights data:** Check your [Auction Insights report](/blog/how-to-read-auction-insights-report) before the test so you know which competitors are active on your brand terms. This context helps you interpret the results.
+
+## Step 1: Choose your test and control regions
+
+The geographic split is the foundation of your test. You need two groups of regions that are similar in terms of:
+
+- Population and market size
+- Brand awareness and search volume for your brand
+- Competitive landscape
+- Historical conversion rates
+
+**Example split for a UK-wide brand:**
+
+| Test regions (brand ads OFF) | Control regions (brand ads ON) |
+|---|---|
+| South East (excl. London) | London |
+| Yorkshire and the Humber | North West |
+| East of England | West Midlands |
+
+The key is balance. You want the test regions to represent roughly 30-50% of your total brand search volume. Less than 30% and you may not have enough data. More than 50% and you are putting too much revenue at risk.
+
+For businesses that operate in fewer regions, you can split by city, county, or even postcode area. The principle is the same: matched pairs with similar characteristics.
+
+## Step 2: Establish your baseline
+
+Before pausing anything, record two weeks of baseline data for both your test and control regions. You need:
+
+- **Brand campaign clicks and conversions** (from Google Ads, filtered by region)
+- **Organic brand clicks and conversions** (from Google Analytics, filtered by region)
+- **Total site traffic and conversions** (from Google Analytics, filtered by region)
+- **Revenue from brand searches** (if you track revenue)
+
+Create a simple spreadsheet with daily data for each region group. This baseline is what you will compare against during the test period.
+
+**Example baseline data (weekly averages):**
+
+| Metric | Test regions | Control regions |
+|---|---|---|
+| Brand ad clicks | 1,200 | 1,400 |
+| Brand ad conversions | 180 | 210 |
+| Organic brand clicks | 2,800 | 3,200 |
+| Organic brand conversions | 280 | 320 |
+| Total conversions (all sources) | 460 | 530 |
+
+## Step 3: Pause brand ads in test regions
+
+Now pause your brand campaign in the test regions only. There are two ways to do this:
+
+**Option A: Campaign-level location exclusion.** Add the test regions as negative locations in your brand campaign. This is the simplest method and easy to reverse.
+
+**Option B: Create a duplicate campaign.** Duplicate your brand campaign, set one copy to target only control regions (ads ON) and set the other to target only test regions (ads OFF, i.e., paused). This gives you cleaner reporting but requires more setup.
+
+Option A is usually sufficient. The important thing is that brand ads stop showing in your test regions while continuing normally in your control regions.
+
+Double-check by searching for your brand name from a test region (or using Google's ad preview tool with the test region selected). You should see no brand ads from your account.
+
+## Step 4: Run the test for 2-4 weeks
+
+Let the test run for a minimum of two weeks. Four weeks is better, as it accounts for weekly variation and gives you more data to work with.
+
+During the test period, do not make any other significant changes to your marketing. No new campaigns, no major budget changes, no website redesigns. You want the only variable to be the presence or absence of brand ads in the test regions.
+
+Monitor the data daily but resist the urge to intervene early. The first few days may show volatility as the system adjusts. A full two-week window gives you much more reliable data.
+
+**What to track during the test:**
+
+In the test regions (brand ads OFF):
+- Organic brand clicks (should increase if paid traffic shifts to organic)
+- Total site traffic (should remain roughly stable if the campaign is non-incremental)
+- Total conversions (the critical metric)
+
+In the control regions (brand ads ON):
+- All the same metrics (these serve as your benchmark for normal performance)
+
+## Step 5: Calculate the results
+
+After the test period, compare the test and control regions. Here is how to calculate incrementality.
+
+### Calculate the expected conversions
+
+First, work out what the test regions "should" have produced based on the control regions' performance.
+
+**Expected test conversions = Baseline test conversions x (Actual control conversions / Baseline control conversions)**
+
+This adjusts for any overall market changes during the test period.
+
+### Example calculation
+
+Let us say your baseline and test period data look like this:
+
+| Metric | Baseline (weekly avg) | Test period (weekly avg) |
+|---|---|---|
+| **Control regions** | | |
+| Total conversions | 530 | 545 |
+| Brand ad conversions | 210 | 215 |
+| **Test regions** | | |
+| Total conversions | 460 | 435 |
+| Brand ad conversions | 180 | 0 (ads paused) |
+| Organic brand conversions | 280 | 390 |
+
+**Step A:** Calculate the expected test conversions if brand ads had no effect:
+
+Expected test conversions = 460 x (545 / 530) = 460 x 1.028 = 473
+
+**Step B:** Compare expected versus actual:
+
+Expected: 473 conversions per week
+Actual: 435 conversions per week
+Difference: 38 conversions per week
+
+**Step C:** Calculate incremental lift:
+
+The brand campaign was driving 180 conversions per week in the test regions. Of those, 38 appear to be genuinely incremental (the rest shifted to organic).
+
+Incrementality rate = 38 / 180 = 21%
+
+This means only 21% of brand campaign conversions were incremental. The other 79% would have happened anyway through organic search.
+
+### Calculate the financial impact
+
+Now translate this into money.
+
+If your brand campaign spends £2,000 per month in the test regions and only 21% of conversions are incremental:
+
+- Total brand spend: £2,000/month
+- Incremental value: 21% of attributed conversions
+- Effective cost per incremental conversion: £2,000 / (180 x 0.21 x 4.33 weeks) = £2,000 / 164 = £12.20
+
+Compare this to your non-brand campaigns. If your non-brand cost per conversion is £25, the brand campaign is still efficient on an incremental basis. If your non-brand cost per conversion is £8, the brand campaign is actually less efficient than it appeared.
+
+You can also run these numbers through our [brand spend calculator](/calculator) to model different scenarios.
+
+## Step 6: Interpret the results
+
+Your incrementality rate will fall into one of three ranges.
+
+### Low incrementality (0-20%)
+
+Your brand campaign is largely wasted. The vast majority of clicks and conversions would have happened organically. This is common for well-known brands with strong organic rankings and minimal competitor bidding.
+
+**Recommended action:** Pause the brand campaign entirely. Redirect the budget to non-brand campaigns. Set up [SERP monitoring](/blog/what-is-serp-monitoring-brand-protection) to detect if competitors start bidding on your brand terms in the future.
+
+### Moderate incrementality (20-50%)
+
+Your brand campaign has some value but is overspending relative to what it delivers. Some traffic is genuinely at risk — likely from competitor activity — but a significant portion would come through organically.
+
+**Recommended action:** Keep the brand campaign active but reduce bids and budget. Focus spend on the brand terms where competitors are most active (check Auction Insights). Consider using automated rules to only bid when competitor impression share exceeds a threshold.
+
+### High incrementality (50%+)
+
+Your brand campaign is driving substantial additional traffic that would not have come through organic. This is most common for brands with aggressive competitor bidding, weak organic rankings, or in industries where ads dominate the SERP.
+
+**Recommended action:** Continue running brand campaigns but optimise for efficiency. Follow [brand campaign best practices](/blog/google-ads-brand-campaign-best-practices) to minimise costs while maintaining coverage. Re-test periodically, as incrementality can change as competitive conditions shift.
+
+## Common pitfalls and how to avoid them
+
+### Test period too short
+
+Running the test for less than two weeks often produces unreliable results. Weekly patterns (e.g., weekday vs weekend behaviour) can skew short tests. Four weeks gives you the most reliable data.
+
+### Contamination between regions
+
+If users in your test region see brand ads through mobile devices with location errors, or if they search from a VPN in a different region, your test can be contaminated. This is unavoidable to some degree, but choosing larger geographic regions (counties rather than postcodes) reduces the problem.
+
+### Ignoring external factors
+
+A competitor might start or stop bidding on your brand during the test, changing the dynamics. Check Auction Insights at the start and end of the test. If the competitive landscape changed significantly, the results may not be reliable.
+
+### Forgetting to measure total impact
+
+Some advertisers only compare brand ad conversions before and after. This misses the point. You need to compare total conversions across all channels, because the hypothesis is that paid traffic shifts to organic. If you only look at paid data, you will always conclude the campaign was 100% incremental.
+
+### Sample size too small
+
+If your test regions generate fewer than 50 conversions per week, the results will be noisy. Either extend the test period to 6-8 weeks, increase the proportion of regions in the test group, or use a different methodology (such as a time-based test where you pause brand ads everywhere for alternating weeks).
+
+## What to do after the test
+
+Regardless of the results, an incrementality test gives you something most advertisers lack: actual data about the value of their brand campaigns. Use it.
+
+If the test shows low incrementality, you have just identified a budget reallocation opportunity. Every pound moved from non-incremental brand spend to high-intent non-brand campaigns is a pound working harder for your business.
+
+If the test shows high incrementality, you now have confidence that your brand spend is justified — and you can defend it in budget discussions with evidence rather than gut feel.
+
+Either way, re-test every 6-12 months. Competitive dynamics change. Your organic rankings change. New competitors enter the market. An incrementality rate measured today may not hold next year.
+
+For a quick estimate of your potential savings before running a full test, try our [brand campaign calculator](/calculator). And for ongoing monitoring of competitor activity on your brand terms, request a free [brand audit](/audit) to see exactly what is happening on your brand SERPs right now.
