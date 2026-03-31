@@ -45,10 +45,6 @@
   --sidebar-accent-foreground: oklch(13% 0.015 250);
   --sidebar-border: oklch(88% 0.006 250);
   --sidebar-ring: oklch(44% 0.22 250);
-  --status-new: oklch(52% 0.22 15);
-  --status-acknowledged: oklch(44% 0.22 250);
-  --status-reported: oklch(55% 0.15 55);
-  --status-resolved: oklch(50% 0.15 195);
 }
 
 .dark {
@@ -85,10 +81,6 @@
   --sidebar-accent-foreground: oklch(95% 0.005 250);
   --sidebar-border: oklch(25% 0.03 250);
   --sidebar-ring: oklch(62% 0.22 250);
-  --status-new: oklch(65% 0.22 15);
-  --status-acknowledged: oklch(62% 0.22 250);
-  --status-reported: oklch(72% 0.15 55);
-  --status-resolved: oklch(72% 0.15 195);
 }
 
 @theme inline {
@@ -255,48 +247,6 @@ body {
   background-color: oklch(52% 0.20 145);
   display: inline-block;
   flex-shrink: 0;
-}
-
-/* ── Status Badge Utilities ── */
-.badge-new {
-  background: oklch(52% 0.22 15 / 0.12);
-  color: var(--status-new);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-acknowledged {
-  background: oklch(52% 0.22 250 / 0.12);
-  color: var(--status-acknowledged);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-reported {
-  background: oklch(52% 0.15 55 / 0.12);
-  color: var(--status-reported);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-resolved {
-  background: oklch(52% 0.15 195 / 0.12);
-  color: var(--status-resolved);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
 }
 
 /* ── Sidebar Utilities ── */
