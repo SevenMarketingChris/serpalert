@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { createBrandForUser, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
+import { createBrandForUser, getBrandsForUser, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
 
 export type CreateUserBrandState = {
   error?: string
@@ -15,9 +15,14 @@ export async function createBrand(
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
 
+  // Get user's current brands to determine their plan
+  const userBrands = await getBrandsForUser(userId)
+  const currentPlan = (userBrands[0]?.plan ?? 'free') as keyof typeof PLAN_LIMITS
+  const planLimit = PLAN_LIMITS[currentPlan]?.brands ?? PLAN_LIMITS.free.brands
+
   const brandCount = await getUserBrandCount(userId)
-  if (brandCount >= PLAN_LIMITS.free.brands) {
-    return { error: `You can only create ${PLAN_LIMITS.free.brands} brand on the free plan` }
+  if (brandCount >= planLimit) {
+    return { error: `You've reached the ${currentPlan} plan limit of ${planLimit} brand${planLimit !== 1 ? 's' : ''}` }
   }
 
   const name = ((formData.get('name') as string) ?? '').trim()

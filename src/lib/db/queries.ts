@@ -367,6 +367,7 @@ export async function createBrand(data: {
   googleAdsCustomerId?: string; slackWebhookUrl?: string
   monthlyBrandSpend?: string; brandRoas?: string
   agencyManaged?: boolean; subscriptionStatus?: string
+  trialEndsAt?: Date
 }): Promise<Brand> {
   const rows = await db.insert(brands).values(data).returning()
   if (!rows[0]) throw new Error('Failed to create brand')

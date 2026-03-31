@@ -41,7 +41,7 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
       monthlyBrandSpend: spendRaw,
       brandRoas: roasRaw,
       agencyManaged,
-      subscriptionStatus: agencyManaged ? 'agency' : 'trialing',
+      subscriptionStatus: agencyManaged ? 'agency' : 'active',
     })
     revalidatePath('/admin/brands')
     return { clientToken: brand.clientToken }

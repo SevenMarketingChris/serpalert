@@ -15,7 +15,10 @@ export default async function DashboardPage() {
 
   const brands: Brand[] = await getBrandsForUser(userId)
   const brandCount = await getUserBrandCount(userId)
-  const canAddBrand = brandCount < PLAN_LIMITS.free.brands
+  // Determine plan limit
+  const currentPlan = (brands[0]?.plan ?? 'free') as keyof typeof PLAN_LIMITS
+  const planLimit = PLAN_LIMITS[currentPlan]?.brands ?? PLAN_LIMITS.free.brands
+  const canAddBrand = brandCount < planLimit
 
   const lastChecks = await Promise.all(
     brands.map(async (b) => {
