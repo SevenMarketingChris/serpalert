@@ -94,14 +94,14 @@ export async function updateAdminSettings(
   }
 }
 
-export async function deleteBrandAction(brandId: string): Promise<void> {
+export async function deleteBrandAction(brandId: string): Promise<{ error?: string } | void> {
   const { userId } = await auth()
-  if (!userId) return
+  if (!userId) return { error: 'Not authenticated' }
 
   const brand = await getBrandById(brandId)
-  if (!brand) return
+  if (!brand) return { error: 'Brand not found' }
 
-  if (brand.userId !== userId) return
+  if (brand.userId !== userId) return { error: 'Not authorized' }
 
   await deleteBrand(brandId)
   redirect('/dashboard')

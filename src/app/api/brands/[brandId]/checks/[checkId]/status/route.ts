@@ -11,10 +11,12 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ brandId: string; checkId: string }> },
 ) {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
 
   const { brandId, checkId } = await params
   if (!UUID_RE.test(brandId) || !UUID_RE.test(checkId)) {
@@ -23,7 +25,13 @@ export async function PATCH(
 
   // Verify brand ownership
   const brand = await getBrandById(brandId)
-  if (!brand || (brand.userId !== userId && !brand.agencyManaged)) {
+  if (!brand) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+  if (brand.agencyManaged && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  if (!brand.agencyManaged && brand.userId !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
