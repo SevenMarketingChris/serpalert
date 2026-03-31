@@ -160,7 +160,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-400 font-mono hidden sm:inline">{relativeTime}</span>
-            <ManualCheckButton brandId={brandId} />
+            <ManualCheckButton brandId={brandId} lastCheckAt={checks[0]?.checkedAt ? new Date(checks[0].checkedAt).toISOString() : null} />
           </div>
         </div>
       </div>
