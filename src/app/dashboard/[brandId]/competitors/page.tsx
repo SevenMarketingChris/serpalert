@@ -17,7 +17,9 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
   const brand = await getBrandById(brandId)
-  if (!brand || brand.userId !== userId) notFound()
+  if (!brand) notFound()
+  if (brand.agencyManaged) notFound() // agency brands are admin-only via admin panel
+  if (brand.userId !== userId) notFound()
 
   const competitors = await getCompetitorSummaryForBrand(brandId)
 

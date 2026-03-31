@@ -11,7 +11,9 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
   if (!userId) redirect('/sign-in')
 
   const brand = await getBrandById(brandId)
-  if (!brand || brand.userId !== userId) notFound()
+  if (!brand) notFound()
+  if (brand.agencyManaged) notFound()
+  if (brand.userId !== userId) notFound()
 
   const hasGoogleAds = !!brand.googleAdsCustomerId
 

@@ -34,7 +34,7 @@ export async function createBrand(
     .split(',')
     .map(k => k.trim())
     .filter(Boolean)
-    .slice(0, PLAN_LIMITS.free.keywords)
+    .slice(0, PLAN_LIMITS[currentPlan]?.keywords ?? PLAN_LIMITS.free.keywords)
 
   try {
     await createBrandForUser({ name, domain, keywords }, userId)
