@@ -168,6 +168,7 @@ export async function updateBrand(
     monthlyBrandSpend?: string | null; brandRoas?: string | null
     brandCampaignId?: string | null
     watchlistDomains?: string[]
+    alertConfig?: string | null
     active?: boolean
   },
 ): Promise<Brand> {
