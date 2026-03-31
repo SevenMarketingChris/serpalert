@@ -2,18 +2,25 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
-import { getBrandsForUser, getLastCheckForBrand, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
+import { getBrandsForUser, getAllActiveBrands, getLastCheckForBrand, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
 import type { Brand, SerpCheck } from '@/lib/db/schema'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { getRelativeTime } from '@/lib/time'
 import { SubscribeBanner } from '@/components/subscribe-banner'
 import { SubscribeButton } from '@/components/subscribe-button'
+import { checkIsAdmin } from '@/lib/auth'
 
 export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
 
-  const brands: Brand[] = await getBrandsForUser(userId)
+  const isAdmin = await checkIsAdmin()
+  const userBrands: Brand[] = await getBrandsForUser(userId)
+  // Admin sees agency brands too
+  const agencyBrands: Brand[] = isAdmin
+    ? (await getAllActiveBrands()).filter(b => b.agencyManaged)
+    : []
+  const brands = [...userBrands, ...agencyBrands]
   const brandCount = await getUserBrandCount(userId)
   // Determine plan limit
   const currentPlan = (brands[0]?.plan ?? 'free') as keyof typeof PLAN_LIMITS
@@ -38,6 +45,14 @@ export default async function DashboardPage() {
             <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
           </div>
           <div className="flex items-center gap-4">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Admin
+              </Link>
+            )}
             <ThemeToggle />
             <UserButton />
           </div>
@@ -113,7 +128,12 @@ export default async function DashboardPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          {b.subscriptionStatus === 'active' && (
+                          {b.agencyManaged && (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono bg-orange-500/10 text-orange-600">
+                              Agency
+                            </span>
+                          )}
+                          {b.subscriptionStatus === 'active' && !b.agencyManaged && (
                             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono bg-emerald-500/10 text-emerald-600">
                               Active
                             </span>
