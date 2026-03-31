@@ -279,11 +279,15 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         </section>
 
         {/* 8. Stale data warning */}
-        {(!lastCheck || (Date.now() - new Date(lastCheck.checkedAt).getTime()) > 48 * 60 * 60 * 1000) && (
+        {!lastCheck ? (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm text-blue-600">
+            Monitoring starting soon — your first check will run within the hour.
+          </div>
+        ) : (Date.now() - new Date(lastCheck.checkedAt).getTime()) > 48 * 60 * 60 * 1000 ? (
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-sm text-amber-600 dark:text-amber-400">
             Monitoring may be paused — the last scan was more than 48 hours ago. Contact your account manager if this persists.
           </div>
-        )}
+        ) : null}
 
         {/* 9. Footer */}
         <footer className="text-center pt-4 pb-8 border-t border-border space-y-1">

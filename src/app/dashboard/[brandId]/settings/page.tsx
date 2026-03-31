@@ -57,23 +57,23 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
         {/* 3. Keyword Suggestions */}
         <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
 
-        {/* 3. Alert Configuration */}
+        {/* 4. Alert Configuration */}
         <AlertConfigForm
           brandId={brand.id}
           slackWebhookUrl={brand.slackWebhookUrl ?? ''}
         />
 
-        {/* 4. Google Ads */}
+        {/* 5. Google Ads */}
         <GoogleAdsForm
           brandId={brand.id}
           googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
           brandCampaignId={brand.brandCampaignId ?? ''}
         />
 
-        {/* 5. Client Portal */}
+        {/* 6. Client Portal */}
         <ClientPortalSection clientToken={brand.clientToken} />
 
-        {/* 6. Admin Settings (admin only) */}
+        {/* 7. Admin Settings (admin only) */}
         {isAdmin && (
           <AdminSettingsForm
             brandId={brand.id}
@@ -84,7 +84,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
           />
         )}
 
-        {/* 7. Delete Brand */}
+        {/* 8. Delete Brand */}
         <div className="pt-2">
           <DeleteBrandLink brandId={brand.id} brandName={brand.name} />
         </div>

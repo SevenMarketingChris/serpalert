@@ -28,7 +28,7 @@ const faqs = [
   {
     question: "What happens after my trial?",
     answer:
-      "Monitoring pauses. You can still view historical data.",
+      "Monitoring pauses but you can still view all historical data. Subscribe from your dashboard to resume monitoring instantly.",
   },
   {
     question: "Can I monitor more keywords?",

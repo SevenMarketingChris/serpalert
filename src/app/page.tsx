@@ -185,9 +185,9 @@ export default function HomePage() {
               },
               {
                 step: "02",
-                title: "Turn off brand campaigns",
+                title: "Optionally pause brand campaigns",
                 description:
-                  "Pause your brand ads and redirect that budget into acquisition campaigns that drive new revenue.",
+                  "If you choose to, pause your brand ads and redirect that budget into acquisition campaigns — non-brand keywords, product categories, competitor terms.",
               },
               {
                 step: "03",
