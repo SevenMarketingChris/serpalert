@@ -36,8 +36,12 @@ export function CompetitorSummary({ competitors, brandId }: CompetitorSummaryPro
         </thead>
         <tbody className="divide-y divide-gray-50">
           {competitors.map(c => (
-            <tr key={c.domain} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-2.5 font-mono text-gray-900">{c.domain}</td>
+            <tr key={c.domain} className="hover:bg-indigo-50/50 transition-colors group">
+              <td className="px-4 py-2.5">
+                <Link href={`/dashboard/${brandId}/competitors`} className="font-mono text-gray-900 group-hover:text-indigo-700 hover:underline">
+                  {c.domain}
+                </Link>
+              </td>
               <td className="px-4 py-2.5 font-mono text-gray-700">{c.timesSeen}</td>
               <td className="px-4 py-2.5 font-mono text-gray-700">{c.keywords}</td>
               <td className="px-4 py-2.5 font-mono text-gray-400">{getRelativeTime(c.lastSeen)}</td>

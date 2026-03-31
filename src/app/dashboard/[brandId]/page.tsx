@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
@@ -165,20 +166,20 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         </div>
       </div>
 
-      {/* (b) Metric Cards */}
+      {/* (b) Metric Cards — clickable */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono">Checks Today</p>
+        <Link href={`/dashboard/${brandId}/screenshots`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Checks Today</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{checksToday.length}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono">Active Competitors</p>
+        </Link>
+        <Link href={`/dashboard/${brandId}/competitors`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Active Competitors</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{activeCompetitors}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono">Keywords</p>
+        </Link>
+        <Link href={`/dashboard/${brandId}/settings`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Keywords</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{brand.keywords.length}</p>
-        </div>
+        </Link>
         <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono">7d Trend</p>
           <div className="mt-2">

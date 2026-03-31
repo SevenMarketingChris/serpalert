@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
@@ -19,6 +20,13 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
 
   return (
     <div className="max-w-5xl space-y-4">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
+        <Link href={`/dashboard/${brandId}`} className="hover:text-indigo-600 transition-colors">&larr; Overview</Link>
+        <span>/</span>
+        <span className="text-gray-600">Competitors</span>
+      </div>
+
       {competitors.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl p-12 text-center space-y-3 shadow-sm">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 mx-auto">
