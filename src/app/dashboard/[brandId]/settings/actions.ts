@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/queries'
 
 export type SettingsState = {
@@ -13,11 +14,16 @@ export async function updateBrandDetails(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
+  const { userId } = await auth()
+  if (!userId) return { error: 'Not authenticated' }
+
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
+
+  if (brand.userId !== userId) return { error: 'Not authorized' }
 
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
@@ -45,8 +51,16 @@ export async function updateAdminSettings(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
+  const { userId } = await auth()
+  if (!userId) return { error: 'Not authenticated' }
+
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
+
+  const brand = await getBrandById(brandId)
+  if (!brand) return { error: 'Brand not found' }
+
+  if (brand.userId !== userId) return { error: 'Not authorized' }
 
   const monthlyBrandSpend = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || null
   const brandRoas = ((formData.get('brandRoas') as string) ?? '').trim() || null
@@ -79,8 +93,13 @@ export async function updateAdminSettings(
 }
 
 export async function deleteBrandAction(brandId: string): Promise<void> {
+  const { userId } = await auth()
+  if (!userId) return
+
   const brand = await getBrandById(brandId)
   if (!brand) return
+
+  if (brand.userId !== userId) return
 
   await deleteBrand(brandId)
   redirect('/dashboard')

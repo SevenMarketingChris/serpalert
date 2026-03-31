@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/screenshot'
@@ -15,6 +16,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
 
   if (!UUID_RE.test(brandId)) {
     return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
+  }
+
+  const { userId } = await auth()
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const { ok } = rateLimit(`manual-check:${brandId}`, { limit: 3, windowMs: 300_000 })
