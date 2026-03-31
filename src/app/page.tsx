@@ -22,6 +22,12 @@ export default function HomePage() {
           </span>
           <div className="flex items-center gap-4">
             <Link
+              href="/pricing"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
               href="/sign-in"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
