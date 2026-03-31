@@ -34,7 +34,10 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
           </div>
           <p className="font-semibold text-gray-900">No competitors detected yet</p>
           <p className="text-sm text-gray-500 max-w-sm mx-auto">
-            When competitors start bidding on your brand keywords, they&apos;ll appear here with full details.
+            When competitors start bidding on your brand keywords, they&apos;ll appear here with full details including their ad copy, position, and frequency.
+          </p>
+          <p className="text-xs text-gray-400 mt-2">
+            Checks run every hour — if your brand is new, check back after the first scan completes.
           </p>
         </div>
       ) : (

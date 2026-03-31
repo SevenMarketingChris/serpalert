@@ -188,6 +188,20 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         </div>
       </div>
 
+      {/* Getting Started card for new brands */}
+      {checks.length === 0 && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 space-y-3">
+          <h3 className="font-semibold text-indigo-900">Getting started</h3>
+          <p className="text-sm text-indigo-700">Your brand has been created and is queued for monitoring. Here&apos;s what happens next:</p>
+          <ol className="list-decimal list-inside text-sm text-indigo-600 space-y-1.5">
+            <li>Your first SERP check will run within the hour automatically</li>
+            <li>We&apos;ll capture a screenshot of the Google results page for each keyword</li>
+            <li>If any competitors are bidding on your brand, you&apos;ll see them here</li>
+            <li>Set up <a href={`/dashboard/${brandId}/settings`} className="underline font-medium">Slack alerts</a> to get notified instantly</li>
+          </ol>
+        </div>
+      )}
+
       {/* (c) Recent Scan */}
       {latestRun && (
         <RecentScan run={latestRun} />

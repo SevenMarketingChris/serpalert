@@ -8,8 +8,8 @@ export const metadata = {
 };
 
 const features = [
-  "Monitor up to 3 brand keywords",
-  "Checks 3x daily (morning, noon, evening)",
+  "Monitor up to 2 brand keywords",
+  "Hourly SERP checks (24x daily)",
   "SERP screenshot evidence",
   "Competitor ad copy tracking",
   "Slack alerts for new competitors",
@@ -36,7 +36,7 @@ const faqs = [
   },
   {
     question: "How often are checks run?",
-    answer: "3 times daily — morning (8am), afternoon (1pm), and evening (7pm) UK time. Plus you can run a manual check anytime from the dashboard.",
+    answer: "Every hour, 24 times a day. Plus manual checks anytime from the dashboard.",
   },
   {
     question: "Do you support other countries?",

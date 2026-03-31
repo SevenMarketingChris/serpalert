@@ -3,7 +3,7 @@ import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql,
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
-  free:         { brands: 1,  keywords: 3   },
+  free:         { brands: 1,  keywords: 2   },
   starter:      { brands: 3,  keywords: 25  },
   professional: { brands: 10, keywords: 100 },
   agency:       { brands: 50, keywords: 500 },
