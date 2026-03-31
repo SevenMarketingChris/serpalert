@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   try {
     const allBrands = await getAllActiveBrands()
     const today = new Date().toISOString().split('T')[0]
-    const results = []
+    const results: { brand: string; status: string; count?: number; error?: string }[] = []
 
     const CONCURRENCY = 3
     for (let i = 0; i < allBrands.length; i += CONCURRENCY) {
