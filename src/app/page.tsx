@@ -289,7 +289,7 @@ export default function HomePage() {
               <ArrowRight className="h-4 w-4" />
             </Link>
             <span className="text-sm text-muted-foreground">
-              Free forever for 1 brand &middot; No credit card required
+              7-day free trial &middot; No credit card required
             </span>
           </div>
         </div>

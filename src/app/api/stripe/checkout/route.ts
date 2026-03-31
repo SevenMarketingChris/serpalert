@@ -9,7 +9,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { brandId } = await request.json()
+  let brandId: string
+  try {
+    const body = await request.json()
+    brandId = body.brandId
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
   if (!brandId) {
     return NextResponse.json({ error: 'brandId required' }, { status: 400 })
   }
