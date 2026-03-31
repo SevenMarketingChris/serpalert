@@ -32,12 +32,20 @@ export function ClientPortalSection({ clientToken }: Props) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">
-        Client Portal
-      </h3>
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">
+          Client Portal
+        </h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Share a read-only dashboard with your client or team. The portal link gives view-only access to monitoring results, competitor data, and screenshots — no login required. Anyone with the link can view the data, so share it securely.
+        </p>
+      </div>
       <div className="space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Client Token</label>
+          <p className="text-[11px] text-gray-400">
+            A unique identifier for this brand&apos;s client portal. Keep this private — it grants access to the read-only dashboard.
+          </p>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono text-sm truncate">
               {clientToken}
@@ -50,6 +58,9 @@ export function ClientPortalSection({ clientToken }: Props) {
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Client Portal Link</label>
+          <p className="text-[11px] text-gray-400">
+            Send this link to your client. They can view their monitoring dashboard, competitor data, and SERP screenshots without needing to sign in.
+          </p>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono text-sm truncate">
               {portalLink}

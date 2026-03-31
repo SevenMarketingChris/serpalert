@@ -18,7 +18,12 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Google Ads</h3>
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Google Ads Integration</h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Connect your Google Ads account to enable automatic brand campaign toggling. When a competitor is detected, SerpAlert can automatically enable your brand campaign to defend your position — and pause it when the coast is clear, saving you budget.
+        </p>
+      </div>
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="brandId" value={brandId} />
 
@@ -30,6 +35,9 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
             defaultValue={googleAdsCustomerId}
             placeholder="123-456-7890"
           />
+          <p className="text-[11px] text-gray-400">
+            Your Google Ads account ID in the format 123-456-7890. Find it in the top-right corner of your Google Ads dashboard. This connects SerpAlert to your ad account for campaign automation and auction insights.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -41,7 +49,7 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
             placeholder="e.g. 12345678"
           />
           <p className="text-[11px] text-gray-400">
-            The Google Ads campaign ID for your brand campaign. SerpAlert will automatically enable this campaign when competitors are detected and pause it when clear.
+            The numeric ID of your brand campaign in Google Ads. Find it by clicking your brand campaign — the ID is in the URL. When set, SerpAlert will automatically enable this campaign when competitors are detected bidding on your brand, and pause it when no competitors are found — so you only spend on brand defence when you need to.
           </p>
         </div>
 

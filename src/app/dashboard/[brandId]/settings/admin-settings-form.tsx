@@ -26,11 +26,16 @@ export function AdminSettingsForm({
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Admin Settings</h3>
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Admin Settings</h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Advanced settings for agency administrators. These control monitoring behaviour, financial data used in ROI calculations, and competitor watchlists.
+        </p>
+      </div>
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="brandId" value={brandId} />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <input
             type="checkbox"
             id="active"
@@ -38,11 +43,16 @@ export function AdminSettingsForm({
             defaultChecked={active}
             className="h-4 w-4 rounded border-gray-300"
           />
-          <Label htmlFor="active">Active</Label>
+          <div>
+            <Label htmlFor="active">Active Monitoring</Label>
+            <p className="text-[11px] text-gray-400">
+              When enabled, SerpAlert runs scheduled SERP checks for this brand. Disable to pause monitoring without deleting the brand or its data.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="monthlyBrandSpend">Monthly Brand Spend</Label>
+          <Label htmlFor="monthlyBrandSpend">Monthly Brand Spend (GBP)</Label>
           <Input
             id="monthlyBrandSpend"
             name="monthlyBrandSpend"
@@ -51,6 +61,9 @@ export function AdminSettingsForm({
             defaultValue={monthlyBrandSpend}
             placeholder="0.00"
           />
+          <p className="text-[11px] text-gray-400">
+            How much this brand currently spends per month on brand keyword campaigns in Google Ads. Used to calculate potential savings in the budget redirect calculator on the homepage.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -63,6 +76,9 @@ export function AdminSettingsForm({
             defaultValue={brandRoas}
             placeholder="0.00"
           />
+          <p className="text-[11px] text-gray-400">
+            The return on ad spend for brand campaigns (e.g. 6.0 means every 1 GBP spent returns 6 GBP in revenue). Used alongside monthly spend for ROI calculations.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -74,7 +90,7 @@ export function AdminSettingsForm({
             placeholder="rival.com, competitor.co.uk"
           />
           <p className="text-[11px] text-gray-400">
-            Comma-separated domains to watch for. Get priority alerts when these specific competitors appear.
+            Comma-separated list of competitor domains to prioritise. When these specific domains appear in SERP checks, they&apos;ll be flagged with higher priority in alerts and reports. Useful for tracking known competitors.
           </p>
         </div>
 

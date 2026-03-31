@@ -20,7 +20,12 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Alert Configuration</h3>
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Alert Configuration</h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Get notified instantly when competitors start bidding on your brand keywords. Configure where and when you receive alerts.
+        </p>
+      </div>
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="brandId" value={brandId} />
 
@@ -33,7 +38,7 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
             placeholder="https://hooks.slack.com/..."
           />
           <p className="text-[11px] text-gray-400">
-            Receive alerts in Slack when competitors are detected on your brand keywords.
+            Paste a Slack incoming webhook URL to receive real-time alerts in your chosen Slack channel. To create one, go to your Slack workspace &gt; Apps &gt; Incoming Webhooks &gt; Add to Slack. Leave blank to disable Slack alerts.
           </p>
         </div>
 
@@ -48,7 +53,7 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
             placeholder="1"
           />
           <p className="text-[11px] text-gray-400">
-            Only alert when this many or more competitors are detected.
+            The minimum number of competitors that must be detected before an alert is sent. Set to 1 to be notified about every competitor, or increase to reduce noise if you only care about multiple competitors bidding simultaneously.
           </p>
         </div>
 
