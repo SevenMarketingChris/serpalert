@@ -103,6 +103,7 @@ export async function POST(request: Request) {
 
       const brand = await getBrandByStripeCustomerId(customerId)
       if (!brand) break
+      if (brand.subscriptionStatus === 'canceled') break
 
       await updateBrandSubscription(brand.id, { subscriptionStatus: 'past_due' })
       console.info(`Brand ${brand.id} payment failed — marked past_due`)

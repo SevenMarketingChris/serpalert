@@ -97,6 +97,10 @@ export async function GET(request: Request) {
       if (!brand.googleAdsCustomerId || !brand.brandCampaignId) continue
 
       const brandResults = results.filter(r => r.brandId === brand.id)
+      if (brandResults.length === 0) {
+        console.warn(`Skipping campaign toggle for ${brand.name} — no keywords checked`)
+        continue
+      }
       const anyError = brandResults.some(r => r.status === 'error')
       const anyDegraded = brandResults.some(r => r.adCheckDegraded)
       if (anyError || anyDegraded) {

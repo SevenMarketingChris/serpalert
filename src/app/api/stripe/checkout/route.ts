@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server'
 import { getStripe } from '@/lib/stripe'
 import { getBrandById } from '@/lib/db/queries'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function POST(request: Request) {
   const { userId } = await auth()
   if (!userId) {
@@ -16,8 +18,8 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
-  if (!brandId) {
-    return NextResponse.json({ error: 'brandId required' }, { status: 400 })
+  if (!brandId || !UUID_RE.test(brandId)) {
+    return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
   }
 
   const brand = await getBrandById(brandId)
