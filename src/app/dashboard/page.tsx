@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const brands = [...userBrands, ...agencyBrands]
 
   // Auto-redirect single-brand users to their brand dashboard
-  if (brands.length === 1) {
+  if (brands.length === 1 && !isAdmin) {
     redirect(`/dashboard/${brands[0].id}`)
   }
 

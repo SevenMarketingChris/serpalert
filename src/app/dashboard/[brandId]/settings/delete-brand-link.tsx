@@ -20,11 +20,16 @@ interface Props {
 export function DeleteBrandLink({ brandId, brandName }: Props) {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleDelete() {
     setDeleting(true)
-    await deleteBrandAction(brandId)
-    setDeleting(false)
+    setError(null)
+    const result = await deleteBrandAction(brandId)
+    if (result?.error) {
+      setError(result.error)
+      setDeleting(false)
+    }
   }
 
   return (
@@ -37,6 +42,9 @@ export function DeleteBrandLink({ brandId, brandName }: Props) {
         Delete this brand
       </button>
 
+      {error && (
+        <p className="text-sm text-red-600 mt-1">{error}</p>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

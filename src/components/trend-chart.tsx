@@ -48,8 +48,8 @@ export function TrendChart({ data }: TrendChartProps) {
               backgroundColor: '#fff',
             }}
           />
-          <Bar dataKey="checks" stackId="a" fill="#c7d2fe" radius={[0, 0, 0, 0]} name="Checks" />
-          <Bar dataKey="threats" stackId="a" fill="#f87171" radius={[2, 2, 0, 0]} name="Threats" />
+          <Bar dataKey="checks" fill="#c7d2fe" radius={[2, 2, 0, 0]} name="Checks" />
+          <Bar dataKey="threats" fill="#f87171" radius={[2, 2, 0, 0]} name="Threats" />
         </BarChart>
       </ResponsiveContainer>
       <div className="flex items-center gap-4 mt-2 text-[10px] text-gray-400">

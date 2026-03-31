@@ -26,6 +26,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ bra
   const headers = ['Domain', 'Avg Position', 'Count 30d', 'Count Total', 'Keywords', 'First Seen', 'Last Seen']
 
   function escapeCsv(value: string): string {
+    // Neutralise CSV injection
+    if (/^[=+\-@\t\r]/.test(value)) {
+      value = "'" + value
+    }
     if (value.includes(',') || value.includes('"') || value.includes('\n')) {
       return `"${value.replace(/"/g, '""')}"`
     }

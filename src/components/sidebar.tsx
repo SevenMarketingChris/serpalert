@@ -100,86 +100,93 @@ export function Sidebar({
     return pathname.startsWith(fullPath)
   }
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-4 py-5">
-        <span className="font-extrabold text-lg bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
-          SerpAlert
-        </span>
-      </div>
+  function renderSidebarContent(mobile: boolean) {
+    // mobile=true: shown in hamburger drawer (no responsive hiding)
+    // mobile=false: shown in tablet icon rail / desktop full sidebar (hide text at md, show at lg)
+    const textClass = mobile ? 'inline' : 'hidden lg:inline'
+    const blockClass = mobile ? 'block' : 'hidden lg:block'
 
-      {/* Brand name or switcher */}
-      <div className="px-2 pb-2">
-        {brands.length > 1 ? (
-          <BrandSwitcher
-            currentBrandId={brandId}
-            currentBrandName={brandName}
-            brands={brands}
-          />
-        ) : (
-          <p className="px-3 py-1 text-sm font-semibold text-gray-900 truncate lg:block md:hidden">
-            {brandName}
+    return (
+      <div className="flex flex-col h-full">
+        {/* Logo */}
+        <div className="px-4 py-5">
+          <span className="font-extrabold text-lg bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
+            SerpAlert
+          </span>
+        </div>
+
+        {/* Brand name or switcher */}
+        <div className="px-2 pb-2">
+          {brands.length > 1 ? (
+            <BrandSwitcher
+              currentBrandId={brandId}
+              currentBrandName={brandName}
+              brands={brands}
+            />
+          ) : (
+            <p className={`px-3 py-1 text-sm font-semibold text-gray-900 truncate ${blockClass}`}>
+              {brandName}
+            </p>
+          )}
+        </div>
+
+        {/* Last check time */}
+        {lastCheckTime && (
+          <p className={`px-4 pb-3 text-[10px] text-gray-400 font-mono ${blockClass}`}>
+            Last check: {getRelativeTime(lastCheckTime)}
           </p>
         )}
-      </div>
 
-      {/* Last check time */}
-      {lastCheckTime && (
-        <p className="px-4 pb-3 text-[10px] text-gray-400 font-mono lg:block md:hidden">
-          Last check: {getRelativeTime(lastCheckTime)}
-        </p>
-      )}
+        {/* Nav items */}
+        <nav className="flex-1 px-2 space-y-0.5">
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(item.path)
+            return (
+              <Link
+                key={item.path}
+                href={`${basePath}${item.path}`}
+                title={item.label}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                  active
+                    ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-600'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span className={textClass}>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
-      {/* Nav items */}
-      <nav className="flex-1 px-2 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
-          const active = isActive(item.path)
-          return (
-            <Link
-              key={item.path}
-              href={`${basePath}${item.path}`}
-              title={item.label}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
-                active
-                  ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-600'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span className="lg:inline md:hidden">{item.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+        {/* Divider */}
+        <div className="mx-4 my-3 border-t border-gray-200" />
 
-      {/* Divider */}
-      <div className="mx-4 my-3 border-t border-gray-200" />
-
-      {/* Subscription badge */}
-      <div className="px-4 pb-3 lg:block md:hidden">
-        <SubscriptionBadge
-          subscriptionStatus={subscriptionStatus}
-          trialEndsAt={trialEndsAt}
-          agencyManaged={agencyManaged}
-        />
-      </div>
-
-      {/* Admin link at very bottom */}
-      {isAdmin && (
-        <div className="px-2 pb-3 mt-auto">
-          <Link
-            href="/admin/brands"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-          >
-            <Globe className="h-4 w-4 shrink-0" />
-            <span className="lg:inline md:hidden">Admin Panel</span>
-          </Link>
+        {/* Subscription badge */}
+        <div className={`px-4 pb-3 ${blockClass}`}>
+          <SubscriptionBadge
+            subscriptionStatus={subscriptionStatus}
+            trialEndsAt={trialEndsAt}
+            agencyManaged={agencyManaged}
+          />
         </div>
-      )}
-    </div>
-  )
+
+        {/* Admin link at very bottom */}
+        {isAdmin && (
+          <div className="px-2 pb-3 mt-auto">
+            <Link
+              href="/admin/brands"
+              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
+              <Globe className="h-4 w-4 shrink-0" />
+              <span className={textClass}>Admin Panel</span>
+            </Link>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -216,14 +223,14 @@ export function Sidebar({
             >
               <X className="h-5 w-5" />
             </button>
-            {sidebarContent}
+            {renderSidebarContent(true)}
           </aside>
         </div>
       )}
 
       {/* Tablet icon rail (md) + Desktop full sidebar (lg) */}
       <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-[#f5f5f7] border-r border-gray-200 min-h-screen sticky top-0 h-screen overflow-y-auto">
-        {sidebarContent}
+        {renderSidebarContent(false)}
       </aside>
     </>
   )

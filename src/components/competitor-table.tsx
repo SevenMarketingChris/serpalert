@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
 type Competitor = {
@@ -56,6 +56,7 @@ export function CompetitorTable({
   const [expandedDomain, setExpandedDomain] = useState<string | null>(null)
   const [adCopyCache, setAdCopyCache] = useState<Record<string, AdCopy[]>>({})
   const [loading, setLoading] = useState<string | null>(null)
+  const [fetchErrors, setFetchErrors] = useState<Record<string, boolean>>({})
 
   async function toggleRow(domain: string) {
     if (expandedDomain === domain) {
@@ -63,16 +64,19 @@ export function CompetitorTable({
       return
     }
     setExpandedDomain(domain)
-    if (!adCopyCache[domain]) {
+    if (!adCopyCache[domain] || fetchErrors[domain]) {
+      setFetchErrors((prev) => ({ ...prev, [domain]: false }))
       setLoading(domain)
       try {
         const res = await fetch(`/api/brands/${brandId}/ad-copy?domain=${encodeURIComponent(domain)}`)
         if (res.ok) {
           const data = await res.json()
           setAdCopyCache((prev) => ({ ...prev, [domain]: data }))
+        } else {
+          setFetchErrors((prev) => ({ ...prev, [domain]: true }))
         }
       } catch {
-        // silently fail
+        setFetchErrors((prev) => ({ ...prev, [domain]: true }))
       } finally {
         setLoading(null)
       }
@@ -101,9 +105,8 @@ export function CompetitorTable({
               const isExpanded = expandedDomain === competitor.domain
               const adCopies = adCopyCache[competitor.domain]
               return (
-                <>
+                <React.Fragment key={competitor.domain}>
                   <tr
-                    key={competitor.domain}
                     className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => toggleRow(competitor.domain)}
                   >
@@ -163,10 +166,17 @@ export function CompetitorTable({
                     </td>
                   </tr>
                   {isExpanded && (
-                    <tr key={`${competitor.domain}-expanded`} className="bg-gray-50/50">
+                    <tr className="bg-gray-50/50">
                       <td colSpan={8} className="px-8 py-4">
                         {loading === competitor.domain ? (
                           <p className="text-sm text-gray-400">Loading ad copy history...</p>
+                        ) : fetchErrors[competitor.domain] ? (
+                          <p
+                            className="text-sm text-red-500 cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); setExpandedDomain(null); setTimeout(() => toggleRow(competitor.domain), 0) }}
+                          >
+                            Failed to load. Click to retry.
+                          </p>
                         ) : adCopies && adCopies.length > 0 ? (
                           <div className="space-y-2">
                             <p className="text-[10px] uppercase tracking-wider text-gray-400 font-mono mb-2">
@@ -218,7 +228,7 @@ export function CompetitorTable({
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               )
             })}
           </tbody>
@@ -280,6 +290,13 @@ export function CompetitorTable({
                 <div className="mt-3 pt-3 border-t border-gray-100">
                   {loading === competitor.domain ? (
                     <p className="text-sm text-gray-400">Loading...</p>
+                  ) : fetchErrors[competitor.domain] ? (
+                    <p
+                      className="text-sm text-red-500 cursor-pointer"
+                      onClick={(e) => { e.stopPropagation(); setExpandedDomain(null); setTimeout(() => toggleRow(competitor.domain), 0) }}
+                    >
+                      Failed to load. Click to retry.
+                    </p>
                   ) : adCopies && adCopies.length > 0 ? (
                     <div className="space-y-3">
                       <p className="text-[10px] uppercase tracking-wider text-gray-400 font-mono">

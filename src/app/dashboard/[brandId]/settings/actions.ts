@@ -102,13 +102,16 @@ export async function updateAlertConfig(
   if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
 
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
+  const alertThreshold = parseInt(formData.get('alertThreshold') as string) || 1
 
   if (slackWebhookUrl && !slackWebhookUrl.startsWith('https://hooks.slack.com/')) {
     return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
   }
 
+  const alertConfig = JSON.stringify({ alertThreshold })
+
   try {
-    await updateBrand(brandId, { slackWebhookUrl })
+    await updateBrand(brandId, { slackWebhookUrl, alertConfig })
     revalidatePath(`/dashboard/${brandId}`)
     return { success: 'Alert settings updated' }
   } catch {

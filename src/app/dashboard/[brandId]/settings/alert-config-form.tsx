@@ -10,9 +10,12 @@ import { updateAlertConfig, type SettingsState } from './actions'
 interface Props {
   brandId: string
   slackWebhookUrl: string
+  alertConfig?: string | null
 }
 
-export function AlertConfigForm({ brandId, slackWebhookUrl }: Props) {
+export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props) {
+  const parsedConfig = alertConfig ? (() => { try { return JSON.parse(alertConfig) } catch { return {} } })() : {}
+  const initialThreshold = parsedConfig.alertThreshold ?? 1
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAlertConfig, null)
 
   return (
@@ -41,7 +44,7 @@ export function AlertConfigForm({ brandId, slackWebhookUrl }: Props) {
             name="alertThreshold"
             type="number"
             min={1}
-            defaultValue={1}
+            defaultValue={initialThreshold}
             placeholder="1"
           />
           <p className="text-[11px] text-gray-400">

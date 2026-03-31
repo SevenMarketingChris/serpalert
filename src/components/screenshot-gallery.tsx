@@ -26,8 +26,7 @@ function formatDateTime(date: Date): string {
 export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }) {
   const [selectedKeyword, setSelectedKeyword] = useState('all')
   const [modalImage, setModalImage] = useState<{ url: string; keyword: string } | null>(null)
-  const [imageError, setImageError] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const [imageStatus, setImageStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
 
   const uniqueKeywords = [...new Set(screenshots.map((s) => s.keyword))].sort()
 
@@ -84,7 +83,9 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
           <div key={date} className="space-y-3">
             <h3 className="text-xs font-mono uppercase tracking-wider text-gray-400">{date}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {items.map((check) => (
+              {items.map((check) => {
+                if (!check.screenshotUrl) return null
+                return (
                 <div
                   key={check.id}
                   className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm group"
@@ -92,14 +93,14 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                   <button
                     type="button"
                     onClick={() => {
-                      setModalImage({ url: check.screenshotUrl!, keyword: check.keyword })
-                      setImageError(false)
-                      setLoaded(false)
+                      if (!check.screenshotUrl) return
+                      setModalImage({ url: check.screenshotUrl, keyword: check.keyword })
+                      setImageStatus('loading')
                     }}
                     className="block relative aspect-video w-full bg-gray-50 overflow-hidden cursor-pointer"
                   >
                     <Image
-                      src={check.screenshotUrl!}
+                      src={check.screenshotUrl}
                       alt={`SERP screenshot for "${check.keyword}"`}
                       fill
                       className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
@@ -128,7 +129,8 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                     </p>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         ))}
@@ -143,11 +145,11 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                 SERP: <span className="text-indigo-600">{modalImage.keyword}</span>
               </p>
               <div className="rounded-lg overflow-hidden bg-gray-50 relative">
-                {imageError ? (
+                {imageStatus === 'error' ? (
                   <div className="p-12 text-center text-gray-400 text-sm">Screenshot unavailable</div>
                 ) : (
                   <>
-                    {!loaded && (
+                    {imageStatus === 'loading' && (
                       <div className="absolute inset-0 bg-gray-100 animate-pulse" />
                     )}
                     <Image
@@ -158,8 +160,8 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                       className="w-full h-auto"
                       loading="lazy"
                       unoptimized
-                      onError={() => setImageError(true)}
-                      onLoad={() => setLoaded(true)}
+                      onError={() => setImageStatus('error')}
+                      onLoad={() => setImageStatus('loaded')}
                     />
                   </>
                 )}
