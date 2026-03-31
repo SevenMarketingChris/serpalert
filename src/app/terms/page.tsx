@@ -33,7 +33,7 @@ export default function TermsOfServicePage() {
             <p className="text-gray-700 leading-relaxed">
               SerpAlert monitors Google search results for competitor ads
               appearing on your brand keywords. The service checks SERPs on an
-              hourly basis, captures screenshots as evidence, and sends alerts
+              regular basis (currently 3 times daily), captures screenshots as evidence, and sends alerts
               when competitors are detected.
             </p>
           </section>

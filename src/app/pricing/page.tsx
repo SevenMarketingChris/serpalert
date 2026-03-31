@@ -36,7 +36,7 @@ const faqs = [
   },
   {
     question: "How often are checks run?",
-    answer: "3x daily by default.",
+    answer: "3 times daily — morning (8am), afternoon (1pm), and evening (7pm) UK time. Plus you can run a manual check anytime from the dashboard.",
   },
   {
     question: "Do you support other countries?",

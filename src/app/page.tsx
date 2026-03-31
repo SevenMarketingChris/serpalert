@@ -57,7 +57,7 @@ export default function HomePage() {
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Turn off brand campaigns and redirect that budget to winning new
-            customers. SerpAlert watches your brand keywords every hour and
+            customers. SerpAlert watches your brand keywords multiple times a day and
             alerts you the moment a competitor moves in.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3">
@@ -80,9 +80,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl px-6 pb-20">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { value: "< 60 min", label: "Alert time" },
+              { value: "< 6 hrs", label: "Alert time" },
               { value: "80%", label: "Clicks retained organically" },
-              { value: "24/7", label: "Hourly monitoring" },
+              { value: "24/7", label: "Daily monitoring" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -147,7 +147,7 @@ export default function HomePage() {
               {
                 title: "We watch for competitors, you grow",
                 description:
-                  "SerpAlert monitors your brand SERPs every hour. If a competitor bids on your name, you'll know in under 60 minutes with proof.",
+                  "SerpAlert monitors your brand SERPs 3 times a day. If a competitor bids on your name, you'll get an alert with screenshot proof.",
                 icon: Shield,
                 accent: "text-emerald-500",
               },
@@ -191,7 +191,7 @@ export default function HomePage() {
               },
               {
                 step: "03",
-                title: "Get alerted within the hour",
+                title: "Get alerted when competitors appear",
                 description:
                   "If a competitor starts bidding on your brand, you'll get an alert with SERP screenshots as evidence.",
               },
@@ -224,9 +224,9 @@ export default function HomePage() {
             {[
               {
                 icon: Clock,
-                title: "Hourly checks",
+                title: "Regular checks",
                 description:
-                  "We check Google SERPs every hour so you catch threats fast.",
+                  "We check Google SERPs 3 times daily — morning, afternoon, and evening — so you catch threats fast.",
               },
               {
                 icon: Camera,
