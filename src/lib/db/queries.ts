@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, ne, sql, max } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql, max } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -217,36 +217,6 @@ export async function replaceTopKeywords(
   // Stub — tables not yet created
 }
 
-const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
-type AdStatus = typeof VALID_STATUSES[number]
-
-export async function updateCompetitorAdStatus(id: string, status: string): Promise<CompetitorAd> {
-  if (!VALID_STATUSES.includes(status as AdStatus)) {
-    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
-  }
-  const rows = await db.update(competitorAds)
-    .set({ status: status as AdStatus })
-    .where(eq(competitorAds.id, id))
-    .returning()
-  if (!rows[0]) throw new Error('Competitor ad not found')
-  return rows[0]
-}
-
-export async function updateAllAdsStatusForCheck(checkId: string, status: string): Promise<void> {
-  if (!VALID_STATUSES.includes(status as AdStatus)) {
-    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
-  }
-  await db.update(competitorAds)
-    .set({ status: status as AdStatus })
-    .where(eq(competitorAds.serpCheckId, checkId))
-}
-
-export async function getUnresolvedAdsForBrand(brandId: string): Promise<CompetitorAd[]> {
-  return db.select().from(competitorAds)
-    .where(and(eq(competitorAds.brandId, brandId), ne(competitorAds.status, 'resolved')))
-    .orderBy(desc(competitorAds.firstSeenAt))
-}
-
 export async function getCompetitorAdById(id: string): Promise<CompetitorAd | null> {
   const rows = await db.select().from(competitorAds).where(eq(competitorAds.id, id)).limit(1)
   return rows[0] ?? null
@@ -420,16 +390,6 @@ export async function getAdCopyHistory(brandId: string, domain: string): Promise
     lastSeen: r.lastSeen,
     count: r.count,
   }))
-}
-
-export async function getUnresolvedThreatCount(brandId: string): Promise<number> {
-  const rows = await db.select({ count: countDistinct(competitorAds.serpCheckId) })
-    .from(competitorAds)
-    .where(and(
-      eq(competitorAds.brandId, brandId),
-      inArray(competitorAds.status, ['new', 'acknowledged', 'reported']),
-    ))
-  return rows[0]?.count ?? 0
 }
 
 export async function updateBrandSubscription(

@@ -3,8 +3,6 @@ import { auth } from '@clerk/nextjs/server'
 import {
   getBrandById,
   getBrandsForUser,
-  PLAN_LIMITS,
-  getUnresolvedThreatCount,
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
@@ -30,13 +28,7 @@ export default async function BrandDashboardLayout({
 
   const userBrands = await getBrandsForUser(userId)
 
-  const [unresolvedCount, lastCheck] = await Promise.all([
-    getUnresolvedThreatCount(brandId),
-    getLastCheckForBrand(brandId),
-  ])
-
-  const plan = brand.plan ?? 'free'
-  const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
+  const lastCheck = await getLastCheckForBrand(brandId)
 
   return (
     <div className="flex min-h-screen">
@@ -44,12 +36,11 @@ export default async function BrandDashboardLayout({
         brandId={brandId}
         brandName={brand.name}
         brands={userBrands.map((b) => ({ id: b.id, name: b.name }))}
-        plan={plan}
-        keywordCount={brand.keywords.length}
-        keywordLimit={limits.keywords}
+        lastCheckTime={lastCheck ? new Date(lastCheck.checkedAt) : null}
         isAdmin={isAdmin}
-        unresolvedCount={unresolvedCount}
-        lastCheckAt={lastCheck ? new Date(lastCheck.checkedAt).toISOString() : null}
+        subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
+        trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt) : null}
+        agencyManaged={brand.agencyManaged ?? false}
       />
       <main className="flex-1 min-w-0 p-6">{children}</main>
     </div>

@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Shield,
-  BarChart3,
   Camera,
   Settings,
   Menu,
@@ -20,32 +19,73 @@ interface SidebarProps {
   brandId: string
   brandName: string
   brands: { id: string; name: string }[]
-  plan: string
-  keywordCount: number
-  keywordLimit: number
+  lastCheckTime: Date | null
   isAdmin: boolean
-  unresolvedCount?: number
-  lastCheckAt?: string | null
+  subscriptionStatus: string
+  trialEndsAt: Date | null
+  agencyManaged: boolean
 }
 
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Overview', path: '' },
   { icon: Shield, label: 'Competitors', path: '/competitors' },
   { icon: Camera, label: 'Screenshots', path: '/screenshots' },
-  { icon: BarChart3, label: 'Insights', path: '/insights' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ]
+
+function SubscriptionBadge({
+  subscriptionStatus,
+  trialEndsAt,
+  agencyManaged,
+}: {
+  subscriptionStatus: string
+  trialEndsAt: Date | null
+  agencyManaged: boolean
+}) {
+  if (agencyManaged) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700">
+        Agency
+      </span>
+    )
+  }
+
+  if (subscriptionStatus === 'trialing' && trialEndsAt) {
+    const now = new Date()
+    const diffMs = Math.max(0, new Date(trialEndsAt).getTime() - now.getTime())
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+    return (
+      <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
+        Trial ({daysLeft} {daysLeft === 1 ? 'day' : 'days'} left)
+      </span>
+    )
+  }
+
+  if (subscriptionStatus === 'active') {
+    return (
+      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700">
+        Active
+      </span>
+    )
+  }
+
+  // Fallback for other statuses (past_due, cancelled, etc.)
+  return (
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-semibold text-gray-600">
+      {subscriptionStatus}
+    </span>
+  )
+}
 
 export function Sidebar({
   brandId,
   brandName,
   brands,
-  plan,
-  keywordCount,
-  keywordLimit,
+  lastCheckTime,
   isAdmin,
-  unresolvedCount,
-  lastCheckAt,
+  subscriptionStatus,
+  trialEndsAt,
+  agencyManaged,
 }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -61,42 +101,38 @@ export function Sidebar({
   }
 
   const sidebarContent = (
-    <>
+    <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-4 py-5">
-        <span className="text-gradient-tech font-extrabold text-lg">SerpAlert</span>
+        <span className="font-extrabold text-lg bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
+          SerpAlert
+        </span>
       </div>
 
-      {/* Brand Switcher */}
-      <div className="px-2 pb-3">
-        <BrandSwitcher
-          currentBrandId={brandId}
-          currentBrandName={brandName}
-          brands={brands}
-        />
+      {/* Brand name or switcher */}
+      <div className="px-2 pb-2">
+        {brands.length > 1 ? (
+          <BrandSwitcher
+            currentBrandId={brandId}
+            currentBrandName={brandName}
+            brands={brands}
+          />
+        ) : (
+          <p className="px-3 py-1 text-sm font-semibold text-gray-900 truncate lg:block md:hidden">
+            {brandName}
+          </p>
+        )}
       </div>
 
-      {lastCheckAt && (
-        <p className="px-4 pb-2 text-[10px] text-muted-foreground font-mono">
-          Last scan {getRelativeTime(lastCheckAt)}
+      {/* Last check time */}
+      {lastCheckTime && (
+        <p className="px-4 pb-3 text-[10px] text-gray-400 font-mono lg:block md:hidden">
+          Last check: {getRelativeTime(lastCheckTime)}
         </p>
       )}
 
-      {/* Admin link */}
-      {isAdmin && (
-        <div className="px-2 pb-2">
-          <Link
-            href="/admin/brands"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-          >
-            <Globe className="h-4 w-4 shrink-0" />
-            <span className="lg:inline md:hidden">All Brands</span>
-          </Link>
-        </div>
-      )}
-
       {/* Nav items */}
-      <nav className="flex-1 px-2 space-y-1">
+      <nav className="flex-1 px-2 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.path)
           return (
@@ -107,75 +143,75 @@ export function Sidebar({
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
                 active
-                  ? 'sidebar-item-active bg-sidebar-accent text-sidebar-accent-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                  ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-600'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
               <span className="lg:inline md:hidden">{item.label}</span>
-              {item.path === '/competitors' && (unresolvedCount ?? 0) > 0 && (
-                <span className="ml-auto lg:inline md:hidden bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                  {unresolvedCount}
-                </span>
-              )}
             </Link>
           )
         })}
       </nav>
 
       {/* Divider */}
-      <div className="mx-4 my-3 border-t border-sidebar-border" />
+      <div className="mx-4 my-3 border-t border-gray-200" />
 
-      {/* Plan info */}
-      <div className="px-4 pb-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:block md:hidden">
-          {plan}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1 lg:block md:hidden">
-          {keywordCount}/{keywordLimit} keywords
-        </p>
+      {/* Subscription badge */}
+      <div className="px-4 pb-3 lg:block md:hidden">
+        <SubscriptionBadge
+          subscriptionStatus={subscriptionStatus}
+          trialEndsAt={trialEndsAt}
+          agencyManaged={agencyManaged}
+        />
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-sidebar-border px-4 py-3">
-        <p className="truncate text-xs text-muted-foreground lg:block md:hidden">
-          SerpAlert
-        </p>
-      </div>
-    </>
+      {/* Admin link at very bottom */}
+      {isAdmin && (
+        <div className="px-2 pb-3 mt-auto">
+          <Link
+            href="/admin/brands"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+          >
+            <Globe className="h-4 w-4 shrink-0" />
+            <span className="lg:inline md:hidden">Admin Panel</span>
+          </Link>
+        </div>
+      )}
+    </div>
   )
 
   return (
     <>
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-sidebar px-4 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-gray-200 bg-[#f5f5f7] px-4 md:hidden">
         <button
           onClick={() => setMobileOpen(true)}
-          className="p-1.5 text-sidebar-foreground hover:text-foreground transition-colors"
+          className="p-1.5 text-gray-600 hover:text-gray-900 transition-colors"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
         </button>
-        <span className="text-gradient-tech font-extrabold text-lg">SerpAlert</span>
-        <div className="w-8" /> {/* Spacer for centering */}
+        <span className="font-extrabold text-lg bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
+          SerpAlert
+        </span>
+        <div className="w-8" />
       </div>
 
-      {/* Mobile spacer so content isn't hidden behind the fixed bar */}
+      {/* Mobile spacer */}
       <div className="h-14 md:hidden shrink-0" />
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
           />
-          {/* Drawer */}
-          <aside className="relative flex h-full w-[260px] flex-col bg-sidebar">
+          <aside className="relative flex h-full w-[260px] flex-col bg-[#f5f5f7]">
             <button
               onClick={() => setMobileOpen(false)}
-              className="absolute right-3 top-4 p-1 text-sidebar-foreground hover:text-foreground transition-colors"
+              className="absolute right-3 top-4 p-1 text-gray-600 hover:text-gray-900 transition-colors"
               aria-label="Close menu"
             >
               <X className="h-5 w-5" />
@@ -186,7 +222,7 @@ export function Sidebar({
       )}
 
       {/* Tablet icon rail (md) + Desktop full sidebar (lg) */}
-      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-sidebar border-r border-sidebar-border min-h-screen sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-[#f5f5f7] border-r border-gray-200 min-h-screen sticky top-0 h-screen overflow-y-auto">
         {sidebarContent}
       </aside>
     </>
