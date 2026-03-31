@@ -1,4 +1,5 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Shield } from 'lucide-react'
@@ -13,8 +14,10 @@ const rankBorderColors: Record<number, string> = {
 
 export default async function CompetitorsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || brand.userId !== userId) notFound()
 
   const competitors = await getCompetitorSummaryForBrand(brandId)
 

@@ -1,4 +1,5 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import Image from 'next/image'
 import { getBrandById, getScreenshotsForBrand } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'

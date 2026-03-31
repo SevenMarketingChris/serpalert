@@ -20,24 +20,28 @@ export async function GET(request: Request) {
     const today = new Date().toISOString().split('T')[0]
     const results = []
 
-    for (const brand of allBrands) {
-      if (!brand.googleAdsCustomerId) {
-        results.push({ brand: brand.name, status: 'skipped' })
-        continue
-      }
-      try {
-        const insights = await getAuctionInsights(brand.googleAdsCustomerId)
-        await insertAuctionInsights(insights.map(i => ({
-          brandId: brand.id, date: today, competitorDomain: i.competitorDomain,
-          impressionShare: i.impressionShare?.toString(),
-          overlapRate: i.overlapRate?.toString(),
-          outrankingShare: i.outrankingShare?.toString(),
-        })))
-        results.push({ brand: brand.name, status: 'ok', count: insights.length })
-      } catch (err) {
-        console.error(`Auction insights failed for ${brand.name}:`, err)
-        results.push({ brand: brand.name, status: 'error', error: 'Check failed' })
-      }
+    const CONCURRENCY = 3
+    for (let i = 0; i < allBrands.length; i += CONCURRENCY) {
+      const batch = allBrands.slice(i, i + CONCURRENCY)
+      await Promise.allSettled(batch.map(async (brand) => {
+        if (!brand.googleAdsCustomerId) {
+          results.push({ brand: brand.name, status: 'skipped' })
+          return
+        }
+        try {
+          const insights = await getAuctionInsights(brand.googleAdsCustomerId)
+          await insertAuctionInsights(insights.map(i => ({
+            brandId: brand.id, date: today, competitorDomain: i.competitorDomain,
+            impressionShare: i.impressionShare?.toString(),
+            overlapRate: i.overlapRate?.toString(),
+            outrankingShare: i.outrankingShare?.toString(),
+          })))
+          results.push({ brand: brand.name, status: 'ok', count: insights.length })
+        } catch (err) {
+          console.error(`Auction insights failed for ${brand.name}:`, err)
+          results.push({ brand: brand.name, status: 'error', error: 'Check failed' })
+        }
+      }))
     }
 
     return NextResponse.json({ results, date: today })

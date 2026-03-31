@@ -439,6 +439,7 @@ export async function updateBrandSubscription(
     stripeSubscriptionId?: string
     subscriptionStatus?: string
     plan?: string
+    trialEndsAt?: Date
   },
 ): Promise<void> {
   await db.update(brands)

@@ -1,4 +1,5 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import Link from 'next/link'
 import { getBrandById, getAuctionInsightsLast30Days } from '@/lib/db/queries'
 import { DashboardTabs } from '@/components/dashboard-tabs'
@@ -6,9 +7,11 @@ import { AuctionChart } from '@/components/auction-chart'
 
 export default async function InsightsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
 
   const brand = await getBrandById(brandId)
-  if (!brand) notFound()
+  if (!brand || brand.userId !== userId) notFound()
 
   const hasGoogleAds = !!brand.googleAdsCustomerId
 

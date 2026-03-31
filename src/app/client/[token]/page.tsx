@@ -107,7 +107,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             Summary
           </h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {competitors7d === 0 ? (
+            {competitors7d === 0 || competitorStats.length === 0 ? (
               `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
             ) : (
               `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount} time${competitorStats[0].recentCount !== 1 ? 's' : ''}.`
