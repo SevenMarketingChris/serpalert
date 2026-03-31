@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, PLAN_LIMITS } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 import { DashboardTabs } from '@/components/dashboard-tabs'
 import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
@@ -11,10 +12,9 @@ import { KeywordSuggestions } from '@/components/keyword-suggestions'
 export default async function SettingsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
 
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()

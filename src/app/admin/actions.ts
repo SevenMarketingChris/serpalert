@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 import { createBrand } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 
 export type CreateBrandState = {
   clientToken?: string
@@ -10,10 +11,9 @@ export type CreateBrandState = {
 } | null
 
 export async function createBrandAction(_prev: CreateBrandState, formData: FormData): Promise<CreateBrandState> {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  if (role !== 'admin') return { error: 'Admin access required' }
+  if (!await checkIsAdmin()) return { error: 'Admin access required' }
 
   const name = ((formData.get('name') as string) ?? '').trim()
   const keywords = ((formData.get('keywords') as string) ?? '')

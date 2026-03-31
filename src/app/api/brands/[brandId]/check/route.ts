@@ -18,12 +18,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
     return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
   }
 
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const { checkIsAdmin } = await import('@/lib/auth')
+  const isAdmin = await checkIsAdmin()
 
   const { ok } = rateLimit(`manual-check:${brandId}`, { limit: 3, windowMs: 300_000 })
   if (!ok) {

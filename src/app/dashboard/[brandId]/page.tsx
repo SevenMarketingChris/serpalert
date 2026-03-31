@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 import { StatusHero } from '@/components/status-hero'
 import { GoogleAdsStatus } from '@/components/google-ads-status'
 import { BudgetRedirectSummary } from '@/components/budget-redirect-summary'
@@ -12,10 +13,9 @@ import { toUTCDate } from '@/lib/time'
 export default async function BrandDashboard({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
 
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()

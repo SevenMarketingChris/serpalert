@@ -8,6 +8,7 @@ import {
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
+import { checkIsAdmin } from '@/lib/auth'
 
 export default async function BrandDashboardLayout({
   children,
@@ -16,10 +17,9 @@ export default async function BrandDashboardLayout({
   children: React.ReactNode
   params: Promise<{ brandId: string }>
 }) {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const isAdmin = await checkIsAdmin()
 
   const { brandId } = await params
 

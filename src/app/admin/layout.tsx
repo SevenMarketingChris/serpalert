@@ -1,10 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { checkIsAdmin } from '@/lib/auth'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  if (role !== 'admin') redirect('/unauthorized')
+  if (!await checkIsAdmin()) redirect('/unauthorized')
   return <>{children}</>
 }

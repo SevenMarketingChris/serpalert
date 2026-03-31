@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/queries'
+import { checkIsAdmin } from '@/lib/auth'
 
 export type SettingsState = {
   error?: string
@@ -14,10 +15,9 @@ export async function updateBrandDetails(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const isAdmin = await checkIsAdmin()
 
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
@@ -54,10 +54,9 @@ export async function updateAdminSettings(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  if (role !== 'admin') return { error: 'Admin access required' }
+  if (!await checkIsAdmin()) return { error: 'Admin access required' }
 
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
@@ -96,10 +95,9 @@ export async function updateAdminSettings(
 }
 
 export async function deleteBrandAction(brandId: string): Promise<{ error?: string } | void> {
-  const { userId, sessionClaims } = await auth()
+  const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
-  const isAdmin = role === 'admin'
+  const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
