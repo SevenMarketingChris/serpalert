@@ -32,6 +32,7 @@ export function SubscribeBanner({ brand }: { brand: Brand }) {
 
   if (isTrialing) {
     const daysLeft = Math.ceil((brand.trialEndsAt!.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    if (daysLeft > 3) return null
     return (
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 flex items-center justify-between">
         <div>

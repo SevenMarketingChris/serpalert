@@ -20,16 +20,17 @@ export async function getBrandByToken(token: string): Promise<Brand | null> {
 }
 
 export async function getAllActiveBrands(): Promise<Brand[]> {
-  const allBrands = await db.select().from(brands).where(eq(brands.active, true))
   const now = new Date()
-  return allBrands.filter(b => {
-    if (b.agencyManaged) return true
-    if (b.subscriptionStatus === 'active') return true
-    if (b.subscriptionStatus === 'past_due') return true
-    if (b.subscriptionStatus === 'agency') return true
-    if (b.subscriptionStatus === 'trialing' && b.trialEndsAt && b.trialEndsAt > now) return true
-    return false
-  })
+  return db.select().from(brands).where(
+    and(
+      eq(brands.active, true),
+      sql`(
+        ${brands.agencyManaged} = true
+        OR ${brands.subscriptionStatus} IN ('active', 'past_due', 'agency')
+        OR (${brands.subscriptionStatus} = 'trialing' AND ${brands.trialEndsAt} > ${now})
+      )`
+    )
+  )
 }
 
 export async function getRecentSerpChecks(brandId: string, limit = 50): Promise<SerpCheck[]> {

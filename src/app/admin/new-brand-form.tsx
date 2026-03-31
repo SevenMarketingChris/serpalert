@@ -17,7 +17,7 @@ export function NewBrandForm() {
         <CardTitle className="text-base font-semibold">Add Brand</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-5">
+        <form action={formAction} className="space-y-5" key={state?.clientToken ?? 'new'}>
           {/* Required fields */}
           <div className="space-y-1.5">
             <Label htmlFor="name">Brand Name</Label>

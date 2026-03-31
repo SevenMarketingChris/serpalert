@@ -54,7 +54,7 @@ export function NewUserBrandForm({ keywordLimit }: Props) {
             {isPending ? 'Creating…' : 'Create Brand'}
           </Button>
 
-          {state?.error && (
+          {state?.error && !isPending && (
             <Alert variant="destructive">
               <AlertDescription>{state.error}</AlertDescription>
             </Alert>
