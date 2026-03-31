@@ -80,7 +80,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
             Monitoring {brand.keywords.length} branded search{brand.keywords.length !== 1 ? 'es' : ''} for competitor ads
           </p>
           <div className="pt-2 flex justify-center">
-            <ShareReportButton brandName={brand.name} portalUrl={`https://serpalert.vercel.app/client/${token}`} />
+            <ShareReportButton brandName={brand.name} portalUrl={`${process.env.NEXT_PUBLIC_APP_URL || 'https://serpalert.co.uk'}/client/${token}`} />
           </div>
         </header>
 

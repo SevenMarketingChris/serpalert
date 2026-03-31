@@ -1,7 +1,7 @@
 import { db } from '@/lib/db'
 import { sql } from 'drizzle-orm'
 
-const LOCK_TIMEOUT_MINUTES = 10
+const LOCK_TIMEOUT_MINUTES = 6
 
 /**
  * Table-based cron lock suitable for serverless environments.

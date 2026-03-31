@@ -3,6 +3,9 @@ import { getStripe } from '@/lib/stripe'
 import { updateBrandSubscription, getBrandByStripeSubscriptionId, getBrandByStripeCustomerId } from '@/lib/db/queries'
 
 export async function POST(request: Request) {
+  // Note: No event ID deduplication. All operations are idempotent (upsert/update),
+  // so duplicate webhook deliveries are safe. Add event.id tracking if side effects
+  // (emails, credits) are added later.
   const stripe = getStripe()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
         case 'active': status = 'active'; break
         case 'past_due': status = 'past_due'; break
         case 'canceled': status = 'canceled'; break
-        case 'unpaid': status = 'past_due'; break
+        case 'unpaid': status = 'canceled'; break
         default: status = subscription.status; break
       }
 

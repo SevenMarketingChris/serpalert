@@ -179,7 +179,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
 
       {visible.map((run, i) => (
         <ScanRunCard
-          key={run.checks[0].id}
+          key={run.checks[0]?.id ?? run.timestamp}
           run={run}
           brandId={brandId}
           brandToken={brandToken}

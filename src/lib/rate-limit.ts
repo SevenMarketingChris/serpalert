@@ -1,3 +1,7 @@
+// WARNING: In-memory rate limit — only effective within a single serverless instance.
+// For production, replace with Upstash Redis (@upstash/ratelimit).
+// This provides basic protection against rapid-fire from a single warm instance.
+
 /**
  * Per-instance in-memory rate limiter.
  *

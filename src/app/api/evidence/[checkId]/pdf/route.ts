@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
+import { safeCompare } from '@/lib/auth'
 
 function escapeHtml(str: string): string {
   return str
@@ -26,7 +27,7 @@ export async function GET(
   if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const { check, ads, brandClientToken } = result
-  if (token !== brandClientToken) {
+  if (!safeCompare(token, brandClientToken)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -97,7 +98,7 @@ export async function GET(
   ${check.screenshotUrl ? `
   <div class="section">
     <h2>SERP Screenshot</h2>
-    <img src="${check.screenshotUrl}" alt="SERP screenshot" class="screenshot" />
+    <img src="${escapeHtml(check.screenshotUrl ?? '')}" alt="SERP screenshot" class="screenshot" />
   </div>
   ` : ''}
 

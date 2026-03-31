@@ -6,7 +6,7 @@ const isAdminRoute = createRouteMatcher(['/admin(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    const { userId } = await auth()
+    const { userId, sessionClaims } = await auth()
     if (!userId) {
       const signInUrl = new URL('/sign-in', req.url)
       signInUrl.searchParams.set('redirect_url', req.url)
@@ -14,7 +14,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     if (isAdminRoute(req)) {
-      const { sessionClaims } = await auth()
       const role = (sessionClaims?.publicMetadata as { role?: string })?.role
       if (role !== 'admin') {
         return NextResponse.redirect(new URL('/unauthorized', req.url))
