@@ -14,8 +14,10 @@ export async function updateBrandDetails(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) return { error: 'Not authenticated' }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
 
   const brandId = formData.get('brandId') as string
   if (!brandId) return { error: 'Missing brand ID' }
@@ -23,7 +25,8 @@ export async function updateBrandDetails(
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  if (brand.userId !== userId) return { error: 'Not authorized' }
+  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
+  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
 
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
@@ -95,13 +98,16 @@ export async function updateAdminSettings(
 }
 
 export async function deleteBrandAction(brandId: string): Promise<{ error?: string } | void> {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) return { error: 'Not authenticated' }
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+  const isAdmin = role === 'admin'
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  if (brand.userId !== userId) return { error: 'Not authorized' }
+  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
+  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
 
   await deleteBrand(brandId)
   redirect('/dashboard')
