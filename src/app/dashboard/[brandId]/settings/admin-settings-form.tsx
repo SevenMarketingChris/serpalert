@@ -11,9 +11,6 @@ interface Props {
   brandId: string
   monthlyBrandSpend: string
   brandRoas: string
-  googleAdsCustomerId: string
-  brandCampaignId: string
-  slackWebhookUrl: string
   watchlistDomains: string
   active: boolean
 }
@@ -22,21 +19,27 @@ export function AdminSettingsForm({
   brandId,
   monthlyBrandSpend,
   brandRoas,
-  googleAdsCustomerId,
-  brandCampaignId,
-  slackWebhookUrl,
   watchlistDomains,
   active,
 }: Props) {
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAdminSettings, null)
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
-        Admin Settings
-      </h3>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Admin Settings</h3>
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="brandId" value={brandId} />
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="active"
+            name="active"
+            defaultChecked={active}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="active">Active</Label>
+        </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="monthlyBrandSpend">Monthly Brand Spend</Label>
@@ -63,39 +66,6 @@ export function AdminSettingsForm({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="googleAdsCustomerId">Google Ads Customer ID</Label>
-          <Input
-            id="googleAdsCustomerId"
-            name="googleAdsCustomerId"
-            defaultValue={googleAdsCustomerId}
-            placeholder="123-456-7890"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="brandCampaignId">Brand Campaign ID</Label>
-          <Input
-            id="brandCampaignId"
-            name="brandCampaignId"
-            defaultValue={brandCampaignId}
-            placeholder="e.g. 12345678"
-          />
-          <p className="text-[11px] text-muted-foreground">
-            The Google Ads campaign ID for your brand campaign. SerpAlert will automatically enable this campaign when competitors are detected and pause it when clear.
-          </p>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="slackWebhookUrl">Slack Webhook URL</Label>
-          <Input
-            id="slackWebhookUrl"
-            name="slackWebhookUrl"
-            defaultValue={slackWebhookUrl}
-            placeholder="https://hooks.slack.com/..."
-          />
-        </div>
-
-        <div className="space-y-1.5">
           <Label htmlFor="watchlistDomains">Competitor Watchlist</Label>
           <Input
             id="watchlistDomains"
@@ -103,20 +73,9 @@ export function AdminSettingsForm({
             defaultValue={watchlistDomains}
             placeholder="rival.com, competitor.co.uk"
           />
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[11px] text-gray-400">
             Comma-separated domains to watch for. Get priority alerts when these specific competitors appear.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="active"
-            name="active"
-            defaultChecked={active}
-            className="h-4 w-4 rounded border-input"
-          />
-          <Label htmlFor="active">Active</Label>
         </div>
 
         <Button type="submit" disabled={isPending}>

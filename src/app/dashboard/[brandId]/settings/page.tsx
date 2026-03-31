@@ -5,7 +5,9 @@ import { checkIsAdmin } from '@/lib/auth'
 import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
 import { ClientPortalSection } from './client-portal-section'
-import { DangerZone } from './danger-zone'
+import { AlertConfigForm } from './alert-config-form'
+import { GoogleAdsForm } from './google-ads-form'
+import { DeleteBrandLink } from './delete-brand-link'
 import { KeywordSuggestions } from '@/components/keyword-suggestions'
 
 export default async function SettingsPage({ params }: { params: Promise<{ brandId: string }> }) {
@@ -25,7 +27,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
   return (
     <div className="max-w-5xl space-y-4">
       <div className="max-w-2xl space-y-6">
-        {/* Section 1: Brand Details */}
+        {/* 1. Brand Details */}
         <BrandDetailsForm
           brandId={brand.id}
           name={brand.name}
@@ -34,29 +36,40 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
           keywordLimit={limits.keywords}
         />
 
+        {/* 2. Keyword Suggestions */}
         <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
 
-        {/* Section 2: Admin Settings */}
+        {/* 3. Alert Configuration */}
+        <AlertConfigForm
+          brandId={brand.id}
+          slackWebhookUrl={brand.slackWebhookUrl ?? ''}
+        />
+
+        {/* 4. Google Ads */}
+        <GoogleAdsForm
+          brandId={brand.id}
+          googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
+          brandCampaignId={brand.brandCampaignId ?? ''}
+        />
+
+        {/* 5. Client Portal */}
+        <ClientPortalSection clientToken={brand.clientToken} />
+
+        {/* 6. Admin Settings (admin only) */}
         {isAdmin && (
           <AdminSettingsForm
             brandId={brand.id}
             monthlyBrandSpend={brand.monthlyBrandSpend ?? ''}
             brandRoas={brand.brandRoas ?? ''}
-            googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
-            brandCampaignId={brand.brandCampaignId ?? ''}
-            slackWebhookUrl={brand.slackWebhookUrl ?? ''}
             watchlistDomains={(brand.watchlistDomains ?? []).join(', ')}
             active={brand.active}
           />
         )}
 
-        {/* Section 3: Client Portal */}
-        <ClientPortalSection
-          clientToken={brand.clientToken}
-        />
-
-        {/* Section 4: Danger Zone */}
-        <DangerZone brandId={brand.id} brandName={brand.name} />
+        {/* 7. Delete Brand */}
+        <div className="pt-2">
+          <DeleteBrandLink brandId={brand.id} brandName={brand.name} />
+        </div>
       </div>
     </div>
   )

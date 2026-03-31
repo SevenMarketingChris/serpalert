@@ -66,24 +66,14 @@ export async function updateAdminSettings(
 
   const monthlyBrandSpend = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || null
   const brandRoas = ((formData.get('brandRoas') as string) ?? '').trim() || null
-  const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null
-  const brandCampaignId = ((formData.get('brandCampaignId') as string) ?? '').trim() || null
-  const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const watchlistDomainsRaw = ((formData.get('watchlistDomains') as string) ?? '').trim()
   const watchlistDomains = watchlistDomainsRaw ? watchlistDomainsRaw.split(',').map(d => d.trim()).filter(Boolean) : []
   const active = formData.get('active') === 'on'
-
-  if (slackWebhookUrl && !slackWebhookUrl.startsWith('https://hooks.slack.com/')) {
-    return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
-  }
 
   try {
     await updateBrand(brandId, {
       monthlyBrandSpend,
       brandRoas,
-      googleAdsCustomerId,
-      brandCampaignId,
-      slackWebhookUrl,
       watchlistDomains,
       active,
     })
