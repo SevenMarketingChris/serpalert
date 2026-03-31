@@ -46,6 +46,7 @@ export async function sendNewCompetitorAlert(params: {
       ],
       text: `New competitor ${params.domain} detected on "${params.keyword}" for ${params.brandName}`,
     }),
+    redirect: 'error',
     signal: AbortSignal.timeout(10_000),
   })
   if (!response.ok) {

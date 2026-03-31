@@ -32,7 +32,13 @@ export async function PATCH(
 
   // Verify brand ownership
   const brand = await getBrandById(brandId)
-  if (!brand || (brand.userId !== userId && !brand.agencyManaged)) {
+  if (!brand) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+  if (brand.agencyManaged && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  if (!brand.agencyManaged && brand.userId !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
