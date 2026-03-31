@@ -16,7 +16,10 @@ interface Props {
 export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props) {
   const parsedConfig = alertConfig ? (() => { try { return JSON.parse(alertConfig) } catch { return {} } })() : {}
   const initialThreshold = parsedConfig.alertThreshold ?? 1
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAlertConfig, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateAlertConfig(prev, formData, brandId),
+    null,
+  )
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
@@ -27,8 +30,6 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
         </p>
       </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
-
         <div className="space-y-1.5">
           <Label htmlFor="slackWebhookUrl">Slack Webhook URL</Label>
           <Input

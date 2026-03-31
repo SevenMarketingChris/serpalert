@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { getBrandById, getAdCopyHistory } from '@/lib/db/queries'
 import { generateAdCopyAnalysis } from '@/lib/ai'
 
@@ -15,14 +16,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ bran
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  const { checkIsAdmin } = await import('@/lib/auth')
   const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  if (brand.agencyManaged && !isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  if (!brand.agencyManaged && brand.userId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const url = new URL(request.url)
   const domain = url.searchParams.get('domain')

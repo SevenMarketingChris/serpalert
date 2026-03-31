@@ -22,7 +22,10 @@ export function AdminSettingsForm({
   watchlistDomains,
   active,
 }: Props) {
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAdminSettings, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateAdminSettings(prev, formData, brandId),
+    null,
+  )
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
@@ -33,7 +36,6 @@ export function AdminSettingsForm({
         </p>
       </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
 
         <div className="flex items-center gap-3">
           <input

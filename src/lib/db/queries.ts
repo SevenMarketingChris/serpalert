@@ -186,7 +186,9 @@ export async function updateBrand(
   return rows[0]
 }
 
-// Stub functions for upcoming Ahrefs SEO features (no tables yet)
+// Not implemented: Ahrefs SEO integration is planned but tables are not yet created.
+// These functions will be re-implemented once the ahrefs_domains and ahrefs_keywords
+// tables exist in the database schema.
 export type AhrefsMetrics = {
   domainRating: string | null
   organicTraffic: number | null
@@ -194,19 +196,19 @@ export type AhrefsMetrics = {
 }
 
 export async function getBrandAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics | null> {
-  return null
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getCompetitorAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics[]> {
-  return []
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getTopKeywordsForDomain(_brandId: string, _domain: string): Promise<{ keyword: string; position: number; volume: number }[]> {
-  return []
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getMonthlyReports(_brandId: string): Promise<{ id: string; month: string; summary: string }[]> {
-  return []
+  throw new Error('Not implemented: Monthly reports feature pending database schema')
 }
 
 export async function upsertAhrefsDomainMetrics(_data: {
@@ -214,14 +216,14 @@ export async function upsertAhrefsDomainMetrics(_data: {
   domainRating: string | null; organicTraffic: number | null
   organicKeywords: number | null; referringDomains: number | null; backlinks: number | null
 }): Promise<void> {
-  // Stub — tables not yet created
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function replaceTopKeywords(
   _brandId: string, _domain: string, _date: string,
   _keywords: { keyword: string; position: number | null; volume: number | null; traffic: number | null }[],
 ): Promise<void> {
-  // Stub — tables not yet created
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getCompetitorAdById(id: string): Promise<CompetitorAd | null> {

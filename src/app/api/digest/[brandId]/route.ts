@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
 import { isAdminRequest } from '@/lib/auth'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks, getCompetitorSummaryForBrand } from '@/lib/db/queries'
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
+import { escapeHtml } from '@/lib/utils'
 
 export async function GET(
   request: Request,

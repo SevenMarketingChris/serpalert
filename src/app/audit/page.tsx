@@ -42,7 +42,9 @@ export default function AuditPage() {
       }
 
       if (!res.ok) {
-        setError('Something went wrong. Please try again.')
+        const errorData = await res.json().catch(() => ({}))
+        const message = errorData.error ?? `Server error (${res.status}). Please try again.`
+        setError(message)
         setStep('input')
         return
       }

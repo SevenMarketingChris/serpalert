@@ -16,37 +16,37 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "SERP Alert — Protect Your Brand from Competitor Ads",
-    template: "%s | SerpAlert",
+    template: "%s",
+    default: "SerpAlert — Protect Your Brand from Competitor Ads",
   },
-  description: "Monitor competitor ad activity on Google Search. Get hourly SERP alerts with screenshot evidence. Stop paying for clicks you already own.",
-  robots: { index: true, follow: true },
-  metadataBase: new URL("https://serpalert.co.uk"),
+  description:
+    "Monitor competitor ad activity on Google Search. Get hourly SERP alerts with screenshot evidence. Stop paying for clicks you already own.",
   openGraph: {
+    title: "SerpAlert — Block Competitor Brand Bidding",
+    description:
+      "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
     type: "website",
-    locale: "en_GB",
     siteName: "SerpAlert",
-    title: "SERP Alert — Protect Your Brand from Competitor Ads",
-    description: "Monitor competitor ad activity on Google Search. Get hourly SERP alerts with screenshot evidence.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SerpAlert - Brand Keyword Monitoring",
+        alt: "SerpAlert — Block Competitor Brand Bidding",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SERP Alert — Protect Your Brand from Competitor Ads",
-    description: "Monitor competitor ad activity on Google Search. Get hourly SERP alerts with screenshot evidence.",
+    title: "SerpAlert — Block Competitor Brand Bidding",
+    description:
+      "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
     images: ["/og-image.png"],
   },
+  robots: { index: true, follow: true },
+  metadataBase: new URL("https://serpalert.co.uk"),
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "48x48" },
-    ],
+    icon: [{ url: "/favicon.ico", sizes: "48x48" }],
   },
 };
 
@@ -83,7 +83,8 @@ export default function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "SoftwareApplication",
                 name: "SerpAlert",
-                description: "Brand keyword monitoring tool. Get hourly SERP alerts when competitors bid on your brand name.",
+                description:
+                  "Brand keyword monitoring tool. Get hourly SERP alerts when competitors bid on your brand name.",
                 url: "https://serpalert.co.uk",
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Web",

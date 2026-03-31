@@ -33,6 +33,24 @@ export function isAdminFromClaims(sessionClaims: Record<string, unknown> | null 
   return claims.publicMetadata?.role === 'admin'
 }
 
+/**
+ * Assert that the current user is authorized to access the given brand.
+ * Agency admins can access agency-managed brands; regular users can only
+ * access brands they own (non-agency-managed).
+ */
+export function authorizeBrandAccess(
+  brand: { agencyManaged: boolean; userId: string | null },
+  userId: string | undefined,
+  isAdmin: boolean,
+): void {
+  if (brand.agencyManaged && !isAdmin) {
+    throw new Error('Not authorized: agency-managed brands require admin access')
+  }
+  if (!brand.agencyManaged && brand.userId !== userId) {
+    throw new Error('Not authorized: you do not own this brand')
+  }
+}
+
 export function safeCompare(a: string, b: string): boolean {
   const hashA = createHash('sha256').update(a).digest()
   const hashB = createHash('sha256').update(b).digest()

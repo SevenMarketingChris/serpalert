@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -14,10 +14,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ bra
   if (!brand) {
     return new Response('Not found', { status: 404 })
   }
-  if (brand.agencyManaged && !isAdmin) {
-    return new Response('Not found', { status: 404 })
-  }
-  if (!brand.agencyManaged && brand.userId !== userId) {
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
     return new Response('Not found', { status: 404 })
   }
 
@@ -26,9 +25,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ bra
   const headers = ['Domain', 'Avg Position', 'Count 30d', 'Count Total', 'Keywords', 'First Seen', 'Last Seen']
 
   function escapeCsv(value: string): string {
-    // Neutralise CSV injection
-    if (/^[=+\-@\t\r]/.test(value)) {
-      value = "'" + value
+    // CSV injection defense: prepend tab to values starting with dangerous chars
+    if (/^[=+\-@]/.test(value)) {
+      value = '\t' + value
     }
     if (value.includes(',') || value.includes('"') || value.includes('\n')) {
       return `"${value.replace(/"/g, '""')}"`

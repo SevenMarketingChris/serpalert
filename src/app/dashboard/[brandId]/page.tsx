@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { ManualCheckButton } from '@/components/manual-check-button'
 import { ActivityFeed } from '@/components/activity-feed'
 import { TrendChart } from '@/components/trend-chart'
@@ -19,11 +19,13 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
   const isAdmin = await checkIsAdmin()
-
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged && !isAdmin) notFound()
-  if (!brand.agencyManaged && brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const checks = await getRecentSerpChecks(brandId, 100)
   const todayStr = toUTCDate(new Date())

@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getScreenshotsForBrand } from '@/lib/db/queries'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { ScreenshotGallery } from '@/components/screenshot-gallery'
 
 export default async function ScreenshotsPage({ params }: { params: Promise<{ brandId: string }> }) {
@@ -13,8 +13,11 @@ export default async function ScreenshotsPage({ params }: { params: Promise<{ br
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged && !isAdmin) notFound()
-  if (!brand.agencyManaged && brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const screenshots = await getScreenshotsForBrand(brandId, 100)
 

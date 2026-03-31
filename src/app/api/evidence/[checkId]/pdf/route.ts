@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSerpCheckWithAds, getBrandById } from '@/lib/db/queries'
 import { safeCompare } from '@/lib/auth'
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-}
+import { escapeHtml } from '@/lib/utils'
 
 export async function GET(
   request: Request,
@@ -18,8 +10,8 @@ export async function GET(
   const { checkId } = await params
   const token = new URL(request.url).searchParams.get('token')
 
-  // Validate token BEFORE any DB fetch
-  if (!token) {
+  // Validate token pattern BEFORE any DB fetch
+  if (!token || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

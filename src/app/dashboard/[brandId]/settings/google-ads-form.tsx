@@ -14,7 +14,10 @@ interface Props {
 }
 
 export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }: Props) {
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateGoogleAds, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateGoogleAds(prev, formData, brandId),
+    null,
+  )
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
@@ -25,7 +28,6 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
         </p>
       </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
 
         <div className="space-y-1.5">
           <Label htmlFor="googleAdsCustomerId">Google Ads Customer ID</Label>

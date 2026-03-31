@@ -17,7 +17,7 @@ const CreateBrandSchema = z.object({
 
 export async function GET(request: Request) {
   if (!isAdminRequest(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  return NextResponse.json(await getAllActiveBrands())
+  return NextResponse.json(await getAllActiveBrands(), { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function POST(request: Request) {

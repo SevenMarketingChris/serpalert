@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       competitorCount: competitors.length,
       competitors,
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err) {
     console.error('Audit SERP check failed:', err)
     return NextResponse.json(

@@ -22,17 +22,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { checkIsAdmin } = await import('@/lib/auth')
+  const { checkIsAdmin, authorizeBrandAccess } = await import('@/lib/auth')
   const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-  if (brand.agencyManaged && !isAdmin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-  if (!brand.agencyManaged && brand.userId !== userId) {
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

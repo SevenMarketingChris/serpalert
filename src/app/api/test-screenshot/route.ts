@@ -15,10 +15,11 @@ export async function GET(request: Request) {
       headers: {
         'Content-Type': 'image/png',
         'Content-Disposition': `inline; filename="screenshot.png"`,
+        'Cache-Control': 'no-store',
       },
     })
   } catch (err) {
     console.error('[test-screenshot] Failed:', err)
-    return NextResponse.json({ error: 'Screenshot failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Screenshot failed' }, { status: 500, headers: { 'Cache-Control': 'no-store' } })
   }
 }

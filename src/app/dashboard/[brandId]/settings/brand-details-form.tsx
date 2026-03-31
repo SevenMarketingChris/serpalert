@@ -16,7 +16,10 @@ interface Props {
 }
 
 export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit }: Props) {
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateBrandDetails, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateBrandDetails(prev, formData, brandId),
+    null,
+  )
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
@@ -29,7 +32,6 @@ export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit
         </p>
       </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
 
         <div className="space-y-1.5">
           <Label htmlFor="name">Brand Name <span className="text-destructive">*</span></Label>

@@ -14,3 +14,7 @@ export function isSafeUrl(url: string | null | undefined): boolean {
     return false
   }
 }
+
+export function escapeHtml(str: string): string {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')
+}

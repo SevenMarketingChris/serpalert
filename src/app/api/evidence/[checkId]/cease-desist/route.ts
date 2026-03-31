@@ -10,9 +10,8 @@ export async function GET(
 ) {
   const { checkId } = await params
   const token = new URL(request.url).searchParams.get('token')
-
-  // Validate token before DB fetch
-  if (!token) {
+  // Validate token pattern before DB fetch
+  if (!token || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

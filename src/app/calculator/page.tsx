@@ -3,7 +3,7 @@ import { ArrowRight, Eye, Bell, TrendingUp } from "lucide-react";
 import { WalkthroughCalculator } from "@/components/walkthrough-calculator";
 
 export const metadata = {
-  title: "Brand Campaign Savings Calculator — SerpAlert",
+  title: "Savings Calculator — SerpAlert",
   description:
     "Calculate how much you're wasting on Google Ads brand campaigns. See what happens when you redirect that budget into high-ROI non-brand campaigns.",
 };

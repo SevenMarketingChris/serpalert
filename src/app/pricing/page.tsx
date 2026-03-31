@@ -12,6 +12,25 @@ export const metadata = {
   },
 };
 
+const pricingJsonLd = `{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "SerpAlert Brand Monitoring",
+  "description": "Monitor competitor ad activity on your brand keywords on Google Search",
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "GBP",
+    "lowPrice": "69",
+    "highPrice": "149",
+    "offerCount": "4"
+  },
+  "brand": {
+    "@type": "Brand",
+    "name": "SerpAlert"
+  },
+  "category": "Brand Protection Software"
+}`;
+
 const features = [
   "Monitor your brand keyword",
   "Hourly SERP checks (24x daily)",
@@ -69,6 +88,11 @@ const faqs = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: pricingJsonLd }}
+      />
       {/* Header */}
       <nav className="border-b border-gray-200 bg-white px-6 py-4">
         <div className="mx-auto max-w-5xl flex items-center justify-between">

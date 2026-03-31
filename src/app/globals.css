@@ -274,3 +274,50 @@ body {
 .action-btn:hover {
   background-color: var(--accent);
 }
+
+/* ── Print Styles ── */
+@media print {
+  /* Hide navigation, buttons, and decorative elements */
+  nav,
+  footer,
+  button,
+  script,
+  .bg-dot-pattern {
+    display: none !important;
+  }
+  /* Force white background, black text */
+  * {
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-color: #aaa !important;
+  }
+  /* Page breaks between sections */
+  section,
+  .space-y-8 section {
+    page-break-inside: avoid;
+  }
+  /* Ensure links show their URLs in print */
+  a[href^="http"]::after,
+  a[href^="/privacy"]::after,
+  a[href^="/terms"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666 !important;
+  }
+  /* Improve section spacing for print */
+  h1 {
+    font-size: 24pt !important;
+    margin-top: 2rem !important;
+  }
+  h2 {
+    font-size: 18pt !important;
+    margin-top: 1.5rem !important;
+    page-break-after: avoid;
+  }
+  /* Ensure good margins */
+  body {
+    margin: 0.75in;
+  }
+}

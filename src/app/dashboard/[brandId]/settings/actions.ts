@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/queries'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { z } from 'zod'
 
 export type SettingsState = {
   error?: string
@@ -14,19 +15,16 @@ export type SettingsState = {
 export async function updateBrandDetails(
   _prev: SettingsState,
   formData: FormData,
+  brandId: string,
 ): Promise<SettingsState> {
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   const isAdmin = await checkIsAdmin()
 
-  const brandId = formData.get('brandId') as string
-  if (!brandId) return { error: 'Missing brand ID' }
-
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
-  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+  authorizeBrandAccess(brand, userId, isAdmin)
 
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
@@ -53,13 +51,11 @@ export async function updateBrandDetails(
 export async function updateAdminSettings(
   _prev: SettingsState,
   formData: FormData,
+  brandId: string,
 ): Promise<SettingsState> {
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   if (!await checkIsAdmin()) return { error: 'Admin access required' }
-
-  const brandId = formData.get('brandId') as string
-  if (!brandId) return { error: 'Missing brand ID' }
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
@@ -69,6 +65,20 @@ export async function updateAdminSettings(
   const watchlistDomainsRaw = ((formData.get('watchlistDomains') as string) ?? '').trim()
   const watchlistDomains = watchlistDomainsRaw ? watchlistDomainsRaw.split(',').map(d => d.trim()).filter(Boolean) : []
   const active = formData.get('active') === 'on'
+
+  // Validate numeric fields with zod
+  if (monthlyBrandSpend !== null) {
+    const parsed = z.coerce.number().positive().safeParse(monthlyBrandSpend)
+    if (!parsed.success) {
+      return { error: 'Monthly brand spend must be a positive number' }
+    }
+  }
+  if (brandRoas !== null) {
+    const parsed = z.coerce.number().positive().safeParse(brandRoas)
+    if (!parsed.success) {
+      return { error: 'Brand ROAS must be a positive number' }
+    }
+  }
 
   try {
     await updateBrand(brandId, {
@@ -87,19 +97,16 @@ export async function updateAdminSettings(
 export async function updateAlertConfig(
   _prev: SettingsState,
   formData: FormData,
+  brandId: string,
 ): Promise<SettingsState> {
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-
-  const brandId = formData.get('brandId') as string
-  if (!brandId) return { error: 'Missing brand ID' }
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
-  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
-  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+  authorizeBrandAccess(brand, userId, isAdmin)
 
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const alertThreshold = parseInt(formData.get('alertThreshold') as string) || 1
@@ -122,19 +129,16 @@ export async function updateAlertConfig(
 export async function updateGoogleAds(
   _prev: SettingsState,
   formData: FormData,
+  brandId: string,
 ): Promise<SettingsState> {
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
-
-  const brandId = formData.get('brandId') as string
-  if (!brandId) return { error: 'Missing brand ID' }
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
-  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
-  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+  authorizeBrandAccess(brand, userId, isAdmin)
 
   const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null
   const brandCampaignId = ((formData.get('brandCampaignId') as string) ?? '').trim() || null
@@ -156,8 +160,7 @@ export async function deleteBrandAction(brandId: string): Promise<{ error?: stri
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  if (brand.agencyManaged && !isAdmin) return { error: 'Not authorized' }
-  if (!brand.agencyManaged && brand.userId !== userId) return { error: 'Not authorized' }
+  authorizeBrandAccess(brand, userId, isAdmin)
 
   await deleteBrand(brandId)
   redirect('/dashboard')

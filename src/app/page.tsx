@@ -12,9 +12,40 @@ import {
 import { BudgetCalculator } from "@/components/budget-calculator";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
 
+export const metadata = {
+  title: "SerpAlert — Block Competitor Brand Bidding",
+  description:
+    "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
+};
+
+const saasJsonLd = `{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SerpAlert",
+  "description": "Monitor competitor ad activity on your brand keywords on Google Search. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
+  "url": "https://serpalert.co.uk",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "149",
+    "priceCurrency": "GBP",
+    "description": "Monthly subscription"
+  },
+  "brand": {
+    "@type": "Brand",
+    "name": "SerpAlert"
+  }
+}`;
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: saasJsonLd }}
+      />
       {/* Nav */}
       <nav className="border-b border-border bg-card px-6 py-4">
         <div className="mx-auto max-w-5xl flex items-center justify-between">

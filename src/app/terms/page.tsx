@@ -4,12 +4,15 @@ export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link
-          href="/"
-          className="text-sm text-indigo-600 hover:underline inline-block mb-8"
-        >
-          &larr; Back to home
-        </Link>
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <span>&larr;</span>
+            <span>Back to home</span>
+          </Link>
+          <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Privacy Policy
+          </Link>
+        </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-8 md:p-12 space-y-8">
           <div>

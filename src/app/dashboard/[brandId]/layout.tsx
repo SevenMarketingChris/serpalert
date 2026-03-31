@@ -7,7 +7,7 @@ import {
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
 export default async function BrandDashboardLayout({
   children,
@@ -24,8 +24,11 @@ export default async function BrandDashboardLayout({
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged && !isAdmin) notFound()
-  if (!brand.agencyManaged && brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const userBrands = await getBrandsForUser(userId)
   // Admin sees all brands (personal + agency) in the switcher
