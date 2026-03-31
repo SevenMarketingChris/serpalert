@@ -29,15 +29,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ bran
   }
 
   const adCopy = await getAdCopyHistory(brandId, domain)
-
-  return NextResponse.json(
-    adCopy.map((a) => ({
-      headline: a.headline,
-      description: a.description,
-      displayUrl: a.displayUrl,
-      firstSeen: a.firstSeen,
-      lastSeen: a.lastSeen,
-      count: a.count,
-    }))
-  )
+  return NextResponse.json(adCopy)
 }
