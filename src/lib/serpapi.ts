@@ -46,7 +46,8 @@ export async function checkSerpForAds(
 
   if (!response.ok) {
     const text = await response.text().catch(() => '')
-    console.error(`SerpAPI ${response.status}: ${text.slice(0, 200)}`)
+    const safeText = text.replace(apiKey, '[REDACTED]').slice(0, 200)
+    console.error(`SerpAPI ${response.status}: ${safeText}`)
     throw new Error(`SerpAPI failed: ${response.status}`)
   }
 

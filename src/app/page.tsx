@@ -242,9 +242,9 @@ export default function HomePage() {
               },
               {
                 icon: Bell,
-                title: "Slack & email alerts",
+                title: "Slack Alerts",
                 description:
-                  "Get notified instantly via Slack, email, or both.",
+                  "Get notified instantly via Slack when a competitor appears.",
               },
               {
                 icon: Building2,

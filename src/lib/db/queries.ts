@@ -27,7 +27,7 @@ export async function getAllActiveBrands(): Promise<Brand[]> {
       sql`(
         ${brands.agencyManaged} = true
         OR ${brands.subscriptionStatus} IN ('active', 'past_due', 'agency')
-        OR (${brands.subscriptionStatus} = 'trialing' AND ${brands.trialEndsAt} > ${now})
+        OR (${brands.subscriptionStatus} = 'trialing' AND (${brands.trialEndsAt} IS NULL OR ${brands.trialEndsAt} > ${now}))
       )`
     )
   )
@@ -438,6 +438,7 @@ export async function updateBrandSubscription(
     stripeCustomerId?: string
     stripeSubscriptionId?: string
     subscriptionStatus?: string
+    plan?: string
   },
 ): Promise<void> {
   await db.update(brands)

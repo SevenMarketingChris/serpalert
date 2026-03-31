@@ -2,6 +2,7 @@ export function getRelativeTime(date: Date | string | null): string {
   if (!date) return 'Never'
   const now = new Date()
   const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return 'Unknown'
   const diffMs = Math.max(0, now.getTime() - d.getTime())
   const diffMin = Math.floor(diffMs / 60000)
   if (diffMin < 1) return 'just now'

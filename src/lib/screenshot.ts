@@ -47,6 +47,11 @@ export async function screenshotSerp(taskId: string): Promise<Buffer> {
     throw new Error(`DataForSEO screenshot: no image returned for task ${taskId}`)
   }
 
+  const parsedUrl = new URL(imageUrl)
+  if (parsedUrl.protocol !== 'https:') {
+    throw new Error('Screenshot URL must be HTTPS')
+  }
+
   console.info(`DataForSEO screenshot: downloading from ${imageUrl.slice(0, 80)}...`)
 
   const imgResponse = await fetch(imageUrl, { signal: AbortSignal.timeout(15_000) })
