@@ -2,7 +2,6 @@ import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, PLAN_LIMITS } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
-import { DashboardTabs } from '@/components/dashboard-tabs'
 import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
 import { ClientPortalSection } from './client-portal-section'
@@ -25,8 +24,6 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
 
   return (
     <div className="max-w-5xl space-y-4">
-      <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
-
       <div className="max-w-2xl space-y-6">
         {/* Section 1: Brand Details */}
         <BrandDetailsForm

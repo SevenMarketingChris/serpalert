@@ -21,6 +21,7 @@ export const brands = pgTable('brands', {
   agencyManaged: boolean('agency_managed').notNull().default(false),
   trialEndsAt: timestamp('trial_ends_at'),
   subscriptionStatus: text('subscription_status').notNull().default('trialing'),
+  alertConfig: text('alert_config'), // JSON string for alert settings
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => [

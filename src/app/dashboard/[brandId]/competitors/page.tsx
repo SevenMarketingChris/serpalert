@@ -2,7 +2,6 @@ import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
-import { DashboardTabs } from '@/components/dashboard-tabs'
 import { Shield } from 'lucide-react'
 import { WastedSpendBadge } from '@/components/wasted-spend-badge'
 import { getRelativeTime } from '@/lib/time'
@@ -27,8 +26,6 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
 
   return (
     <div className="max-w-5xl space-y-4">
-      <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
-
       {competitors.length === 0 ? (
         <div className="bg-card border border-border rounded-lg p-12 text-center space-y-3">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mx-auto">

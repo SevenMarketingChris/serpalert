@@ -3,7 +3,6 @@ import { auth } from '@clerk/nextjs/server'
 import Link from 'next/link'
 import { getBrandById, getAuctionInsightsLast30Days } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
-import { DashboardTabs } from '@/components/dashboard-tabs'
 import { AuctionChart } from '@/components/auction-chart'
 
 export default async function InsightsPage({ params }: { params: Promise<{ brandId: string }> }) {
@@ -21,8 +20,6 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
 
   return (
     <div className="max-w-5xl space-y-4">
-      <DashboardTabs brandId={brandId} hasGoogleAds={hasGoogleAds} />
-
       {hasGoogleAds ? (
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
