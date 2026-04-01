@@ -3,13 +3,15 @@ import type { NextConfig } from "next";
 const clerkScriptSources = [
   "https://clerk.com",
   "https://*.clerk.com",
-  ...(process.env.NODE_ENV === "production" ? [] : ["https://*.clerk.accounts.dev"]),
+  "https://clerk.serpalert.co.uk",
+  "https://*.clerk.accounts.dev",
 ];
 
 const clerkConnectSources = [
   "https://clerk.com",
   "https://*.clerk.com",
-  ...(process.env.NODE_ENV === "production" ? [] : ["https://*.clerk.accounts.dev"]),
+  "https://clerk.serpalert.co.uk",
+  "https://*.clerk.accounts.dev",
 ];
 
 const nextConfig: NextConfig = {
