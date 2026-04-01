@@ -9,6 +9,7 @@ import { TrendChart } from '@/components/trend-chart'
 import { RecentScan } from '@/components/recent-scan'
 import { CompetitorSummary } from '@/components/competitor-summary'
 import { SparklineBars } from '@/components/sparkline-bars'
+import { DashboardCalculator } from '@/components/dashboard-calculator'
 import { toUTCDate, getRelativeTime } from '@/lib/time'
 import { ShieldCheck, AlertTriangle, Sparkles } from 'lucide-react'
 import { groupChecksIntoRuns } from '@/lib/group-checks'
@@ -248,6 +249,12 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
       {topCompetitors.length > 0 && (
         <CompetitorSummary competitors={topCompetitors} brandId={brandId} />
       )}
+
+      {/* (g) Budget Redirect Calculator */}
+      <DashboardCalculator
+        initialBrandSpend={brand.monthlyBrandSpend ? Number(brand.monthlyBrandSpend) : undefined}
+        initialBrandRoas={brand.brandRoas ? Number(brand.brandRoas) : undefined}
+      />
     </div>
   )
 }
