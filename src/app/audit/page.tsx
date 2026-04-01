@@ -15,5 +15,17 @@ export const metadata = createPageMetadata({
 })
 
 export default function AuditPage() {
-  return <AuditPageClient />
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SerpAlert Brand Bidding Audit",
+        "description": "Check whether competitors are bidding on your brand keyword right now. Run a free audit and get the full report by email.",
+        "url": "https://serpalert.co.uk/audit",
+        "applicationCategory": "BusinessApplication",
+      }) }} />
+      <AuditPageClient />
+    </>
+  )
 }

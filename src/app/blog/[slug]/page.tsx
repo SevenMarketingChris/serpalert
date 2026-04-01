@@ -47,8 +47,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const post = getPostBySlug(slug)
   if (!post) notFound()
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": post.description,
+    "datePublished": post.date,
+    "author": { "@type": "Person", "name": post.author },
+    "url": absoluteUrl(`/blog/${post.slug}`),
+    "publisher": {
+      "@type": "Organization",
+      "name": "SerpAlert",
+      "url": "https://serpalert.co.uk",
+    },
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageViewTracker properties={{ page: 'blog_post', slug: post.slug }} />
       <MarketingHeader />
 

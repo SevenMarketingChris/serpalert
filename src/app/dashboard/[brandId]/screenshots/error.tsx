@@ -17,9 +17,9 @@ export default function Error({
   return (
     <div className="max-w-5xl py-12 text-center space-y-4">
       <AlertTriangle className="h-8 w-8 text-destructive mx-auto" />
-      <h2 className="text-lg font-semibold">Something went wrong</h2>
+      <h2 className="text-lg font-semibold">Screenshots failed to load</h2>
       <p className="text-sm text-muted-foreground">
-        This section failed to load. Try refreshing.
+        The screenshots section encountered an error. Try refreshing.
       </p>
       <button
         onClick={reset}

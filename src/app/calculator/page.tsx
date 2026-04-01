@@ -21,6 +21,14 @@ export const metadata = createPageMetadata({
 export default function CalculatorPage() {
   return (
     <div className="min-h-screen bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SerpAlert Budget Calculator",
+        "description": "Calculate how much revenue you could generate by redirecting your brand campaign budget.",
+        "url": "https://serpalert.co.uk/calculator",
+        "applicationCategory": "BusinessApplication",
+      }) }} />
       <PageViewTracker properties={{ page: "calculator" }} />
       <MarketingHeader />
 

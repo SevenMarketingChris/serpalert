@@ -20,6 +20,11 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
     null,
   )
 
+  useEffect(() => {
+    if (state?.success) toast.success(state.success)
+    if (state?.error) toast.error(state.error)
+  }, [state])
+
   return (
     <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg shadow-gray-200/20 space-y-4">
       <div>

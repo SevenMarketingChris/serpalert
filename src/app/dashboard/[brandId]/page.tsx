@@ -169,6 +169,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
   return (
     <div className="space-y-4 max-w-5xl">
+      <h1 className="text-lg font-semibold text-gray-900">{brand.name}</h1>
       {/* (a) Status Banner */}
       <div className={`rounded-2xl overflow-hidden ${
         isProtected
