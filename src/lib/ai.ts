@@ -4,6 +4,24 @@ import { anthropic } from '@ai-sdk/anthropic'
 const haiku = anthropic('claude-haiku-4-5-20251001')
 const sonnet = anthropic('claude-sonnet-4-6-20250116')
 
+/**
+ * Sanitize user/external data before passing to LLM prompts.
+ * Strips characters that could be used for prompt injection,
+ * truncates to a safe length, and removes instruction-like patterns.
+ */
+function sanitize(input: string | null | undefined, maxLength = 200): string {
+  if (!input) return 'Unknown'
+  return input
+    .replace(/[\r\n]+/g, ' ')           // flatten newlines
+    .replace(/[<>{}[\]]/g, '')           // strip brackets/braces
+    .replace(/ignore\s+(all|previous|above)\s+instructions?/gi, '[filtered]')
+    .replace(/you\s+are\s+(now|a)\s+/gi, '[filtered]')
+    .replace(/system\s*:?\s*prompt/gi, '[filtered]')
+    .replace(/\bdo\s+not\s+follow\b/gi, '[filtered]')
+    .trim()
+    .slice(0, maxLength)
+}
+
 export async function generateCompetitorSummary(
   brandName: string,
   competitorDomain: string,
@@ -18,13 +36,13 @@ export async function generateCompetitorSummary(
     maxOutputTokens: 200,
     prompt: `You are a brand protection analyst. Write a brief 2-3 sentence summary about this competitor ad detection.
 
-Brand: ${brandName}
-Competitor domain: ${competitorDomain}
-Keyword they're bidding on: "${keyword}"
-Their ad headline: ${adHeadline || 'Unknown'}
-Their ad description: ${adDescription || 'Unknown'}
+Brand: ${sanitize(brandName)}
+Competitor domain: ${sanitize(competitorDomain)}
+Keyword they're bidding on: "${sanitize(keyword)}"
+Their ad headline: ${sanitize(adHeadline)}
+Their ad description: ${sanitize(adDescription)}
 Times seen in last 30 days: ${timesSeenLast30d}
-First detected: ${firstSeenDate}
+First detected: ${sanitize(firstSeenDate)}
 
 Write a concise, professional summary explaining what this competitor is doing, their likely strategy based on the ad copy, and how active they are. No bullet points, just 2-3 sentences. Be specific about the competitor's angle based on their ad copy.`,
   })
@@ -49,10 +67,10 @@ export async function generateMonthlyInsights(
     maxOutputTokens: 300,
     prompt: `You are a brand protection analyst writing a monthly summary for a client. Write 3-4 sentences summarising this month's brand keyword monitoring.
 
-Brand: ${brandName}
+Brand: ${sanitize(brandName)}
 Checks run this month: ${data.totalChecks}
 Keywords monitored: ${data.keywordsMonitored}
-Competitors detected this month: ${competitorList}
+Competitors detected this month: ${sanitize(competitorList, 500)}
 Competitors detected last month: ${data.previousMonthCompetitors}
 
 Write a professional, actionable summary. Compare to last month if relevant. Mention the most active competitor by name. If no competitors were detected, be positive about brand protection. End with a one-sentence recommendation. No bullet points.`,
@@ -71,9 +89,9 @@ export async function generateAdCopyAnalysis(
     maxOutputTokens: 200,
     prompt: `You are a PPC strategist. Analyse this competitor's ad copy targeting the brand "${brandName}" and explain their strategy in 2-3 sentences.
 
-Competitor: ${competitorDomain}
-Their ad headlines: ${headlines.filter(Boolean).join(' | ') || 'Unknown'}
-Their ad descriptions: ${descriptions.filter(Boolean).join(' | ') || 'Unknown'}
+Competitor: ${sanitize(competitorDomain)}
+Their ad headlines: ${sanitize(headlines.filter(Boolean).join(' | ') || 'Unknown', 500)}
+Their ad descriptions: ${sanitize(descriptions.filter(Boolean).join(' | ') || 'Unknown', 500)}
 
 What angle are they taking? What are they offering vs the brand? What should the brand owner know? Be specific and concise.`,
   })
@@ -91,7 +109,7 @@ export async function generateActionRecommendation(
     maxOutputTokens: 150,
     prompt: `You are a PPC strategist advising a brand using SerpAlert — a tool that monitors competitor ads on brand keywords. The product's core message is: you should NOT run brand campaigns unless competitors are actively bidding on your brand name.
 
-Brand: ${brandName}
+Brand: ${sanitize(brandName)}
 Active competitors this week: ${activeCompetitors}
 Has Google Ads brand campaign set up: ${hasBrandCampaign ? 'Yes' : 'No'}
 Brand campaign currently active: ${brandCampaignActive ? 'Yes' : 'No'}
@@ -117,11 +135,11 @@ export async function triageAlert(
   const { text } = await generateText({
     model: haiku,
     maxOutputTokens: 10,
-    prompt: `Classify this competitor ad alert for the brand "${brandName}".
+    prompt: `Classify this competitor ad alert for the brand "${sanitize(brandName)}".
 
-Competitor: ${competitorDomain}
+Competitor: ${sanitize(competitorDomain)}
 Ad position: ${position ?? 'unknown'}
-Keyword: "${keyword}"
+Keyword: "${sanitize(keyword)}"
 
 Rules:
 - "urgent": competitor is in position 1-2, or is a direct industry rival
@@ -144,11 +162,11 @@ export async function classifyCompetitorIntent(
   const { text } = await generateText({
     model: haiku,
     maxOutputTokens: 50,
-    prompt: `Classify this competitor bidding on the brand "${brandName}".
+    prompt: `Classify this competitor bidding on the brand "${sanitize(brandName)}".
 
-Competitor domain: ${competitorDomain}
-Their ad headline: ${adHeadline || 'Unknown'}
-Their ad description: ${adDescription || 'Unknown'}
+Competitor domain: ${sanitize(competitorDomain)}
+Their ad headline: ${sanitize(adHeadline)}
+Their ad description: ${sanitize(adDescription)}
 
 Categories:
 - "direct_rival": a direct competitor offering a similar product/service
@@ -172,7 +190,7 @@ export async function suggestKeyword(
   const { text } = await generateText({
     model: haiku,
     maxOutputTokens: 50,
-    prompt: `A user is setting up brand keyword monitoring for "${brandName}"${domain ? ` (website: ${domain})` : ''}.
+    prompt: `A user is setting up brand keyword monitoring for "${sanitize(brandName)}"${domain ? ` (website: ${sanitize(domain)})` : ''}.
 
 Suggest the single best keyword to monitor for competitor ads. This should be the most common way customers search for this brand. Usually it's just the brand name itself.
 
@@ -194,14 +212,14 @@ export async function generateWeeklyDigest(
   const { text } = await generateText({
     model: sonnet,
     maxOutputTokens: 300,
-    prompt: `You are a brand protection analyst writing a weekly email digest for "${brandName}". Write 3-4 sentences summarising this week's activity in a professional, reassuring tone.
+    prompt: `You are a brand protection analyst writing a weekly email digest for "${sanitize(brandName)}". Write 3-4 sentences summarising this week's activity in a professional, reassuring tone.
 
 Data:
 - Checks run this week: ${data.checksThisWeek}
-- Competitors detected this week: ${data.competitorsThisWeek.map(c => `${c.domain} (${c.count}x)`).join(', ') || 'None'}
+- Competitors detected this week: ${sanitize(data.competitorsThisWeek.map(c => `${c.domain} (${c.count}x)`).join(', ') || 'None', 500)}
 - Competitors last week: ${data.competitorsLastWeek}
-- New competitors (not seen before): ${data.newCompetitors.join(', ') || 'None'}
-- Competitors that stopped bidding: ${data.stoppedCompetitors.join(', ') || 'None'}
+- New competitors (not seen before): ${sanitize(data.newCompetitors.join(', ') || 'None', 500)}
+- Competitors that stopped bidding: ${sanitize(data.stoppedCompetitors.join(', ') || 'None', 500)}
 
 Guidelines:
 - Compare to last week (more/less/same activity)
@@ -223,10 +241,10 @@ export async function generateAdCopySuggestion(
   const { text } = await generateText({
     model: sonnet,
     maxOutputTokens: 200,
-    prompt: `You are a Google Ads copywriter. A brand "${brandName}"${brandDomain ? ` (${brandDomain})` : ''} has competitors bidding on their brand keyword. Write a defensive brand ad that will win back clicks.
+    prompt: `You are a Google Ads copywriter. A brand "${sanitize(brandName)}"${brandDomain ? ` (${sanitize(brandDomain)})` : ''} has competitors bidding on their brand keyword. Write a defensive brand ad that will win back clicks.
 
-Competitor ad headlines: ${competitorHeadlines.filter(Boolean).join(' | ') || 'Unknown'}
-Competitor ad descriptions: ${competitorDescriptions.filter(Boolean).join(' | ') || 'Unknown'}
+Competitor ad headlines: ${sanitize(competitorHeadlines.filter(Boolean).join(' | ') || 'Unknown', 500)}
+Competitor ad descriptions: ${sanitize(competitorDescriptions.filter(Boolean).join(' | ') || 'Unknown', 500)}
 
 Write ONE Google Ads responsive search ad for the brand to counter these competitors:
 - Headline (max 30 characters): should emphasise being the official/original brand
@@ -254,13 +272,13 @@ export async function generateCompetitiveLandscape(
   },
 ): Promise<string> {
   const competitorDetails = data.competitors.length > 0
-    ? data.competitors.map(c => `${c.domain} (seen ${c.count}x, avg position ${c.avgPosition ?? 'N/A'}${c.type ? `, type: ${c.type}` : ''})`).join('\n')
+    ? data.competitors.map(c => `${sanitize(c.domain)} (seen ${c.count}x, avg position ${c.avgPosition ?? 'N/A'}${c.type ? `, type: ${sanitize(c.type)}` : ''})`).join('\n')
     : 'No competitors detected'
 
   const { text } = await generateText({
     model: sonnet,
     maxOutputTokens: 500,
-    prompt: `You are a senior PPC analyst writing a competitive landscape report for "${brandName}" for ${data.monthName}.
+    prompt: `You are a senior PPC analyst writing a competitive landscape report for "${sanitize(brandName)}" for ${sanitize(data.monthName)}.
 
 Data:
 - Total SERP checks: ${data.totalChecks}
@@ -294,7 +312,7 @@ export async function analyzeBidTiming(
   const { text } = await generateText({
     model: haiku,
     maxOutputTokens: 150,
-    prompt: `Analyse when competitors bid on "${brandName}" brand keywords based on detection timestamps.
+    prompt: `Analyse when competitors bid on "${sanitize(brandName)}" brand keywords based on detection timestamps.
 
 Recent detections:
 ${summary}
