@@ -51,7 +51,7 @@ export default async function BrandDashboardLayout({
         trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt) : null}
         agencyManaged={brand.agencyManaged ?? false}
       />
-      <main className="flex-1 min-w-0 p-6">{children}</main>
+      <main id="main-content" className="flex-1 min-w-0 p-6">{children}</main>
     </div>
   )
 }

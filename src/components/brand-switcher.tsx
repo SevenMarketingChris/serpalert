@@ -50,6 +50,7 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
         className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
       >
         <span className="truncate">{currentBrandName}</span>
@@ -57,7 +58,12 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+        <div
+          className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') { setOpen(false); setQuery('') }
+          }}
+        >
           {/* Search input */}
           {brands.length > 1 && (
             <div className="p-2 border-b border-gray-100">
@@ -66,6 +72,7 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
                 <input
                   ref={searchRef}
                   type="text"
+                  aria-label="Search brands"
                   placeholder="Search brands..."
                   value={query}
                   onChange={e => setQuery(e.target.value)}
@@ -76,13 +83,15 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
           )}
 
           {/* Brand list */}
-          <div className="max-h-64 overflow-y-auto py-1">
+          <div role="listbox" className="max-h-64 overflow-y-auto py-1">
             {filtered.length === 0 ? (
               <p className="px-3 py-2 text-sm text-gray-400">No brands found</p>
             ) : (
               filtered.map((brand) => (
                 <button
                   key={brand.id}
+                  role="option"
+                  aria-selected={brand.id === currentBrandId}
                   onClick={() => selectBrand(brand.id)}
                   className={`flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-gray-50 ${
                     brand.id === currentBrandId

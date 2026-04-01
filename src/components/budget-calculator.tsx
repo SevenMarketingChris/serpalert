@@ -204,7 +204,7 @@ export function BudgetCalculator() {
       </div>
 
       <details className="text-xs text-slate-400">
-        <summary className="cursor-pointer font-mono uppercase tracking-widest hover:text-slate-300 transition-colors">
+        <summary className="cursor-pointer font-mono uppercase tracking-widest hover:text-slate-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
           Assumptions & methodology
         </summary>
         <div className="mt-3 space-y-2 pl-4 border-l-2 border-white/10">

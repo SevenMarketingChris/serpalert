@@ -88,10 +88,11 @@ export function AdminSettingsForm({
           <Input
             id="watchlistDomains"
             name="watchlistDomains"
+            aria-describedby="watchlist-help"
             defaultValue={watchlistDomains}
             placeholder="rival.com, competitor.co.uk"
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="watchlist-help" className="text-[11px] text-gray-400">
             Comma-separated list of competitor domains to prioritise. When these specific domains appear in SERP checks, they&apos;ll be flagged with higher priority in alerts and reports. Useful for tracking known competitors.
           </p>
         </div>

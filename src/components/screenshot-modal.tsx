@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Image from 'next/image'
+import { ExternalLink } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { isSafeUrl } from '@/lib/utils'
@@ -56,9 +57,10 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
             href={screenshotUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-primary hover:underline mt-1 inline-block"
+            className="text-xs text-primary hover:underline mt-1 inline-flex items-center"
           >
             Open full size
+            <ExternalLink className="inline h-3 w-3 ml-1" />
           </a>
         )}
       </DialogContent>

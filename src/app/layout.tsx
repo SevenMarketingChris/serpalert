@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 import { createPageMetadata, siteConfig } from "@/lib/metadata";
 import "./globals.css";
 
@@ -27,8 +28,12 @@ export const metadata: Metadata = {
   category: "Marketing",
   referrer: "origin-when-cross-origin",
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "48x48" }],
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
   },
+  other: [{ name: "theme-color", content: "#6366f1" }],
 };
 
 export default function RootLayout({
@@ -56,6 +61,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <div id="main-content">{children}</div>
+            <Toaster position="bottom-right" richColors closeButton />
           </ThemeProvider>
           <script
             type="application/ld+json"

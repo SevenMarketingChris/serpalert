@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { ExternalLink } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { isSafeUrl } from '@/lib/utils'
 import { formatDateTime } from '@/lib/time'
@@ -90,8 +91,9 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
               )}
               {ad.destinationUrl && isSafeUrl(ad.destinationUrl) ? (
                 <a href={ad.destinationUrl} target="_blank" rel="noopener noreferrer"
-                   className="font-mono text-xs text-primary/70 hover:text-primary hover:underline truncate block">
+                   className="font-mono text-xs text-primary/70 hover:text-primary hover:underline truncate inline-flex items-center">
                   {ad.destinationUrl}
+                  <ExternalLink className="inline h-3 w-3 ml-1 shrink-0" />
                 </a>
               ) : ad.destinationUrl ? (
                 <span className="font-mono text-xs text-muted-foreground truncate block">{ad.destinationUrl}</span>

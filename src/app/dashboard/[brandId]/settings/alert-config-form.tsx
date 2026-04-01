@@ -35,10 +35,11 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
           <Input
             id="slackWebhookUrl"
             name="slackWebhookUrl"
+            aria-describedby="slack-help"
             defaultValue={slackWebhookUrl}
             placeholder="https://hooks.slack.com/..."
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="slack-help" className="text-[11px] text-gray-400">
             Paste a Slack incoming webhook URL to receive real-time alerts in your chosen Slack channel. To create one, go to your Slack workspace &gt; Apps &gt; Incoming Webhooks &gt; Add to Slack. Leave blank to disable Slack alerts.
           </p>
         </div>
@@ -48,12 +49,13 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
           <Input
             id="alertThreshold"
             name="alertThreshold"
+            aria-describedby="threshold-help"
             type="number"
             min={1}
             defaultValue={initialThreshold}
             placeholder="1"
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="threshold-help" className="text-[11px] text-gray-400">
             The minimum number of competitors that must be detected before an alert is sent. Set to 1 to be notified about every competitor, or increase to reduce noise if you only care about multiple competitors bidding simultaneously.
           </p>
         </div>

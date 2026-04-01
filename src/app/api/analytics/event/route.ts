@@ -5,7 +5,8 @@ import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
 import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
-  const { ok } = rateLimit('analytics-event', { limit: 100, windowMs: 60_000 })
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const { ok } = rateLimit(`analytics-event-${ip}`, { limit: 100, windowMs: 60_000 })
   if (!ok) {
     return NextResponse.json({ error: 'Rate limited' }, { status: 429 })
   }

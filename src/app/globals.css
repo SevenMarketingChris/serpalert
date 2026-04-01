@@ -288,10 +288,12 @@ body {
   /* Force white background, black text */
   * {
     background-color: white !important;
-    color: black !important;
     box-shadow: none !important;
     text-shadow: none !important;
     border-color: #aaa !important;
+  }
+  body, h1, h2, h3, h4, p, span, li, td, th {
+    color: black !important;
   }
   /* Page breaks between sections */
   section,
@@ -319,5 +321,21 @@ body {
   /* Ensure good margins */
   body {
     margin: 0.75in;
+  }
+}
+
+/* ── Disabled Button Styling ── */
+button:disabled, .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

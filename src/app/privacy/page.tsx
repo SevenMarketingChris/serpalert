@@ -1,4 +1,12 @@
 import Link from "next/link";
+import { createPageMetadata } from "@/lib/metadata";
+
+export const metadata = createPageMetadata({
+  title: "Privacy Policy",
+  description:
+    "How SerpAlert collects, uses, and protects your data under UK GDPR.",
+  path: "/privacy",
+});
 
 export default function PrivacyPolicyPage() {
   return (

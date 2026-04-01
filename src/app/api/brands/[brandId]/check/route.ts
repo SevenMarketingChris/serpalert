@@ -7,6 +7,7 @@ import { uploadScreenshot } from '@/lib/blob-storage'
 import { sendNewCompetitorAlert } from '@/lib/slack'
 import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
+import { rateLimit } from '@/lib/rate-limit'
 const MANUAL_CHECK_COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -37,6 +38,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
     authorizeBrandAccess(brand, userId, isAdmin)
   } catch {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  // Per-user rate limit: 10 manual checks per hour across all brands
+  const { ok: userOk } = rateLimit(`serp-check-user-${userId}`, { limit: 10, windowMs: 3600_000 })
+  if (!userOk) {
+    return NextResponse.json({ error: 'Too many checks. Please wait before checking more brands.' }, { status: 429 })
   }
 
   // DB-backed cooldown: 1 manual check per 4 hours per brand

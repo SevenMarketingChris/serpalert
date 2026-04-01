@@ -16,11 +16,15 @@ export default function DashboardError({
 
   return (
     <div className="flex items-center justify-center max-w-5xl py-12">
-      <div className="text-center space-y-4 max-w-md px-6">
+      <div role="alert" className="text-center space-y-4 max-w-md px-6">
         <p className="text-xs uppercase tracking-widest text-tech-blue font-mono">Error</p>
         <h1 className="text-2xl font-bold">Something went wrong</h1>
         <p className="text-muted-foreground text-sm">{error.message}</p>
-        <Button onClick={reset} variant="outline">Try again</Button>
+        <div className="flex items-center justify-center gap-3">
+          <Button onClick={reset} variant="outline">Try again</Button>
+          <Button onClick={() => window.location.href = '/'} variant="outline">Go Home</Button>
+          <Button onClick={() => window.location.href = '/dashboard'} variant="outline">Dashboard</Button>
+        </div>
       </div>
     </div>
   );

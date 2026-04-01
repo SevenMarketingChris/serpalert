@@ -1,4 +1,12 @@
 import Link from "next/link";
+import { createPageMetadata } from "@/lib/metadata";
+
+export const metadata = createPageMetadata({
+  title: "Terms of Service",
+  description:
+    "Terms and conditions for using SerpAlert brand keyword monitoring.",
+  path: "/terms",
+});
 
 export default function TermsOfServicePage() {
   return (

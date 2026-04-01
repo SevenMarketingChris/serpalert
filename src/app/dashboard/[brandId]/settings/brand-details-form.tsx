@@ -59,11 +59,12 @@ export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit
           <textarea
             id="keywords"
             name="keywords"
+            aria-describedby="keywords-help"
             className="flex min-h-[100px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             defaultValue={keywords.join('\n')}
             placeholder="One keyword per line"
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="keywords-help" className="text-[11px] text-gray-400">
             The brand keywords you want to monitor. One per line. These are the search terms we check for competitor ads — typically your brand name and common misspellings. You can use up to {keywordLimit} keywords on your current plan.
           </p>
         </div>

@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import dynamic from 'next/dynamic'
 import { ManualCheckButton } from '@/components/manual-check-button'
 import { ActivityFeed } from '@/components/activity-feed'
-import { TrendChart } from '@/components/trend-chart'
+const TrendChart = dynamic(() => import('@/components/trend-chart').then(m => ({ default: m.TrendChart })), { ssr: false })
 import { RecentScan } from '@/components/recent-scan'
 import { CompetitorSummary } from '@/components/competitor-summary'
 import { SparklineBars } from '@/components/sparkline-bars'
@@ -18,8 +19,10 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const isAdmin = await checkIsAdmin()
-  const brand = await getBrandById(brandId)
+  const [isAdmin, brand] = await Promise.all([
+    checkIsAdmin(),
+    getBrandById(brandId),
+  ])
   if (!brand) notFound()
   try {
     authorizeBrandAccess(brand, userId, isAdmin)

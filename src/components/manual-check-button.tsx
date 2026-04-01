@@ -116,6 +116,7 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
         <button
           onClick={handleCheck}
           disabled={status === 'running' || onCooldown}
+          aria-busy={status === 'running'}
           className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-mono text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-sm"
         >
           {status === 'running' ? (
@@ -151,7 +152,7 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
         </p>
       )}
       {result && (
-        <p className={`text-[11px] font-mono ${status === 'error' ? 'text-red-500' : 'text-emerald-600'}`}>
+        <p aria-live="polite" className={`text-[11px] font-mono ${status === 'error' ? 'text-red-500' : 'text-emerald-600'}`}>
           {result}
         </p>
       )}

@@ -44,12 +44,13 @@ export function SubscribeButton({ brandId }: { brandId: string }) {
       <Button
         onClick={handleSubscribe}
         disabled={loading}
+        aria-busy={loading}
         size="sm"
         className="bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap"
       >
         {loading ? 'Loading...' : 'Subscribe — £149/mo'}
       </Button>
-      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
+      {error && <p aria-live="polite" className="text-xs text-destructive mt-1">{error}</p>}
     </div>
   )
 }

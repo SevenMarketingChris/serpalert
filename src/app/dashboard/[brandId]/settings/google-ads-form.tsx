@@ -34,10 +34,11 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
           <Input
             id="googleAdsCustomerId"
             name="googleAdsCustomerId"
+            aria-describedby="gads-id-help"
             defaultValue={googleAdsCustomerId}
             placeholder="123-456-7890"
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="gads-id-help" className="text-[11px] text-gray-400">
             Your Google Ads account ID in the format 123-456-7890. Find it in the top-right corner of your Google Ads dashboard. This connects SerpAlert to your ad account for campaign automation and auction insights.
           </p>
         </div>
@@ -47,10 +48,11 @@ export function GoogleAdsForm({ brandId, googleAdsCustomerId, brandCampaignId }:
           <Input
             id="brandCampaignId"
             name="brandCampaignId"
+            aria-describedby="campaign-id-help"
             defaultValue={brandCampaignId}
             placeholder="e.g. 12345678"
           />
-          <p className="text-[11px] text-gray-400">
+          <p id="campaign-id-help" className="text-[11px] text-gray-400">
             The numeric ID of your brand campaign in Google Ads. Find it by clicking your brand campaign — the ID is in the URL. When set, SerpAlert will automatically enable this campaign when competitors are detected bidding on your brand, and pause it when no competitors are found — so you only spend on brand defence when you need to.
           </p>
         </div>

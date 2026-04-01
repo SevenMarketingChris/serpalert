@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getStripe } from '@/lib/stripe'
 import { getBrandById } from '@/lib/db/queries'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import type Stripe from 'stripe'
 import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
@@ -28,8 +29,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
   }
 
-  const brand = await getBrandById(brandId)
-  if (!brand || brand.userId !== userId) {
+  const [brand, isAdmin] = await Promise.all([
+    getBrandById(brandId),
+    checkIsAdmin(),
+  ])
+  if (!brand) {
+    return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  }
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
 
