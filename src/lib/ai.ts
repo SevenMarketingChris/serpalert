@@ -1,7 +1,8 @@
 import { generateText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 
-const model = anthropic('claude-haiku-4-5-20251001')
+const haiku = anthropic('claude-haiku-4-5-20251001')
+const sonnet = anthropic('claude-sonnet-4-6-20250116')
 
 export async function generateCompetitorSummary(
   brandName: string,
@@ -13,7 +14,7 @@ export async function generateCompetitorSummary(
   firstSeenDate: string,
 ): Promise<string> {
   const { text } = await generateText({
-    model,
+    model: haiku,
     maxOutputTokens: 200,
     prompt: `You are a brand protection analyst. Write a brief 2-3 sentence summary about this competitor ad detection.
 
@@ -44,7 +45,7 @@ export async function generateMonthlyInsights(
     : 'None detected'
 
   const { text } = await generateText({
-    model,
+    model: haiku,
     maxOutputTokens: 300,
     prompt: `You are a brand protection analyst writing a monthly summary for a client. Write 3-4 sentences summarising this month's brand keyword monitoring.
 
@@ -66,7 +67,7 @@ export async function generateAdCopyAnalysis(
   descriptions: string[],
 ): Promise<string> {
   const { text } = await generateText({
-    model,
+    model: haiku,
     maxOutputTokens: 200,
     prompt: `You are a PPC strategist. Analyse this competitor's ad copy targeting the brand "${brandName}" and explain their strategy in 2-3 sentences.
 
@@ -86,7 +87,7 @@ export async function generateActionRecommendation(
   brandCampaignActive: boolean,
 ): Promise<string> {
   const { text } = await generateText({
-    model,
+    model: haiku,
     maxOutputTokens: 150,
     prompt: `You are a PPC strategist advising a brand using SerpAlert — a tool that monitors competitor ads on brand keywords. The product's core message is: you should NOT run brand campaigns unless competitors are actively bidding on your brand name.
 
@@ -101,6 +102,204 @@ Give ONE clear, actionable recommendation. Rules:
 - If they don't have a brand campaign set up and competitors are active: suggest setting one up to defend their position.
 - If they don't have a brand campaign and no competitors: reassure them they're protected and saving money by not running brand ads.
 Be direct, one sentence only.`,
+  })
+  return text
+}
+
+// --- New AI features ---
+
+export async function triageAlert(
+  brandName: string,
+  competitorDomain: string,
+  position: number | null,
+  keyword: string,
+): Promise<'urgent' | 'monitor' | 'ignore'> {
+  const { text } = await generateText({
+    model: haiku,
+    maxOutputTokens: 10,
+    prompt: `Classify this competitor ad alert for the brand "${brandName}".
+
+Competitor: ${competitorDomain}
+Ad position: ${position ?? 'unknown'}
+Keyword: "${keyword}"
+
+Rules:
+- "urgent": competitor is in position 1-2, or is a direct industry rival
+- "monitor": competitor is in position 3+, or is a marketplace/aggregator (e.g. comparison sites)
+- "ignore": competitor domain looks unrelated to the brand's industry
+
+Reply with exactly one word: urgent, monitor, or ignore.`,
+  })
+  const cleaned = text.trim().toLowerCase()
+  if (cleaned === 'urgent' || cleaned === 'monitor' || cleaned === 'ignore') return cleaned
+  return 'monitor' // default if unexpected
+}
+
+export async function classifyCompetitorIntent(
+  brandName: string,
+  competitorDomain: string,
+  adHeadline: string | null,
+  adDescription: string | null,
+): Promise<{ type: 'direct_rival' | 'marketplace' | 'unrelated'; confidence: string }> {
+  const { text } = await generateText({
+    model: haiku,
+    maxOutputTokens: 50,
+    prompt: `Classify this competitor bidding on the brand "${brandName}".
+
+Competitor domain: ${competitorDomain}
+Their ad headline: ${adHeadline || 'Unknown'}
+Their ad description: ${adDescription || 'Unknown'}
+
+Categories:
+- "direct_rival": a direct competitor offering a similar product/service
+- "marketplace": an aggregator, comparison site, or marketplace listing multiple providers
+- "unrelated": domain appears unrelated to the brand's industry
+
+Reply in format: TYPE|CONFIDENCE
+Example: direct_rival|high
+or: marketplace|medium`,
+  })
+  const parts = text.trim().toLowerCase().split('|')
+  const type = (['direct_rival', 'marketplace', 'unrelated'].includes(parts[0]) ? parts[0] : 'unrelated') as 'direct_rival' | 'marketplace' | 'unrelated'
+  const confidence = parts[1] || 'medium'
+  return { type, confidence }
+}
+
+export async function suggestKeyword(
+  brandName: string,
+  domain: string | null,
+): Promise<string> {
+  const { text } = await generateText({
+    model: haiku,
+    maxOutputTokens: 50,
+    prompt: `A user is setting up brand keyword monitoring for "${brandName}"${domain ? ` (website: ${domain})` : ''}.
+
+Suggest the single best keyword to monitor for competitor ads. This should be the most common way customers search for this brand. Usually it's just the brand name itself.
+
+Reply with only the keyword, nothing else.`,
+  })
+  return text.trim()
+}
+
+export async function generateWeeklyDigest(
+  brandName: string,
+  data: {
+    checksThisWeek: number
+    competitorsThisWeek: { domain: string; count: number }[]
+    competitorsLastWeek: number
+    newCompetitors: string[]
+    stoppedCompetitors: string[]
+  },
+): Promise<string> {
+  const { text } = await generateText({
+    model: sonnet,
+    maxOutputTokens: 300,
+    prompt: `You are a brand protection analyst writing a weekly email digest for "${brandName}". Write 3-4 sentences summarising this week's activity in a professional, reassuring tone.
+
+Data:
+- Checks run this week: ${data.checksThisWeek}
+- Competitors detected this week: ${data.competitorsThisWeek.map(c => `${c.domain} (${c.count}x)`).join(', ') || 'None'}
+- Competitors last week: ${data.competitorsLastWeek}
+- New competitors (not seen before): ${data.newCompetitors.join(', ') || 'None'}
+- Competitors that stopped bidding: ${data.stoppedCompetitors.join(', ') || 'None'}
+
+Guidelines:
+- Compare to last week (more/less/same activity)
+- Highlight new competitors by name if any appeared
+- Note if any stopped bidding (positive development)
+- End with a clear action: "No action needed" or "Keep brand campaign active" etc
+- Never suggest launching a brand campaign if no competitors are active
+- Keep it concise and professional — this goes directly in an email`,
+  })
+  return text
+}
+
+export async function generateAdCopySuggestion(
+  brandName: string,
+  competitorHeadlines: string[],
+  competitorDescriptions: string[],
+  brandDomain: string | null,
+): Promise<{ headline: string; description: string }> {
+  const { text } = await generateText({
+    model: sonnet,
+    maxOutputTokens: 200,
+    prompt: `You are a Google Ads copywriter. A brand "${brandName}"${brandDomain ? ` (${brandDomain})` : ''} has competitors bidding on their brand keyword. Write a defensive brand ad that will win back clicks.
+
+Competitor ad headlines: ${competitorHeadlines.filter(Boolean).join(' | ') || 'Unknown'}
+Competitor ad descriptions: ${competitorDescriptions.filter(Boolean).join(' | ') || 'Unknown'}
+
+Write ONE Google Ads responsive search ad for the brand to counter these competitors:
+- Headline (max 30 characters): should emphasise being the official/original brand
+- Description (max 90 characters): should highlight what makes the brand better than competitors
+
+Reply in format:
+HEADLINE: [your headline]
+DESCRIPTION: [your description]`,
+  })
+  const headlineMatch = text.match(/HEADLINE:\s*(.+)/i)
+  const descMatch = text.match(/DESCRIPTION:\s*(.+)/i)
+  return {
+    headline: headlineMatch?.[1]?.trim() || `${brandName} — Official Site`,
+    description: descMatch?.[1]?.trim() || `The original ${brandName}. Don't settle for imitators.`,
+  }
+}
+
+export async function generateCompetitiveLandscape(
+  brandName: string,
+  data: {
+    totalChecks: number
+    competitors: { domain: string; count: number; avgPosition: number | null; type?: string }[]
+    keywordsMonitored: number
+    monthName: string
+  },
+): Promise<string> {
+  const competitorDetails = data.competitors.length > 0
+    ? data.competitors.map(c => `${c.domain} (seen ${c.count}x, avg position ${c.avgPosition ?? 'N/A'}${c.type ? `, type: ${c.type}` : ''})`).join('\n')
+    : 'No competitors detected'
+
+  const { text } = await generateText({
+    model: sonnet,
+    maxOutputTokens: 500,
+    prompt: `You are a senior PPC analyst writing a competitive landscape report for "${brandName}" for ${data.monthName}.
+
+Data:
+- Total SERP checks: ${data.totalChecks}
+- Keywords monitored: ${data.keywordsMonitored}
+- Competitors detected:
+${competitorDetails}
+
+Write a 4-6 sentence executive summary covering:
+1. Overall threat level (low/medium/high) based on competitor count and positions
+2. Who the main threats are and their bidding strategy
+3. Month-over-month trend if apparent
+4. Specific recommendation (keep campaign paused, activate defence, adjust bids, etc)
+5. Never recommend running brand campaigns if no competitors are active
+
+Write in professional analyst tone. This will be included in a PDF report sent to the brand owner.`,
+  })
+  return text
+}
+
+export async function analyzeBidTiming(
+  brandName: string,
+  checkTimestamps: { domain: string; checkedAt: string }[],
+): Promise<string> {
+  const summary = checkTimestamps.reduce((acc, c) => {
+    const hour = new Date(c.checkedAt).getUTCHours()
+    const day = new Date(c.checkedAt).toLocaleDateString('en-GB', { weekday: 'long' })
+    acc.push(`${c.domain} seen at ${hour}:00 UTC on ${day}`)
+    return acc
+  }, [] as string[]).slice(0, 50).join('\n')
+
+  const { text } = await generateText({
+    model: haiku,
+    maxOutputTokens: 150,
+    prompt: `Analyse when competitors bid on "${brandName}" brand keywords based on detection timestamps.
+
+Recent detections:
+${summary}
+
+In 2-3 sentences, describe any patterns: Do they bid more on weekdays vs weekends? Morning vs evening? Are there specific days with more activity? If you can identify a pattern, suggest when the brand should schedule their defensive campaign.`,
   })
   return text
 }
