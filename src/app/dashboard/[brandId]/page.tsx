@@ -272,17 +272,26 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         </div>
       )}
 
-      {/* Getting Started card for new brands */}
+      {/* Getting Started — encourage first scan */}
       {checks.length === 0 && (
-        <div className="bg-indigo-50/60 backdrop-blur-lg border border-indigo-200/40 rounded-2xl p-5 shadow-lg shadow-indigo-100/10 space-y-3">
-          <h3 className="font-semibold text-indigo-900">Getting started</h3>
-          <p className="text-sm text-indigo-700">Your brand has been created and is queued for monitoring. Here&apos;s what happens next:</p>
-          <ol className="list-decimal list-inside text-sm text-indigo-600 space-y-1.5">
-            <li>Your first SERP check will run within the hour automatically</li>
-            <li>We&apos;ll capture a screenshot of the Google results page for each keyword</li>
-            <li>If any competitors are bidding on your brand, you&apos;ll see them here</li>
-            <li>Set up <a href={`/dashboard/${brandId}/settings`} className="underline font-medium">Slack alerts</a> to get notified instantly</li>
-          </ol>
+        <div className="bg-gradient-to-r from-indigo-50/80 to-violet-50/80 backdrop-blur-lg border border-indigo-200/40 rounded-2xl p-6 shadow-lg shadow-indigo-100/10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-indigo-900">Run your first scan</h3>
+              <p className="text-sm text-indigo-700 max-w-md">
+                Your brand is set up and ready to go. Run your first SERP check now to see if any competitors are bidding on your brand name — it takes about 30 seconds.
+              </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+                <span className="text-[11px] text-indigo-500">We&apos;ll check Google for &quot;{brand.keywords[0] || brand.name}&quot;</span>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <ManualCheckButton brandId={brandId} lastCheckAt={null} />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-indigo-200/30">
+            <p className="text-xs text-indigo-400">After your first scan, automatic hourly checks will begin. Set up <a href={`/dashboard/${brandId}/settings`} className="underline font-medium text-indigo-500 hover:text-indigo-700">Slack alerts</a> to get notified instantly when competitors appear.</p>
+          </div>
         </div>
       )}
 
