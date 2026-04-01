@@ -99,7 +99,7 @@ export async function createBrandForUser(
   // Enforce brand limit
   const currentCount = await getUserBrandCount(userId)
   if (currentCount >= PLAN_LIMITS.free.brands) {
-    throw new Error('Brand limit reached for your plan')
+    throw new Error('You can only create 1 brand on your current plan. Contact us to add more.')
   }
   const baseSlug = data.name
     .toLowerCase()
@@ -323,8 +323,10 @@ export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck |
 export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<string, SerpCheck>> {
   if (brandIds.length === 0) return new Map()
 
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
   const rows = await db.select().from(serpChecks)
-    .where(inArray(serpChecks.brandId, brandIds))
+    .where(and(inArray(serpChecks.brandId, brandIds), gte(serpChecks.checkedAt, sevenDaysAgo)))
     .orderBy(desc(serpChecks.checkedAt))
 
   const latestByBrand = new Map<string, SerpCheck>()

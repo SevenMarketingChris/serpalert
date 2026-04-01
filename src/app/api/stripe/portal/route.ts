@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getStripe } from '@/lib/stripe'
 import { getBrandById } from '@/lib/db/queries'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -23,7 +24,16 @@ export async function POST(request: Request) {
   }
 
   const brand = await getBrandById(brandId)
-  if (!brand || brand.userId !== userId || !brand.stripeCustomerId) {
+  if (!brand) {
+    return NextResponse.json({ error: 'No billing account found' }, { status: 404 })
+  }
+  const isAdmin = await checkIsAdmin()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return NextResponse.json({ error: 'No billing account found' }, { status: 404 })
+  }
+  if (!brand.stripeCustomerId) {
     return NextResponse.json({ error: 'No billing account found' }, { status: 404 })
   }
 

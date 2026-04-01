@@ -190,7 +190,7 @@ export function DashboardCalculator({ initialBrandSpend = 2000, initialBrandRoas
             }`}>
               <div className="flex items-center gap-2">
                 <TrendingUp className={`w-5 h-5 ${isPositive ? 'text-emerald-600' : isNegative ? 'text-amber-600' : 'text-gray-500'}`} />
-                <p className="text-[10px] uppercase tracking-widest font-mono font-semibold ${isPositive ? 'text-emerald-600' : isNegative ? 'text-amber-600' : 'text-gray-500'}">
+                <p className={`text-[10px] uppercase tracking-widest font-mono font-semibold ${isPositive ? 'text-emerald-600' : isNegative ? 'text-amber-600' : 'text-gray-500'}`}>
                   Net monthly impact
                 </p>
               </div>

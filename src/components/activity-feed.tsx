@@ -144,7 +144,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
     <div className="space-y-3">
       <h2 className="text-sm font-semibold font-mono">Activity Feed</h2>
 
-      {visible.map((run, i) => (
+      {visible.map((run) => (
         <ScanRunCard
           key={run.checks[0]?.id ?? run.timestamp}
           run={run}

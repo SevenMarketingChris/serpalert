@@ -109,6 +109,9 @@ export async function GET(
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Content-Disposition': `inline; filename="evidence-${check.keyword}-${check.id.slice(0, 8)}.html"`,
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; img-src https://*.public.blob.vercel-storage.com; frame-ancestors 'none'",
     },
   })
 }

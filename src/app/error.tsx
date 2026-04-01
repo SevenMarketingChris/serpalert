@@ -21,7 +21,7 @@ export default function GlobalError({
           <div role="alert" className="text-center space-y-4 max-w-md px-6">
             <p className="text-xs uppercase tracking-widest text-tech-blue font-mono">System Error</p>
             <h1 className="text-2xl font-bold text-gradient-tech">Something went wrong</h1>
-            <p className="text-muted-foreground text-sm">{error.message || 'An unexpected error occurred'}</p>
+            <p className="text-muted-foreground text-sm">An unexpected error occurred. Please try again.</p>
             <div className="flex items-center justify-center gap-3">
               <Button onClick={reset} variant="outline">Reload</Button>
               <Button onClick={() => window.location.href = '/'} variant="outline">Go Home</Button>

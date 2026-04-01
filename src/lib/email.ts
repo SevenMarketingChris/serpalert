@@ -1,6 +1,10 @@
 import { Resend } from 'resend'
 import { escapeHtml } from '@/lib/utils'
 
+function sanitizeSubject(str: string): string {
+  return str.replace(/[\r\n]+/g, ' ').trim()
+}
+
 let _resend: Resend | null = null
 
 function getResend(): Resend {
@@ -16,7 +20,7 @@ export async function sendWelcomeEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Welcome to SerpAlert — ${brandName} is now being monitored`,
+    subject: sanitizeSubject(`Welcome to SerpAlert — ${escapeHtml(brandName)} is now being monitored`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Welcome to SerpAlert</h1>
@@ -78,7 +82,7 @@ export async function sendNewCompetitorEmail(to: string, brandName: string, comp
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `New competitor detected on "${escapeHtml(brandName)}" — ${competitorDomain}`,
+    subject: sanitizeSubject(`New competitor detected on "${escapeHtml(brandName)}" — ${competitorDomain}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">New Competitor Alert</h1>
@@ -117,7 +121,7 @@ export async function sendTrialExpiredEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Your SerpAlert trial has expired — ${escapeHtml(brandName)}`,
+    subject: sanitizeSubject(`Your SerpAlert trial has expired — ${escapeHtml(brandName)}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Your trial has ended</h1>
@@ -145,7 +149,7 @@ export async function sendPaymentFailedEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Payment failed for ${escapeHtml(brandName)} — action required`,
+    subject: sanitizeSubject(`Payment failed for ${escapeHtml(brandName)} — action required`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Payment failed</h1>
@@ -194,7 +198,7 @@ export async function sendWeeklyDigestEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Weekly Update — ${escapeHtml(brandName)} — ${data.competitorsThisWeek} competitor${data.competitorsThisWeek !== 1 ? 's' : ''} detected`,
+    subject: sanitizeSubject(`Weekly Update — ${escapeHtml(brandName)} — ${data.competitorsThisWeek} competitor${data.competitorsThisWeek !== 1 ? 's' : ''} detected`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Weekly Brand Protection Update</h1>
@@ -270,7 +274,7 @@ export async function sendMonthlyReport(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Monthly Report — ${escapeHtml(brandName)} — ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`,
+    subject: sanitizeSubject(`Monthly Report — ${escapeHtml(brandName)} — ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Monthly Report</h1>
@@ -377,7 +381,7 @@ export async function sendAuditReportEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Brand Audit: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} found on "${escapeHtml(keyword)}"`,
+    subject: sanitizeSubject(`Brand Audit: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} found on "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Your Brand Audit Report</h1>
@@ -428,7 +432,7 @@ export async function sendWeeklyAuditEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Weekly Update: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} on "${escapeHtml(keyword)}"`,
+    subject: sanitizeSubject(`Weekly Update: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} on "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Weekly Brand Check</h1>
@@ -455,7 +459,7 @@ export async function sendAuditMonitoringEndedEmail(to: string, keyword: string)
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
-    subject: `Free monitoring ended for "${escapeHtml(keyword)}"`,
+    subject: sanitizeSubject(`Free monitoring ended for "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
         <h1 style="font-size: 20px; color: #111;">Your free monitoring has ended</h1>
