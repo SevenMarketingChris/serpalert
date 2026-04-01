@@ -11,12 +11,23 @@ import {
 } from "lucide-react";
 import { BudgetCalculator } from "@/components/budget-calculator";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
+import { MarketingCta } from "@/components/marketing-cta";
+import { MarketingFooter } from "@/components/marketing-footer";
+import { MarketingHeader } from "@/components/marketing-header";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata = {
-  title: "SerpAlert — Block Competitor Brand Bidding",
+export const metadata = createPageMetadata({
+  title: "Block Competitor Brand Bidding",
   description:
     "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
-};
+  path: "/",
+  keywords: [
+    "brand bidding monitoring",
+    "competitor brand ads",
+    "brand protection software",
+    "google ads brand monitoring",
+  ],
+});
 
 const saasJsonLd = `{
   "@context": "https://schema.org",
@@ -46,34 +57,7 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: saasJsonLd }}
       />
-      {/* Nav */}
-      <nav className="border-b border-border bg-card px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <span className="text-gradient-tech font-extrabold text-xl">
-            SerpAlert
-          </span>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/sign-up"
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Start Free Trial
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingHeader />
 
       {/* Hero */}
       <section className="bg-background">
@@ -92,16 +76,22 @@ export default function HomePage() {
             customers. SerpAlert watches your brand keyword every hour and
             alerts you the moment a competitor moves in.
           </p>
-          <div className="mt-10 flex flex-col items-center gap-3">
+          <div className="mt-10 flex flex-col items-center gap-4">
             <Link
-              href="/sign-up"
+              href="/audit"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Start Your Free Trial
+              Run Free Brand Audit
               <ArrowRight className="h-4 w-4" />
             </Link>
+            <Link
+              href="/sign-up"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card"
+            >
+              Start Your Free Trial
+            </Link>
             <span className="text-sm text-muted-foreground">
-              No credit card required
+              Free audit first. Trial when you are ready for hourly monitoring.
             </span>
           </div>
         </div>
@@ -308,39 +298,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA footer */}
-      <section className="bg-card border-t border-border">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            Reclaim your brand budget today
-          </h2>
-          <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Stop wasting money on brand defence. Let SerpAlert watch your back
-            while you focus on growth.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Start Your Free Trial
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <span className="text-sm text-muted-foreground">
-              7-day free trial &middot; No credit card required
-            </span>
-          </div>
-          <div className="mt-8 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <span>&middot;</span>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </section>
+      <MarketingCta
+        title="Reclaim your brand budget today"
+        description="Start with a free audit to see whether competitors are actually bidding on your brand. Move to the trial when you want hourly monitoring and alerts."
+        note="7-day free trial. No credit card required."
+      />
+      <MarketingFooter />
       <ExitIntentPopup />
     </div>
   );

@@ -1,9 +1,13 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import { MarketingCta } from '@/components/marketing-cta'
+import { MarketingFooter } from '@/components/marketing-footer'
+import { MarketingHeader } from '@/components/marketing-header'
 import { getPostBySlug, getAllSlugs } from '@/lib/blog'
 import { BlogContent } from './blog-content'
 import type { Metadata } from 'next'
+import { absoluteUrl, createPageMetadata } from '@/lib/metadata'
 
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }))
@@ -13,8 +17,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const post = getPostBySlug(slug)
   if (!post) return {}
+
+  const pageMetadata = createPageMetadata({
+    title: post.title,
+    description: post.description,
+    path: `/blog/${post.slug}`,
+    type: 'article',
+    publishedTime: post.date,
+  })
+
   return {
-    title: `${post.title} — SerpAlert`,
+    ...pageMetadata,
+    authors: [{ name: post.author }],
+    other: {
+      'article:published_time': post.date,
+      'article:author': post.author,
+    },
+    alternates: {
+      canonical: absoluteUrl(`/blog/${post.slug}`),
+    },
+    title: post.title,
     description: post.description,
   }
 }
@@ -26,18 +48,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <Link href="/">
-            <span className="text-gradient-tech font-extrabold text-xl">SerpAlert</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/blog" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Blog</Link>
-            <Link href="/audit" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Free Audit</Link>
-            <Link href="/sign-up" className="inline-flex h-8 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">Start Free Trial</Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingHeader />
 
       <article className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-2xl">
@@ -60,31 +71,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           <BlogContent content={post.content} />
 
-          <div className="mt-16 rounded-xl bg-indigo-50 border border-indigo-100 p-8 text-center">
-            <h3 className="text-xl font-bold text-gray-900">
-              Are competitors bidding on your brand right now?
-            </h3>
-            <p className="mt-2 text-sm text-gray-600">
-              Run a free brand audit — takes 10 seconds, no signup required.
-            </p>
-            <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/audit" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-                Free Brand Audit <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/calculator" className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
-                or calculate your brand campaign waste →
-              </Link>
-            </div>
+          <div className="mt-16">
+            <MarketingCta
+              title="See whether this problem is live on your brand"
+              description="Run the free audit to check your keyword right now, or use the calculator if you want to quantify the cost of staying defensive."
+              secondaryHref="/calculator"
+              secondaryLabel="Calculate brand campaign waste"
+            />
           </div>
         </div>
       </article>
-
-      <footer className="border-t border-gray-200 bg-gray-50 px-6 py-8">
-        <div className="mx-auto max-w-5xl flex items-center justify-center gap-6 text-sm text-gray-400">
-          <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-gray-600 transition-colors">Terms</Link>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   )
 }

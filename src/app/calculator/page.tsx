@@ -1,46 +1,27 @@
 import Link from "next/link";
-import { ArrowRight, Eye, Bell, TrendingUp } from "lucide-react";
+import { Eye, Bell, TrendingUp } from "lucide-react";
+import { MarketingCta } from "@/components/marketing-cta";
+import { MarketingFooter } from "@/components/marketing-footer";
+import { MarketingHeader } from "@/components/marketing-header";
 import { WalkthroughCalculator } from "@/components/walkthrough-calculator";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata = {
-  title: "Savings Calculator — SerpAlert",
+export const metadata = createPageMetadata({
+  title: "Brand Campaign Savings Calculator",
   description:
     "Calculate how much you're wasting on Google Ads brand campaigns. See what happens when you redirect that budget into high-ROI non-brand campaigns.",
-};
+  path: "/calculator",
+  keywords: [
+    "brand campaign calculator",
+    "google ads brand spend calculator",
+    "brand bidding savings calculator",
+  ],
+});
 
 export default function CalculatorPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <nav className="border-b border-border bg-card px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <Link href="/">
-            <span className="text-gradient-tech font-extrabold text-xl">
-              SerpAlert
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/sign-up"
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Start Free Trial
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingHeader />
 
       {/* Hero */}
       <section className="bg-background">
@@ -216,48 +197,12 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-card border-t border-border">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            Ready to stop wasting brand budget?
-          </h2>
-          <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Find out if competitors are actually bidding on your brand — or if
-            you have been paying to defend against nothing.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/audit"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Check if competitors are bidding on your brand
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground hover:bg-card transition-colors"
-            >
-              Start your 7-day free trial
-            </Link>
-          </div>
-          <div className="mt-8 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-            <Link
-              href="/privacy"
-              className="hover:text-foreground transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <span>&middot;</span>
-            <Link
-              href="/terms"
-              className="hover:text-foreground transition-colors"
-            >
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </section>
+      <MarketingCta
+        title="Ready to stop wasting brand budget?"
+        description="Use the audit to see whether competitor bidding is the real threat. Start the trial when you want SerpAlert watching every hour."
+        primaryLabel="Check your brand with a free audit"
+      />
+      <MarketingFooter />
     </div>
   );
 }

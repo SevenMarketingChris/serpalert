@@ -117,6 +117,12 @@ See `.env.example` for the full list. Critical variables that must be set:
 
 Deployed on Vercel. Push to `main` triggers automatic deployment.
 
+Production auth requirement:
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` must be a Clerk live key (`pk_live_...`)
+- `CLERK_SECRET_KEY` must be a Clerk live key (`sk_live_...`)
+- production should not rely on `*.clerk.accounts.dev` assets or auth flows
+
 ```bash
 # Or deploy manually
 npx vercel --prod

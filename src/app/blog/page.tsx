@@ -1,11 +1,21 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { MarketingCta } from '@/components/marketing-cta'
+import { MarketingFooter } from '@/components/marketing-footer'
+import { MarketingHeader } from '@/components/marketing-header'
 import { getAllPosts } from '@/lib/blog'
+import { createPageMetadata } from '@/lib/metadata'
 
-export const metadata = {
-  title: 'Blog — SerpAlert',
+export const metadata = createPageMetadata({
+  title: 'Blog',
   description: 'Guides on brand bidding, Google Ads brand protection, competitor ad monitoring, and saving wasted brand campaign spend.',
-}
+  path: '/blog',
+  keywords: [
+    'brand bidding blog',
+    'google ads brand protection guides',
+    'competitor brand monitoring articles',
+  ],
+})
 
 const categoryLabels: Record<string, string> = {
   guide: 'Guide',
@@ -26,18 +36,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <Link href="/">
-            <span className="text-gradient-tech font-extrabold text-xl">SerpAlert</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/pricing" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Pricing</Link>
-            <Link href="/audit" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Free Audit</Link>
-            <Link href="/sign-up" className="inline-flex h-8 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">Start Free Trial</Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingHeader />
 
       <section className="px-6 py-16 md:py-20 text-center">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
@@ -83,26 +82,13 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section className="bg-white border-t border-gray-200 px-6 py-16 text-center">
-        <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">
-          Are competitors bidding on your brand?
-        </h2>
-        <p className="mt-3 text-gray-500 max-w-md mx-auto">
-          Find out in 10 seconds with a free brand audit.
-        </p>
-        <div className="mt-6">
-          <Link href="/audit" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-            Free Brand Audit <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      <footer className="border-t border-gray-200 bg-gray-50 px-6 py-8">
-        <div className="mx-auto max-w-5xl flex items-center justify-center gap-6 text-sm text-gray-400">
-          <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-gray-600 transition-colors">Terms</Link>
-        </div>
-      </footer>
+      <MarketingCta
+        title="Turn blog intent into a real funnel step"
+        description="If a reader is worried about competitor bidding, the fastest next step is the audit. If they already know the pain, send them to the calculator or the trial."
+        secondaryHref="/calculator"
+        secondaryLabel="Calculate brand campaign waste"
+      />
+      <MarketingFooter />
     </div>
   )
 }

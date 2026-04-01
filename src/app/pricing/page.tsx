@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
+import { MarketingCta } from "@/components/marketing-cta";
+import { MarketingFooter } from "@/components/marketing-footer";
+import { MarketingHeader } from "@/components/marketing-header";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: "Pricing",
   description:
     "Brand keyword monitoring from £149/mo. Agency plans from £69/brand. 7-day free trial.",
-  openGraph: {
-    title: "Pricing — SerpAlert",
-    description: "Brand keyword monitoring from £149/mo. Agency plans from £69/brand. 7-day free trial.",
-  },
-};
+  path: "/pricing",
+  keywords: [
+    "brand monitoring pricing",
+    "brand bidding software cost",
+    "google ads brand protection pricing",
+  ],
+});
 
 const pricingJsonLd = `{
   "@context": "https://schema.org",
@@ -93,22 +99,7 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: pricingJsonLd }}
       />
-      {/* Header */}
-      <nav className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <Link href="/">
-            <span className="text-gradient-tech font-extrabold text-xl">
-              SerpAlert
-            </span>
-          </Link>
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-          >
-            Sign In
-          </Link>
-        </div>
-      </nav>
+      <MarketingHeader />
 
       {/* Hero */}
       <section className="px-6 py-16 md:py-20 text-center">
@@ -242,17 +233,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-gray-50 px-6 py-8">
-        <div className="mx-auto max-w-5xl flex items-center justify-center gap-6 text-sm text-gray-400">
-          <Link href="/privacy" className="hover:text-gray-600 transition-colors">
-            Privacy Policy
-          </Link>
-          <Link href="/terms" className="hover:text-gray-600 transition-colors">
-            Terms
-          </Link>
-        </div>
-      </footer>
+      <MarketingCta
+        title="Need proof before you commit?"
+        description="Run the free audit first to see whether competitors are active on your brand terms, then start the trial when you want always-on monitoring."
+        note="Use the audit for a low-friction check. Use the trial when you are ready to monitor hourly."
+      />
+      <MarketingFooter />
       <ExitIntentPopup />
     </div>
   );

@@ -1,13 +1,30 @@
 import { NextResponse } from 'next/server'
 import { db, brands } from '@/lib/db'
 import { count } from 'drizzle-orm'
+import { isAdminRequest, isCronRequest } from '@/lib/auth'
 
-export async function GET() {
+function notFoundResponse() {
+  return NextResponse.json(
+    { error: 'Not found' },
+    { status: 404, headers: { 'Cache-Control': 'no-store' } }
+  )
+}
+
+export async function GET(request: Request) {
+  if (!isAdminRequest(request) && !isCronRequest(request)) {
+    return notFoundResponse()
+  }
+
   try {
-    // Just verify DB connectivity
     await db.select({ count: count() }).from(brands).limit(1)
-    return NextResponse.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() }, { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' } })
+    return NextResponse.json(
+      { status: 'ok' },
+      { headers: { 'Cache-Control': 'no-store' } }
+    )
   } catch {
-    return NextResponse.json({ status: 'error', database: 'disconnected' }, { status: 500 })
+    return NextResponse.json(
+      { status: 'error' },
+      { status: 500, headers: { 'Cache-Control': 'no-store' } }
+    )
   }
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
+import { createPageMetadata, siteConfig } from "@/lib/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,36 +16,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  ...createPageMetadata(),
   title: {
-    template: "%s",
-    default: "SerpAlert — Protect Your Brand from Competitor Ads",
-  },
-  description:
-    "Monitor competitor ad activity on Google Search. Get hourly SERP alerts with screenshot evidence. Stop paying for clicks you already own.",
-  openGraph: {
-    title: "SerpAlert — Block Competitor Brand Bidding",
-    description:
-      "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
-    type: "website",
-    siteName: "SerpAlert",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "SerpAlert — Block Competitor Brand Bidding",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SerpAlert — Block Competitor Brand Bidding",
-    description:
-      "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
-    images: ["/og-image.png"],
+    default: `${siteConfig.name} | ${siteConfig.defaultTitle}`,
+    template: `%s | ${siteConfig.name}`,
   },
   robots: { index: true, follow: true },
-  metadataBase: new URL("https://serpalert.co.uk"),
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  category: "Marketing",
+  referrer: "origin-when-cross-origin",
   icons: {
     icon: [{ url: "/favicon.ico", sizes: "48x48" }],
   },
@@ -82,10 +63,10 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "SoftwareApplication",
-                name: "SerpAlert",
+                name: siteConfig.name,
                 description:
                   "Brand keyword monitoring tool. Get hourly SERP alerts when competitors bid on your brand name.",
-                url: "https://serpalert.co.uk",
+                url: siteConfig.url,
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Web",
                 offers: {
@@ -101,9 +82,9 @@ export default function RootLayout({
                 },
                 provider: {
                   "@type": "Organization",
-                  name: "SerpAlert",
-                  url: "https://serpalert.co.uk",
-                  logo: "https://serpalert.co.uk/favicon.ico",
+                  name: siteConfig.name,
+                  url: siteConfig.url,
+                  logo: `${siteConfig.url}/favicon.ico`,
                 },
               }),
             }}
