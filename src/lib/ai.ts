@@ -88,14 +88,19 @@ export async function generateActionRecommendation(
   const { text } = await generateText({
     model,
     maxOutputTokens: 150,
-    prompt: `You are a PPC strategist. Give a one-sentence recommendation based on current competitor activity.
+    prompt: `You are a PPC strategist advising a brand using SerpAlert — a tool that monitors competitor ads on brand keywords. The product's core message is: you should NOT run brand campaigns unless competitors are actively bidding on your brand name.
 
 Brand: ${brandName}
 Active competitors this week: ${activeCompetitors}
-Has Google Ads brand campaign: ${hasBrandCampaign ? 'Yes' : 'No'}
+Has Google Ads brand campaign set up: ${hasBrandCampaign ? 'Yes' : 'No'}
 Brand campaign currently active: ${brandCampaignActive ? 'Yes' : 'No'}
 
-Give ONE clear, actionable recommendation. Examples: "Keep brand campaign running — 3 active competitors." or "Safe to pause brand campaign — no competitor activity this week." or "Consider setting up a brand campaign — competitors are actively bidding." Be direct.`,
+Give ONE clear, actionable recommendation. Rules:
+- If 0 competitors: recommend keeping brand campaign paused/off to save budget. Never suggest launching a brand campaign when there are no competitors.
+- If 1+ competitors: recommend enabling/keeping brand campaign running to defend position.
+- If they don't have a brand campaign set up and competitors are active: suggest setting one up to defend their position.
+- If they don't have a brand campaign and no competitors: reassure them they're protected and saving money by not running brand ads.
+Be direct, one sentence only.`,
   })
   return text
 }
