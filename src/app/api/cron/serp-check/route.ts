@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
-import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, getSerpCheckCountForBrand } from '@/lib/db/queries'
+import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, getSerpCheckCountForBrand, getLastCheckForBrand } from '@/lib/db/queries'
 import { checkSerpForBrand } from '@/lib/dataforseo'
 import { screenshotSerp } from '@/lib/screenshot'
 import { uploadScreenshot } from '@/lib/blob-storage'
@@ -38,8 +38,22 @@ export async function GET(request: Request) {
     }
 
     // Build all jobs upfront, fetching recent domains once per brand
+    // Trial brands only get checked every 4 hours (not hourly) to save API costs
+    const TRIAL_COOLDOWN_MS = 4 * 60 * 60 * 1000
     const jobs: Array<{ brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }> = []
     for (const brand of allBrands) {
+      // Throttle trial brands to every 4 hours
+      if (brand.subscriptionStatus === 'trialing') {
+        const lastCheck = await getLastCheckForBrand(brand.id)
+        if (lastCheck) {
+          const elapsed = Date.now() - new Date(lastCheck.checkedAt).getTime()
+          if (elapsed < TRIAL_COOLDOWN_MS) {
+            console.info(`Skipping trial brand "${brand.name}" — last check ${Math.round(elapsed / 60000)}m ago`)
+            continue
+          }
+        }
+      }
+
       const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
       for (const keyword of brand.keywords) {
         jobs.push({ brand, keyword, recentDomains })

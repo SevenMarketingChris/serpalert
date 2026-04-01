@@ -62,9 +62,9 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     }).map(a => a.domain)
   ).size
 
-  // AI recommendation — only show after enough data (at least 24 checks = ~1 day of hourly monitoring)
+  // AI recommendation — only show after enough data (at least 4 checks)
   let aiRecommendation: string | null = null
-  if (checks.length >= 24) {
+  if (checks.length >= 4) {
     try {
       const { generateActionRecommendation } = await import('@/lib/ai')
       aiRecommendation = await generateActionRecommendation(
