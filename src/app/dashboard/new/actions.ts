@@ -113,7 +113,7 @@ export async function createBrand(
     if (msg.includes('unique') || msg.includes('duplicate')) {
       return { error: 'A brand with that name already exists' }
     }
-    console.error('Brand creation failed:', { err, userId, createdBrandId })
+    console.error('Brand creation failed:', err instanceof Error ? err.message : 'Unknown error', { userId, createdBrandId })
     return { error: 'Failed to create brand' }
   }
 

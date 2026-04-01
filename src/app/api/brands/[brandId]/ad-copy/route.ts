@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getAdCopyHistory } from '@/lib/db/queries'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -20,11 +20,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ bran
   if (!brand) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-  if (brand.agencyManaged && !isAdmin) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
-  if (!brand.agencyManaged && brand.userId !== userId) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const url = new URL(request.url)

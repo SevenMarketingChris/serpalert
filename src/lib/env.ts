@@ -40,6 +40,10 @@ export function validateEnv(): void {
     }
   }
 
+  if (process.env.ADMIN_SECRET && process.env.CRON_SECRET && process.env.ADMIN_SECRET === process.env.CRON_SECRET) {
+    console.warn('WARNING: ADMIN_SECRET and CRON_SECRET are identical — they should differ')
+  }
+
   if (errors.length > 0) {
     const msg = `Environment validation failed:\n  - ${errors.join('\n  - ')}`;
     console.error(msg);

@@ -125,6 +125,8 @@ function buildDirectTouchpoint(req: Request): AttributionTouchpoint {
   }
 }
 
+// httpOnly: false is intentional — client-side JS reads these for attribution tracking.
+// The data is non-sensitive (anonymous IDs and UTM params). XSS risk accepted.
 function setAttributionCookie(
   response: NextResponse,
   name: string,

@@ -17,7 +17,14 @@ const CreateBrandSchema = z.object({
 
 export async function GET(request: Request) {
   if (!isAdminRequest(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  return NextResponse.json(await getAllActiveBrands(), { headers: { 'Cache-Control': 'no-store' } })
+  const allBrands = await getAllActiveBrands()
+  const safeBrands = allBrands.map(b => ({
+    id: b.id, name: b.name, slug: b.slug, domain: b.domain,
+    keywords: b.keywords, active: b.active, plan: b.plan,
+    subscriptionStatus: b.subscriptionStatus, agencyManaged: b.agencyManaged,
+    createdAt: b.createdAt, updatedAt: b.updatedAt,
+  }))
+  return NextResponse.json(safeBrands, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function POST(request: Request) {

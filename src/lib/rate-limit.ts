@@ -1,6 +1,7 @@
-// WARNING: In-memory rate limit — only effective within a single serverless instance.
-// For production, replace with Upstash Redis (@upstash/ratelimit).
-// This provides basic protection against rapid-fire from a single warm instance.
+// WARNING: In-memory rate limiter — ineffective across Vercel serverless instances.
+// Each cold start gets a fresh counter. This provides basic protection within a single
+// warm instance only. Replace with @upstash/ratelimit for production-grade rate limiting.
+// Tracking issue: replace when customer count exceeds 10.
 
 /**
  * Per-instance in-memory rate limiter.

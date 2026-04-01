@@ -1,3 +1,6 @@
+// CSRF: Protected by Clerk's SameSite=Lax cookies for REST endpoints
+// and Next.js Server Actions' built-in CSRF tokens for form mutations.
+
 import { timingSafeEqual, createHash } from 'crypto'
 
 const ADMIN_EMAILS = ['chris@sevenmarketing.co.uk']

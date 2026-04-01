@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props) {
-  const parsedConfig = alertConfig ? (() => { try { return JSON.parse(alertConfig) } catch { return {} } })() : {}
+  const parsedConfig = alertConfig ? (() => { try { return JSON.parse(alertConfig) } catch (e) { console.warn('Failed to parse alertConfig JSON:', e instanceof Error ? e.message : 'Unknown error'); return {} } })() : {}
   const initialThreshold = parsedConfig.alertThreshold ?? 1
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
     (prev, formData) => updateAlertConfig(prev, formData, brandId),

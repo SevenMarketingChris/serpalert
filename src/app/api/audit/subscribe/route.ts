@@ -30,6 +30,9 @@ export async function POST(request: Request) {
   if (!keyword || keyword.length > 200) {
     return NextResponse.json({ error: 'Invalid keyword.' }, { status: 400 })
   }
+  if (competitorCount < 0 || competitorCount > 100) {
+    return NextResponse.json({ error: 'competitorCount must be between 0 and 100.' }, { status: 400 })
+  }
 
   try {
     const firstTouch = attribution.firstTouch ? JSON.stringify(attribution.firstTouch) : null

@@ -119,7 +119,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
                 webhookUrl: brand.slackWebhookUrl, brandName: brand.name,
                 brandId: brand.id, domain: ad.domain, keyword,
               })
-            } catch (err) { console.error('[brands/check] Failed to send Slack alert:', err) }
+            } catch (err) { console.warn('[brands/check] Failed to send Slack alert:', err instanceof Error ? err.message : 'Unknown error') }
           }
         }
       }

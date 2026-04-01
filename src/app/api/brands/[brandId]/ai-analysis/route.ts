@@ -37,7 +37,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ bran
 
     const analysis = await generateAdCopyAnalysis(brand.name, domain, headlines, descriptions)
     return NextResponse.json({ analysis })
-  } catch {
+  } catch (err) {
+    console.warn('AI ad-copy analysis failed:', err instanceof Error ? err.message : 'Unknown error', { brandId })
     return NextResponse.json({ error: 'AI analysis unavailable' }, { status: 503 })
   }
 }
