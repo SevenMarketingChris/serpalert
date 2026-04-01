@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
-import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
+import { getBrandById, getCompetitorSummaryForBrand, getAdCopyHistory } from '@/lib/db/queries'
 import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { Shield, Download } from 'lucide-react'
 import { CompetitorTable } from '@/components/competitor-table'
@@ -20,6 +20,21 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
   }
 
   const competitors = await getCompetitorSummaryForBrand(brandId)
+
+  let adCopySuggestion: { headline: string; description: string } | null = null
+  if (competitors.length > 0) {
+    try {
+      const topCompetitor = competitors[0]
+      const adCopy = await getAdCopyHistory(brandId, topCompetitor.domain)
+      const { generateAdCopySuggestion } = await import('@/lib/ai')
+      adCopySuggestion = await generateAdCopySuggestion(
+        brand.name,
+        adCopy.map(a => a.headline).filter(Boolean) as string[],
+        adCopy.map(a => a.description).filter(Boolean) as string[],
+        brand.domain,
+      )
+    } catch { /* AI unavailable */ }
+  }
 
   return (
     <div className="max-w-5xl space-y-4">
@@ -45,6 +60,16 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
         </div>
       ) : (
         <>
+          {/* AI Ad Copy Suggestion */}
+          {competitors.length > 0 && adCopySuggestion && (
+            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400 font-mono">AI Suggested Brand Ad</p>
+              <p className="text-sm font-semibold text-indigo-900">Headline: {adCopySuggestion.headline}</p>
+              <p className="text-sm text-indigo-700">Description: {adCopySuggestion.description}</p>
+              <p className="text-[11px] text-indigo-400">Based on competitor ad copy analysis. Use this in your Google Ads brand campaign.</p>
+            </div>
+          )}
+
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>

@@ -179,6 +179,67 @@ export async function getUserEmail(userId: string): Promise<string | null> {
   }
 }
 
+export async function sendWeeklyDigestEmail(
+  to: string,
+  brandName: string,
+  data: {
+    checksThisWeek: number
+    competitorsThisWeek: number
+    newCompetitors: string[]
+    stoppedCompetitors: string[]
+    aiDigest: string | null
+  }
+) {
+  const resend = getResend()
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    to,
+    subject: `Weekly Update — ${escapeHtml(brandName)} — ${data.competitorsThisWeek} competitor${data.competitorsThisWeek !== 1 ? 's' : ''} detected`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Weekly Brand Protection Update</h1>
+
+        ${data.aiDigest ? `
+        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #818cf8; margin: 0 0 8px;">AI Summary</p>
+          <p style="font-size: 14px; color: #4338ca; line-height: 1.6; margin: 0;">${escapeHtml(data.aiDigest)}</p>
+        </div>
+        ` : ''}
+
+        <div style="display: flex; gap: 12px; margin: 16px 0;">
+          <div style="flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Checks</div>
+            <div style="font-size: 20px; font-weight: 700; font-family: monospace; color: #111;">${data.checksThisWeek}</div>
+          </div>
+          <div style="flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Competitors</div>
+            <div style="font-size: 20px; font-weight: 700; font-family: monospace; color: ${data.competitorsThisWeek > 0 ? '#dc2626' : '#22c55e'};">${data.competitorsThisWeek}</div>
+          </div>
+        </div>
+
+        ${data.newCompetitors.length > 0 ? `
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 12px 0;">
+          <p style="font-size: 13px; color: #991b1b; margin: 0;"><strong>New this week:</strong> ${data.newCompetitors.map(d => escapeHtml(d)).join(', ')}</p>
+        </div>
+        ` : ''}
+
+        ${data.stoppedCompetitors.length > 0 ? `
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin: 12px 0;">
+          <p style="font-size: 13px; color: #166534; margin: 0;"><strong>Stopped bidding:</strong> ${data.stoppedCompetitors.map(d => escapeHtml(d)).join(', ')}</p>
+        </div>
+        ` : ''}
+
+        <p style="margin-top: 24px;">
+          <a href="https://serpalert.co.uk/dashboard" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">View Dashboard</a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
 export async function sendMonthlyReport(
   to: string,
   brandName: string,
@@ -191,6 +252,8 @@ export async function sendMonthlyReport(
     screenshotUrls: string[] // top 3 screenshots
   },
   aiInsights: string | null = null,
+  bidTimingInsight: string | null = null,
+  landscapeReport: string | null = null,
 ) {
   const resend = getResend()
 
@@ -241,6 +304,20 @@ export async function sendMonthlyReport(
         <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 20px 0;">
           <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #818cf8; margin: 0 0 8px;">AI Insights</p>
           <p style="font-size: 14px; color: #4338ca; line-height: 1.6; margin: 0;">${escapeHtml(aiInsights)}</p>
+        </div>
+        ` : ''}
+
+        ${bidTimingInsight ? `
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #16a34a; margin: 0 0 8px;">Bid Timing Pattern</p>
+          <p style="font-size: 14px; color: #166534; line-height: 1.6; margin: 0;">${escapeHtml(bidTimingInsight)}</p>
+        </div>
+        ` : ''}
+
+        ${landscapeReport ? `
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #d97706; margin: 0 0 8px;">Competitive Landscape</p>
+          <p style="font-size: 14px; color: #92400e; line-height: 1.6; margin: 0;">${escapeHtml(landscapeReport)}</p>
         </div>
         ` : ''}
 

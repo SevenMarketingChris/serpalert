@@ -70,6 +70,32 @@ export async function GET(request: Request) {
           // AI unavailable
         }
 
+        // Generate bid timing analysis
+        let bidTimingInsight: string | null = null
+        try {
+          const { analyzeBidTiming } = await import('@/lib/ai')
+          const checksWithCompetitors = recentChecks.filter(c => c.competitorCount > 0)
+          if (checksWithCompetitors.length > 0) {
+            const timestamps = checksWithCompetitors.slice(0, 50).map(c => ({
+              domain: 'competitor',
+              checkedAt: new Date(c.checkedAt).toISOString(),
+            }))
+            bidTimingInsight = await analyzeBidTiming(brand.name, timestamps)
+          }
+        } catch { /* AI unavailable */ }
+
+        // Generate competitive landscape
+        let landscapeReport: string | null = null
+        try {
+          const { generateCompetitiveLandscape } = await import('@/lib/ai')
+          landscapeReport = await generateCompetitiveLandscape(brand.name, {
+            totalChecks: recentChecks.length,
+            competitors: competitorList.map(c => ({ ...c, avgPosition: null })),
+            keywordsMonitored: brand.keywords.length,
+            monthName: new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+          })
+        } catch { /* AI unavailable */ }
+
         await sendMonthlyReport(email, brand.name, {
           totalChecks: recentChecks.length,
           newCompetitors: competitorList,
@@ -77,7 +103,7 @@ export async function GET(request: Request) {
           keywordsMonitored: brand.keywords.length,
           screenshotCount: screenshots.length,
           screenshotUrls,
-        }, aiInsights)
+        }, aiInsights, bidTimingInsight, landscapeReport)
 
         results.push({ brand: brand.name, status: 'sent' })
       } catch (err) {
