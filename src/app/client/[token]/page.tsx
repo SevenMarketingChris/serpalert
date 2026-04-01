@@ -67,6 +67,25 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
   // Count days with actual data for chart visibility
   const daysWithData = last7Days.filter(d => d.checks > 0).length
 
+  // AI-generated executive summary
+  let aiSummary: string | null = null
+  try {
+    const { generateCompetitiveLandscape } = await import('@/lib/ai')
+    const currentMonth = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+    aiSummary = await generateCompetitiveLandscape(brand.name, {
+      totalChecks: checks.length,
+      competitors: competitorStats.map(c => ({
+        domain: c.domain,
+        count: c.recentCount,
+        avgPosition: c.avgPosition,
+      })),
+      keywordsMonitored: brand.keywords.length,
+      monthName: currentMonth,
+    })
+  } catch {
+    // AI unavailable — fallback to hardcoded summary
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader maxWidth="max-w-4xl" showThemeToggle={true} />
@@ -103,19 +122,23 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
           allTimeCompetitors={competitorStats.length}
         />
 
-        {/* 4. Executive Summary (compact) */}
+        {/* 4. AI Executive Summary */}
         <div className="bg-muted/40 border border-border rounded-lg px-5 py-4">
           <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5 flex items-center gap-2">
             <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
-            Summary
+            Executive Summary
           </h2>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {competitors7d === 0 || competitorStats.length === 0 ? (
-              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
-            ) : (
-              `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount} time${competitorStats[0].recentCount !== 1 ? 's' : ''}.`
-            )}
-          </p>
+          {aiSummary ? (
+            <p className="text-xs text-muted-foreground leading-relaxed">{aiSummary}</p>
+          ) : (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {competitors7d === 0 || competitorStats.length === 0 ? (
+                `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. No competitor ads were found — your brand search results are clear.`
+              ) : (
+                `Over the past 7 days, we ran ${last7Days.reduce((s, d) => s + d.checks, 0)} scans across your ${brand.keywords.length} monitored keywords. ${competitors7d} competitor${competitors7d !== 1 ? 's were' : ' was'} found advertising on your brand name. The most active was ${competitorStats[0].domain}, spotted ${competitorStats[0].recentCount} time${competitorStats[0].recentCount !== 1 ? 's' : ''}.`
+              )}
+            </p>
+          )}
         </div>
 
         {/* 5. Competitor Ads Found — compact rows */}
