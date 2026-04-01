@@ -30,6 +30,9 @@ function getDailyStats(checks: CheckWithAds[], days: number) {
   return stats
 }
 
+// NS-01: Client portal tokens are v4 UUIDs (128-bit entropy / ~3.4×10³⁸ possibilities).
+// Brute-forcing is not feasible. Rate limiting on this server component page route
+// would require middleware-level changes and is not warranted given the token entropy.
 export default async function ClientPortal({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
   const brand = await getBrandByToken(token)
@@ -82,8 +85,9 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
       keywordsMonitored: brand.keywords.length,
       monthName: currentMonth,
     })
-  } catch {
+  } catch (err) {
     // AI unavailable — fallback to hardcoded summary
+    console.warn('[client-portal] AI landscape generation failed:', err instanceof Error ? err.message : 'Unknown error')
   }
 
   return (
