@@ -33,7 +33,7 @@ export const metadata: Metadata = {
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
   },
-  other: [{ name: "theme-color", content: "#6366f1" }],
+  other: { "theme-color": "#6366f1" },
 };
 
 export default function RootLayout({
