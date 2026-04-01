@@ -4,6 +4,7 @@ export async function sendNewCompetitorAlert(params: {
   brandId?: string
   domain: string
   keyword: string
+  urgency?: 'urgent' | 'monitor' | 'ignore' | null
 }): Promise<void> {
   if (!params.webhookUrl) return
 
@@ -11,6 +12,12 @@ export async function sendNewCompetitorAlert(params: {
     console.error('Slack webhook URL does not look valid, skipping')
     return
   }
+
+  const urgencyLabel = params.urgency === 'urgent'
+    ? '🔴 URGENT'
+    : params.urgency === 'ignore'
+      ? '⚪ Low Priority'
+      : '🟡 Monitor'
 
   const response = await fetch(params.webhookUrl, {
     method: 'POST',
@@ -28,6 +35,7 @@ export async function sendNewCompetitorAlert(params: {
             { type: 'mrkdwn', text: `*Competitor:*\n${params.domain}` },
             { type: 'mrkdwn', text: `*Keyword:*\n${params.keyword}` },
             { type: 'mrkdwn', text: `*Detected:*\n${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}` },
+            { type: 'mrkdwn', text: `*Priority:*\n${urgencyLabel}` },
           ]
         },
         {

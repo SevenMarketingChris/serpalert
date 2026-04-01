@@ -95,11 +95,31 @@ export async function GET(request: Request) {
             position: ad.position, firstSeenAt: now,
           })))
           const newDomains: string[] = []
+          const urgencyByDomain: Record<string, 'urgent' | 'monitor' | 'ignore'> = {}
+          const competitorTypeByDomain: Record<string, string | null> = {}
           for (const ad of ads) {
             if (!recentDomains.includes(ad.domain)) {
               newDomains.push(ad.domain)
+
+              // AI triage for new competitor
+              let urgency: 'urgent' | 'monitor' | 'ignore' = 'monitor'
               try {
-                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, brandId: brand.id, domain: ad.domain, keyword })
+                const { triageAlert } = await import('@/lib/ai')
+                urgency = await triageAlert(brand.name, ad.domain, ad?.position ?? null, keyword)
+              } catch { /* AI unavailable */ }
+              urgencyByDomain[ad.domain] = urgency
+
+              // AI competitor intent classification
+              let competitorType: string | null = null
+              try {
+                const { classifyCompetitorIntent } = await import('@/lib/ai')
+                const intent = await classifyCompetitorIntent(brand.name, ad.domain, ad?.headline ?? null, ad?.description ?? null)
+                competitorType = intent.type.replace('_', ' ')
+              } catch { /* AI unavailable */ }
+              competitorTypeByDomain[ad.domain] = competitorType
+
+              try {
+                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, brandId: brand.id, domain: ad.domain, keyword, urgency })
               } catch (alertErr) {
                 console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
               }
@@ -127,7 +147,7 @@ export async function GET(request: Request) {
                       new Date().toISOString().slice(0, 10),
                     )
                   } catch (err) { console.error('[cron/serp-check] Failed to generate AI summary:', err) }
-                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null, aiSummary)
+                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null, aiSummary, urgencyByDomain[domain] ?? null, competitorTypeByDomain[domain] ?? null)
                 }
               }
             } catch (emailErr) {

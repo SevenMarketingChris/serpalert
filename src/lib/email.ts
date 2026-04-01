@@ -73,7 +73,7 @@ export async function sendTrialExpiringEmail(to: string, brandName: string, days
   })
 }
 
-export async function sendNewCompetitorEmail(to: string, brandName: string, competitorDomain: string, keyword: string, screenshotUrl: string | null, aiSummary: string | null = null) {
+export async function sendNewCompetitorEmail(to: string, brandName: string, competitorDomain: string, keyword: string, screenshotUrl: string | null, aiSummary: string | null = null, urgency: 'urgent' | 'monitor' | 'ignore' | null = null, competitorType: string | null = null) {
   const resend = getResend()
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
@@ -89,6 +89,8 @@ export async function sendNewCompetitorEmail(to: string, brandName: string, comp
           <p style="margin: 0; font-size: 14px;"><strong style="color: #111;">Competitor:</strong> <span style="color: #dc2626; font-family: monospace;">${escapeHtml(competitorDomain)}</span></p>
           <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Keyword:</strong> <span style="font-family: monospace;">${escapeHtml(keyword)}</span></p>
           <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Brand:</strong> ${escapeHtml(brandName)}</p>
+          ${urgency ? `<p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Priority:</strong> <span style="color: ${urgency === 'urgent' ? '#dc2626' : urgency === 'monitor' ? '#d97706' : '#6b7280'};">${urgency.toUpperCase()}</span></p>` : ''}
+          ${competitorType ? `<p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Competitor type:</strong> ${escapeHtml(competitorType)}</p>` : ''}
         </div>
         ${aiSummary ? `
         <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 16px 0;">
