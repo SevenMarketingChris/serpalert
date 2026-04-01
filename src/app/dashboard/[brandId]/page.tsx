@@ -62,18 +62,20 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     }).map(a => a.domain)
   ).size
 
-  // AI recommendation (non-blocking)
+  // AI recommendation — only show after enough data (at least 24 checks = ~1 day of hourly monitoring)
   let aiRecommendation: string | null = null
-  try {
-    const { generateActionRecommendation } = await import('@/lib/ai')
-    aiRecommendation = await generateActionRecommendation(
-      brand.name,
-      activeCompetitors,
-      !!brand.googleAdsCustomerId,
-      !!brand.brandCampaignId,
-    )
-  } catch {
-    // AI unavailable — skip recommendation
+  if (checks.length >= 24) {
+    try {
+      const { generateActionRecommendation } = await import('@/lib/ai')
+      aiRecommendation = await generateActionRecommendation(
+        brand.name,
+        activeCompetitors,
+        !!brand.googleAdsCustomerId,
+        !!brand.brandCampaignId,
+      )
+    } catch {
+      // AI unavailable — skip recommendation
+    }
   }
 
   // Pre-group checks by date string for O(1) day lookups
