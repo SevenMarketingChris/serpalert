@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { PageViewTracker } from '@/components/analytics/page-view-tracker'
+import { TrackedLink } from '@/components/analytics/tracked-link'
 import { MarketingCta } from '@/components/marketing-cta'
 import { MarketingFooter } from '@/components/marketing-footer'
 import { MarketingHeader } from '@/components/marketing-header'
@@ -48,13 +49,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageViewTracker properties={{ page: 'blog_post', slug: post.slug }} />
       <MarketingHeader />
 
       <article className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-2xl">
-          <Link href="/blog" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-8">
+          <TrackedLink
+            href="/blog"
+            eventProperties={{ placement: 'blog_post_back_link', ctaLabel: 'Back to blog', funnelStage: 'content_navigation' }}
+            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-8"
+          >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to blog
-          </Link>
+          </TrackedLink>
 
           <header className="mb-10">
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight">

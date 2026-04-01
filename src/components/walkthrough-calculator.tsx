@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { emitClientAnalyticsEvent } from '@/lib/analytics/client'
 
 function formatGBP(value: number): string {
   const abs = Math.abs(value)
@@ -50,7 +51,17 @@ export function WalkthroughCalculator() {
         {step === 1 && (
           <div className="pl-10">
             <button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                void emitClientAnalyticsEvent({
+                  name: 'cta_clicked',
+                  properties: {
+                    placement: 'calculator_step_1_next',
+                    ctaLabel: 'Next',
+                    funnelStage: 'calculator_start',
+                  },
+                })
+                setStep(2)
+              }}
               className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
             >
               Next
@@ -96,7 +107,17 @@ export function WalkthroughCalculator() {
           {step === 2 && (
             <div className="pl-10">
               <button
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  void emitClientAnalyticsEvent({
+                    name: 'cta_clicked',
+                    properties: {
+                      placement: 'calculator_step_2_next',
+                      ctaLabel: 'Next',
+                      funnelStage: 'calculator_progress',
+                    },
+                  })
+                  setStep(3)
+                }}
                 className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
               >
                 Next
@@ -143,7 +164,17 @@ export function WalkthroughCalculator() {
           {step === 3 && (
             <div className="pl-10">
               <button
-                onClick={() => setStep(4)}
+                onClick={() => {
+                  void emitClientAnalyticsEvent({
+                    name: 'cta_clicked',
+                    properties: {
+                      placement: 'calculator_step_3_complete',
+                      ctaLabel: 'See full impact',
+                      funnelStage: 'calculator_complete',
+                    },
+                  })
+                  setStep(4)
+                }}
                 className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
               >
                 See full impact

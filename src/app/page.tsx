@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   Clock,
@@ -9,6 +8,8 @@ import {
   Building2,
   Shield,
 } from "lucide-react";
+import { PageViewTracker } from "@/components/analytics/page-view-tracker";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { BudgetCalculator } from "@/components/budget-calculator";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
 import { MarketingCta } from "@/components/marketing-cta";
@@ -52,6 +53,7 @@ const saasJsonLd = `{
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
+      <PageViewTracker properties={{ page: "home" }} />
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -77,19 +79,21 @@ export default function HomePage() {
             alerts you the moment a competitor moves in.
           </p>
           <div className="mt-10 flex flex-col items-center gap-4">
-            <Link
+            <TrackedLink
               href="/audit"
+              eventProperties={{ placement: "home_hero_primary", ctaLabel: "Run Free Brand Audit", funnelStage: "audit_start" }}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Run Free Brand Audit
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link
+              <ArrowRight className="h-4 w-4" />
+            </TrackedLink>
+            <TrackedLink
               href="/sign-up"
+              eventProperties={{ placement: "home_hero_secondary", ctaLabel: "Start Your Free Trial", funnelStage: "signup_start" }}
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card"
             >
               Start Your Free Trial
-            </Link>
+            </TrackedLink>
             <span className="text-sm text-muted-foreground">
               Free audit first. Trial when you are ready for hourly monitoring.
             </span>
@@ -178,7 +182,7 @@ export default function HomePage() {
                 key={card.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-3"
               >
-                <card.icon className={`h-5 w-5 ${card.accent}`} aria-hidden="true" />
+                <card.icon className={`h-5 w-5 ${card.accent}`} />
                 <h3 className="font-semibold text-foreground">{card.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {card.description}
@@ -285,7 +289,7 @@ export default function HomePage() {
                 key={feature.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-2"
               >
-                <feature.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                <feature.icon className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold text-foreground">
                   {feature.title}
                 </h3>

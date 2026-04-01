@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 type MarketingCtaProps = {
   title: string;
@@ -30,19 +30,29 @@ export function MarketingCta({
           {description}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link
+          <TrackedLink
             href={primaryHref}
+            eventProperties={{
+              placement: "marketing_cta_primary",
+              funnelStage: "audit_or_trial",
+              ctaLabel: primaryLabel,
+            }}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             {primaryLabel}
             <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={secondaryHref}
+            eventProperties={{
+              placement: "marketing_cta_secondary",
+              funnelStage: "audit_or_trial",
+              ctaLabel: secondaryLabel,
+            }}
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             {secondaryLabel}
-          </Link>
+          </TrackedLink>
         </div>
         {note ? (
           <p className="mt-4 text-sm text-muted-foreground">{note}</p>

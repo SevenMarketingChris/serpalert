@@ -1,5 +1,6 @@
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { PageViewTracker } from '@/components/analytics/page-view-tracker'
+import { TrackedLink } from '@/components/analytics/tracked-link'
 import { MarketingCta } from '@/components/marketing-cta'
 import { MarketingFooter } from '@/components/marketing-footer'
 import { MarketingHeader } from '@/components/marketing-header'
@@ -36,6 +37,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageViewTracker properties={{ page: 'blog_index' }} />
       <MarketingHeader />
 
       <section className="px-6 py-16 md:py-20 text-center">
@@ -54,9 +56,14 @@ export default function BlogPage() {
           ) : (
             <div className="grid gap-6">
               {posts.map((post) => (
-                <Link
+                <TrackedLink
                   key={post.slug}
                   href={`/blog/${post.slug}`}
+                  eventProperties={{
+                    placement: 'blog_index_post_card',
+                    ctaLabel: post.slug,
+                    funnelStage: 'content_engagement',
+                  }}
                   className="block bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-sm transition-all group"
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -75,7 +82,7 @@ export default function BlogPage() {
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600">
                     Read more <ArrowRight className="h-3.5 w-3.5" />
                   </span>
-                </Link>
+                </TrackedLink>
               ))}
             </div>
           )}

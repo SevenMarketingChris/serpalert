@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { TrackedLink } from '@/components/analytics/tracked-link'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 export function ExitIntentPopup() {
@@ -12,7 +12,6 @@ export function ExitIntentPopup() {
     if (e.clientY <= 0) {
       setOpen(true)
       localStorage.setItem('serpalert_exit_shown', '1')
-      document.removeEventListener('mouseleave', handleMouseLeave)
     }
   }, [])
 
@@ -30,6 +29,12 @@ export function ExitIntentPopup() {
     }
   }, [handleMouseLeave])
 
+  useEffect(() => {
+    if (open) {
+      document.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [open, handleMouseLeave])
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md">
@@ -40,14 +45,15 @@ export function ExitIntentPopup() {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">
-          <Link
+          <TrackedLink
             href="/audit"
+            eventProperties={{ placement: 'exit_intent_popup', ctaLabel: 'Free Brand Audit', funnelStage: 'audit_start' }}
             onClick={() => setOpen(false)}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
           >
             Free Brand Audit
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </TrackedLink>
           <p className="text-sm text-muted-foreground">
             Takes 10 seconds. No signup required.
           </p>

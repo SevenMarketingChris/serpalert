@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Check } from "lucide-react";
+import { PageViewTracker } from "@/components/analytics/page-view-tracker";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
 import { MarketingCta } from "@/components/marketing-cta";
 import { MarketingFooter } from "@/components/marketing-footer";
@@ -94,6 +95,7 @@ const faqs = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageViewTracker properties={{ page: "pricing" }} />
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -139,12 +141,13 @@ export default function PricingPage() {
           </ul>
 
           <div className="mt-8 text-center">
-            <Link
+            <TrackedLink
               href="/sign-up"
+              eventProperties={{ placement: "pricing_card_primary", ctaLabel: "Start Free Trial", funnelStage: "signup_start" }}
               className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-indigo-600 px-6 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
             >
               Start Free Trial
-            </Link>
+            </TrackedLink>
             <p className="mt-3 text-xs text-gray-400">
               No credit card required
             </p>
@@ -201,12 +204,13 @@ export default function PricingPage() {
           </ul>
 
           <div className="text-center">
-            <a
+            <TrackedLink
               href="mailto:hello@serpalert.co.uk"
+              eventProperties={{ placement: "pricing_agency_contact", ctaLabel: "Get in Touch", funnelStage: "sales_contact" }}
               className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-indigo-600 px-6 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
             >
               Get in Touch
-            </a>
+            </TrackedLink>
             <p className="mt-3 text-xs text-gray-400">
               We&apos;ll set up your agency account within 24 hours
             </p>

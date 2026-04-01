@@ -182,9 +182,11 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-gray-900">6. Cookies</h2>
             <p className="text-gray-700 leading-relaxed">
-              SerpAlert uses only essential session cookies provided by Clerk for
-              authentication purposes. We do not use any tracking cookies,
-              analytics cookies, or advertising cookies.
+              SerpAlert uses essential cookies for authentication (Clerk) and
+              first-party attribution cookies that store anonymous/session IDs,
+              UTM parameters, and referrer data for up to 30 days. We use this
+              data only to measure acquisition funnel performance and subscription
+              conversion, not for third-party advertising.
             </p>
           </section>
 

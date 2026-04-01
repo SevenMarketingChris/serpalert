@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Eye, Bell, TrendingUp } from "lucide-react";
+import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { MarketingCta } from "@/components/marketing-cta";
 import { MarketingFooter } from "@/components/marketing-footer";
 import { MarketingHeader } from "@/components/marketing-header";
@@ -21,6 +21,7 @@ export const metadata = createPageMetadata({
 export default function CalculatorPage() {
   return (
     <div className="min-h-screen bg-background">
+      <PageViewTracker properties={{ page: "calculator" }} />
       <MarketingHeader />
 
       {/* Hero */}

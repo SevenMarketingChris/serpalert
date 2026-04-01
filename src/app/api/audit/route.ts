@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rate-limit'
 import { checkSerpForAds } from '@/lib/serpapi'
+import { readAttributionContextFromRequest } from '@/lib/attribution'
+import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
 
 export async function POST(request: Request) {
+  const attribution = readAttributionContextFromRequest(request)
+  const requestUrl = new URL(request.url)
+
   // Rate limit by IP: 1 per hour
   const forwarded = request.headers.get('x-forwarded-for')
   const ip = forwarded?.split(',')[0]?.trim() ?? 'unknown'
@@ -36,6 +41,16 @@ export async function POST(request: Request) {
       description: r.description,
       position: r.position,
     }))
+
+    await emitServerAnalyticsEvent({
+      name: 'audit_check_requested',
+      path: requestUrl.pathname,
+      url: request.url,
+      properties: {
+        keywordLength: keyword.length,
+        competitorCount: competitors.length,
+      },
+    }, attribution)
 
     return NextResponse.json({
       competitorCount: competitors.length,

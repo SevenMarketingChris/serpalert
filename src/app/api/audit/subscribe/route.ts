@@ -3,8 +3,13 @@ import { db } from '@/lib/db'
 import { auditLeads } from '@/lib/db/schema'
 import { sendAuditReportEmail } from '@/lib/email'
 import { checkSerpForAds } from '@/lib/serpapi'
+import { and, eq } from 'drizzle-orm'
+import { readAttributionContextFromRequest } from '@/lib/attribution'
+import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
 
 export async function POST(request: Request) {
+  const attribution = readAttributionContextFromRequest(request)
+  const requestUrl = new URL(request.url)
   let email: string
   let keyword: string
   let competitorCount: number
@@ -27,21 +32,55 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Upsert lead — on conflict (same email+keyword), just update the timestamp
+    const firstTouch = attribution.firstTouch ? JSON.stringify(attribution.firstTouch) : null
+    const lastTouch = attribution.lastTouch ? JSON.stringify(attribution.lastTouch) : null
+
+    // Upsert lead to keep attribution fresh and capture current competitor count.
     await db
       .insert(auditLeads)
       .values({
         email,
         keyword,
         competitorCount,
+        anonymousId: attribution.anonymousId === 'unknown' ? null : attribution.anonymousId,
+        sessionId: attribution.sessionId === 'unknown' ? null : attribution.sessionId,
+        firstTouch,
+        lastTouch,
       })
-      .onConflictDoNothing()
+      .onConflictDoUpdate({
+        target: [auditLeads.email, auditLeads.keyword],
+        set: {
+          competitorCount,
+          anonymousId: attribution.anonymousId === 'unknown' ? undefined : attribution.anonymousId,
+          sessionId: attribution.sessionId === 'unknown' ? undefined : attribution.sessionId,
+          firstTouch: firstTouch ?? undefined,
+          lastTouch: lastTouch ?? undefined,
+          unsubscribed: false,
+        },
+      })
+
+    const leadRows = await db
+      .select({ id: auditLeads.id })
+      .from(auditLeads)
+      .where(and(eq(auditLeads.email, email), eq(auditLeads.keyword, keyword)))
+      .limit(1)
 
     // Fetch fresh competitor data for the email report
     const competitors = await checkSerpForAds(keyword)
 
     // Send full report email
     await sendAuditReportEmail(email, keyword, competitors)
+
+    await emitServerAnalyticsEvent({
+      name: 'audit_report_requested',
+      path: requestUrl.pathname,
+      url: request.url,
+      leadId: leadRows[0]?.id,
+      properties: {
+        keywordLength: keyword.length,
+        competitorCount,
+      },
+    }, attribution)
 
     return NextResponse.json({ success: true })
   } catch (err) {

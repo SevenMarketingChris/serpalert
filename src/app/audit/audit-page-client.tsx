@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { PageViewTracker } from '@/components/analytics/page-view-tracker'
+import { TrackedLink } from '@/components/analytics/tracked-link'
 import { MarketingFooter } from '@/components/marketing-footer'
 import { MarketingHeader } from '@/components/marketing-header'
+import { emitClientAnalyticsEvent } from '@/lib/analytics/client'
 
 interface Competitor {
   domain: string
@@ -31,6 +33,21 @@ export default function AuditPageClient() {
     setStep('loading')
 
     try {
+      void emitClientAnalyticsEvent({
+        name: 'cta_clicked',
+        properties: {
+          placement: 'audit_input_submit',
+          ctaLabel: 'Check Now',
+          funnelStage: 'audit_start',
+          keywordLength: keyword.trim().length,
+        },
+      })
+
+      void emitClientAnalyticsEvent({
+        name: 'audit_check_requested',
+        properties: { keywordLength: keyword.trim().length },
+      })
+
       const res = await fetch('/api/audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,6 +71,14 @@ export default function AuditPageClient() {
       const data = await res.json()
       setCompetitors(data.competitors ?? [])
       setStep('results')
+
+      void emitClientAnalyticsEvent({
+        name: 'audit_result_viewed',
+        properties: {
+          keywordLength: keyword.trim().length,
+          competitorCount: Array.isArray(data.competitors) ? data.competitors.length : 0,
+        },
+      })
     } catch {
       setError('Something went wrong. Please try again.')
       setStep('input')
@@ -67,6 +92,16 @@ export default function AuditPageClient() {
     setEmailSubmitting(true)
 
     try {
+      void emitClientAnalyticsEvent({
+        name: 'cta_clicked',
+        properties: {
+          placement: competitors.length > 0 ? 'audit_report_submit_competitor' : 'audit_report_submit_all_clear',
+          ctaLabel: competitors.length > 0 ? 'Send My Full Report' : 'Send My Weekly Checks',
+          funnelStage: 'audit_submit',
+          competitorCount: competitors.length,
+        },
+      })
+
       const res = await fetch('/api/audit/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,6 +120,14 @@ export default function AuditPageClient() {
       }
 
       setStep('revealed')
+
+      void emitClientAnalyticsEvent({
+        name: 'audit_report_requested',
+        properties: {
+          keywordLength: keyword.trim().length,
+          competitorCount: competitors.length,
+        },
+      })
     } catch {
       setEmailError('Something went wrong. Please try again.')
     } finally {
@@ -94,6 +137,7 @@ export default function AuditPageClient() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageViewTracker properties={{ page: 'audit' }} />
       <MarketingHeader />
 
       <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
@@ -273,13 +317,19 @@ export default function AuditPageClient() {
               <p className="text-sm text-muted-foreground mb-4">
                 Start your 7-day free trial and get hourly monitoring, screenshot evidence, and instant alerts.
               </p>
-              <Link
+              <TrackedLink
                 href="/sign-up"
+                eventProperties={{
+                  placement: 'audit_revealed_trial_cta',
+                  ctaLabel: 'Start Free Trial',
+                  funnelStage: 'signup_start',
+                  competitorCount: competitors.length,
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
               >
                 Start Free Trial
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </TrackedLink>
             </div>
           </div>
         )}

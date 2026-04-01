@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 export function MarketingFooter() {
   return (
@@ -11,24 +11,48 @@ export function MarketingFooter() {
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
-          <Link href="/audit" className="transition-colors hover:text-foreground">
+          <TrackedLink
+            href="/audit"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Free Audit", funnelStage: "audit_start" }}
+            className="transition-colors hover:text-foreground"
+          >
             Free Audit
-          </Link>
-          <Link href="/calculator" className="transition-colors hover:text-foreground">
+          </TrackedLink>
+          <TrackedLink
+            href="/calculator"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Calculator", funnelStage: "calculator" }}
+            className="transition-colors hover:text-foreground"
+          >
             Calculator
-          </Link>
-          <Link href="/blog" className="transition-colors hover:text-foreground">
+          </TrackedLink>
+          <TrackedLink
+            href="/blog"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Blog", funnelStage: "acquisition" }}
+            className="transition-colors hover:text-foreground"
+          >
             Blog
-          </Link>
-          <Link href="/pricing" className="transition-colors hover:text-foreground">
+          </TrackedLink>
+          <TrackedLink
+            href="/pricing"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Pricing", funnelStage: "pricing" }}
+            className="transition-colors hover:text-foreground"
+          >
             Pricing
-          </Link>
-          <Link href="/privacy" className="transition-colors hover:text-foreground">
+          </TrackedLink>
+          <TrackedLink
+            href="/privacy"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Privacy Policy", funnelStage: "legal" }}
+            className="transition-colors hover:text-foreground"
+          >
             Privacy Policy
-          </Link>
-          <Link href="/terms" className="transition-colors hover:text-foreground">
+          </TrackedLink>
+          <TrackedLink
+            href="/terms"
+            eventProperties={{ placement: "footer_nav", ctaLabel: "Terms", funnelStage: "legal" }}
+            className="transition-colors hover:text-foreground"
+          >
             Terms
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </footer>

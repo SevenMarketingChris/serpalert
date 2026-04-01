@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, date, numeric, uniqueIndex, index } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, timestamp, integer, boolean, date, numeric, uniqueIndex, index, jsonb } from 'drizzle-orm/pg-core'
 
 export const brands = pgTable('brands', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -79,12 +79,47 @@ export const auditLeads = pgTable('audit_leads', {
   email: text('email').notNull(),
   keyword: text('keyword').notNull(),
   competitorCount: integer('competitor_count').notNull().default(0),
+  anonymousId: text('anonymous_id'),
+  sessionId: text('session_id'),
+  firstTouch: text('first_touch'),
+  lastTouch: text('last_touch'),
   weeklyChecksRemaining: integer('weekly_checks_remaining').notNull().default(8),
   lastCheckedAt: timestamp('last_checked_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   unsubscribed: boolean('unsubscribed').notNull().default(false),
 }, (table) => [
   uniqueIndex('audit_leads_email_keyword_idx').on(table.email, table.keyword),
+  index('audit_leads_anonymous_id_idx').on(table.anonymousId),
+  index('audit_leads_created_at_idx').on(table.createdAt),
+])
+
+export const analyticsEvents = pgTable('analytics_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  eventName: text('event_name').notNull(),
+  anonymousId: text('anonymous_id').notNull(),
+  sessionId: text('session_id').notNull(),
+  userId: text('user_id'),
+  brandId: uuid('brand_id').references(() => brands.id),
+  leadId: uuid('lead_id').references(() => auditLeads.id),
+  path: text('path').notNull(),
+  url: text('url'),
+  properties: jsonb('properties').$type<Record<string, string | number | boolean | null>>().notNull().default({}),
+  firstTouchSource: text('first_touch_source'),
+  firstTouchMedium: text('first_touch_medium'),
+  firstTouchCampaign: text('first_touch_campaign'),
+  firstTouchReferrer: text('first_touch_referrer'),
+  lastTouchSource: text('last_touch_source'),
+  lastTouchMedium: text('last_touch_medium'),
+  lastTouchCampaign: text('last_touch_campaign'),
+  lastTouchReferrer: text('last_touch_referrer'),
+  happenedAt: timestamp('happened_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => [
+  index('analytics_events_event_name_idx').on(table.eventName),
+  index('analytics_events_happened_at_idx').on(table.happenedAt),
+  index('analytics_events_anonymous_happened_idx').on(table.anonymousId, table.happenedAt),
+  index('analytics_events_user_happened_idx').on(table.userId, table.happenedAt),
+  index('analytics_events_brand_happened_idx').on(table.brandId, table.happenedAt),
 ])
 
 export type Brand = typeof brands.$inferSelect
@@ -92,3 +127,4 @@ export type SerpCheck = typeof serpChecks.$inferSelect
 export type CompetitorAd = typeof competitorAds.$inferSelect
 export type AuctionInsight = typeof auctionInsights.$inferSelect
 export type AuditLead = typeof auditLeads.$inferSelect
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect

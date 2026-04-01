@@ -3,6 +3,33 @@ import { getStripe } from '@/lib/stripe'
 import { updateBrandSubscription, getBrandByStripeSubscriptionId, getBrandByStripeCustomerId } from '@/lib/db/queries'
 import { db } from '@/lib/db'
 import { sql } from 'drizzle-orm'
+import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
+import type { AttributionContext } from '@/lib/attribution'
+
+function attributionFromStripeMetadata(metadata: Record<string, string | undefined> | null | undefined): AttributionContext {
+  return {
+    anonymousId: metadata?.anonymousId ?? 'unknown',
+    sessionId: metadata?.sessionId ?? 'unknown',
+    firstTouch: metadata?.firstTouchSource
+      ? {
+          source: metadata.firstTouchSource,
+          medium: metadata.firstTouchMedium ?? 'unknown',
+          campaign: metadata.firstTouchCampaign ?? undefined,
+          landingPath: '/unknown',
+          capturedAt: new Date().toISOString(),
+        }
+      : null,
+    lastTouch: metadata?.lastTouchSource
+      ? {
+          source: metadata.lastTouchSource,
+          medium: metadata.lastTouchMedium ?? 'unknown',
+          campaign: metadata.lastTouchCampaign ?? undefined,
+          landingPath: '/unknown',
+          capturedAt: new Date().toISOString(),
+        }
+      : null,
+  }
+}
 
 export async function POST(request: Request) {
   const stripe = getStripe()
@@ -78,6 +105,27 @@ export async function POST(request: Request) {
         stripeSubscriptionId: subscriptionId ?? undefined,
         subscriptionStatus: newStatus,
       })
+      if (paymentStatus === 'paid') {
+        const attribution = attributionFromStripeMetadata(session.metadata)
+        await emitServerAnalyticsEvent({
+          name: 'subscription_activated',
+          path: '/api/webhooks/stripe',
+          brandId,
+          userId: session.metadata?.userId,
+          properties: {
+            paymentStatus,
+          },
+        }, attribution)
+        await emitServerAnalyticsEvent({
+          name: 'paid_conversion',
+          path: '/api/webhooks/stripe',
+          brandId,
+          userId: session.metadata?.userId,
+          properties: {
+            paymentStatus,
+          },
+        }, attribution)
+      }
       console.info(`Brand ${brandId} ${newStatus} via Stripe checkout (payment: ${paymentStatus})`)
       break
     }
