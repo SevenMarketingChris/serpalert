@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { PLAN_LIMITS, getBrandsForUser } from '@/lib/db/queries'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { AppHeader } from '@/components/app-header'
 import { NewUserBrandForm } from './new-user-brand-form'
 
 export default async function NewBrandPage() {
@@ -15,22 +15,7 @@ export default async function NewBrandPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card px-6 py-4">
-        <div className="container mx-auto max-w-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              &larr; Back
-            </Link>
-            <span className="text-border">|</span>
-            <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
-          </div>
-          <ThemeToggle />
-        </div>
-      </div>
+      <AppHeader maxWidth="max-w-lg" backHref="/dashboard" />
 
       <div className="container mx-auto p-6 max-w-lg space-y-6">
         <div className="space-y-1 text-center">

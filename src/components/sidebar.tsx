@@ -184,6 +184,13 @@ export function Sidebar({
             </Link>
           </div>
         )}
+
+        {/* Footer */}
+        <div className="border-t border-gray-200 px-4 py-3">
+          <p className={`truncate text-[10px] text-gray-400 font-mono ${blockClass}`}>
+            &copy; {new Date().getFullYear()} SerpAlert
+          </p>
+        </div>
       </div>
     )
   }

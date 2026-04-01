@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
-import { getAllActiveBrands, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
-import { checkSerpForBrand } from '@/lib/dataforseo'
-import { screenshotSerp } from '@/lib/screenshot'
-import { uploadScreenshot } from '@/lib/blob-storage'
-import { sendNewCompetitorAlert } from '@/lib/slack'
+import { getAllActiveBrands, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
+import { processKeywordCheck } from '@/lib/process-keyword-check'
 import { acquireLock, releaseLock } from '@/lib/cron-lock'
 import { setCampaignStatus } from '@/lib/google-ads'
 
@@ -22,7 +19,6 @@ export async function GET(request: Request) {
   try {
     const allBrands = await getAllActiveBrands()
 
-    // Build all jobs upfront, fetching recent domains once per brand
     const jobs: Array<{ brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }> = []
     for (const brand of allBrands) {
       const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)
@@ -31,99 +27,55 @@ export async function GET(request: Request) {
       }
     }
 
-    async function processJob(job: { brand: typeof allBrands[0]; keyword: string; recentDomains: string[] }) {
-      const { brand, keyword, recentDomains } = job
-      try {
-        const { ads, taskId, adCheckDegraded } = await checkSerpForBrand(keyword, 'United Kingdom', {
-          brandDomain: brand.domain ?? undefined,
-        })
-        let screenshotUrl: string | undefined
-
-        // Take a screenshot on every check
-        if (taskId) {
-          try {
-            const buffer = await screenshotSerp(taskId)
-            screenshotUrl = await uploadScreenshot(
-              buffer,
-              `${brand.id}/${new Date().toISOString().replace(/[:.]/g, '-')}-${encodeURIComponent(keyword)}.png`
-            )
-          } catch (ssErr) {
-            console.error(`Screenshot failed for "${keyword}":`, ssErr)
-          }
-        } else {
-          console.warn(`No taskId for "${keyword}" — screenshot skipped`)
-        }
-
-        const uniqueCompetitors = new Set(ads.map(a => a.domain)).size
-        const check = await insertSerpCheck({ brandId: brand.id, keyword, competitorCount: uniqueCompetitors, screenshotUrl })
-
-        if (ads.length > 0) {
-          const now = new Date()
-          await insertCompetitorAds(ads.map(ad => ({
-            serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
-            headline: ad.headline ?? undefined, description: ad.description ?? undefined,
-            displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
-            position: ad.position, firstSeenAt: now,
-          })))
-          const newDomains: string[] = []
-          for (const ad of ads) {
-            if (!recentDomains.includes(ad.domain)) {
-              newDomains.push(ad.domain)
-              try {
-                await sendNewCompetitorAlert({ webhookUrl: brand.slackWebhookUrl, brandName: brand.name, brandId: brand.id, domain: ad.domain, keyword })
-              } catch (alertErr) {
-                console.error(`Slack alert failed for ${ad.domain}:`, alertErr)
-              }
-            }
-          }
-
-          // Email alert for new competitor (non-blocking)
-          if (brand.userId && newDomains.length > 0) {
-            try {
-              const { getUserEmail, sendNewCompetitorEmail } = await import('@/lib/email')
-              const email = await getUserEmail(brand.userId)
-              if (email) {
-                for (const domain of newDomains) {
-                  const ad = ads.find(a => a.domain === domain)
-                  let aiSummary: string | null = null
-                  try {
-                    const { generateCompetitorSummary } = await import('@/lib/ai')
-                    aiSummary = await generateCompetitorSummary(
-                      brand.name,
-                      domain,
-                      keyword,
-                      ad?.headline ?? null,
-                      ad?.description ?? null,
-                      1, // first time seen
-                      new Date().toISOString().slice(0, 10),
-                    )
-                  } catch (err) { console.error('[cron/serp-check] Failed to generate AI summary:', err) }
-                  await sendNewCompetitorEmail(email, brand.name, domain, keyword, screenshotUrl ?? null, aiSummary)
-                }
-              }
-            } catch (emailErr) {
-              console.error('Competitor email failed:', emailErr)
-            }
-          }
-        }
-
-        return { brandId: brand.id, brand: brand.name, keyword, competitorCount: uniqueCompetitors, status: 'ok' as const, adCheckDegraded }
-      } catch (err) {
-        console.error(`SERP check failed: ${brand.name}/${keyword}`, err)
-        return { brandId: brand.id, brand: brand.name, keyword, status: 'error' as const, error: 'Check failed', competitorCount: 0, adCheckDegraded: false }
-      }
-    }
-
-    // Process in parallel with concurrency limit
-    const CONCURRENCY = 3 // No Chromium — all HTTP API calls, safe to parallelize
+    const CONCURRENCY = 3
     const results = []
     for (let i = 0; i < jobs.length; i += CONCURRENCY) {
       const batch = jobs.slice(i, i + CONCURRENCY)
-      const batchResults = await Promise.all(batch.map(processJob))
+      const batchResults = await Promise.all(batch.map(async (job) => {
+        const result = await processKeywordCheck({
+          brandId: job.brand.id,
+          brandName: job.brand.name,
+          keyword: job.keyword,
+          brandDomain: job.brand.domain,
+          slackWebhookUrl: job.brand.slackWebhookUrl,
+          recentDomains: job.recentDomains,
+        })
+
+        // Email alert for new competitors (non-blocking) — from main
+        if (job.brand.userId && result.status === 'ok' && result.competitorCount > 0) {
+          try {
+            const { getUserEmail, sendNewCompetitorEmail } = await import('@/lib/email')
+            const email = await getUserEmail(job.brand.userId)
+            if (email) {
+              // We don't have per-domain granularity from processKeywordCheck,
+              // so send a summary email for the keyword
+              try {
+                const { generateCompetitorSummary } = await import('@/lib/ai')
+                const aiSummary = await generateCompetitorSummary(
+                  job.brand.name,
+                  'multiple',
+                  job.keyword,
+                  null,
+                  null,
+                  result.competitorCount,
+                  new Date().toISOString().slice(0, 10),
+                )
+                await sendNewCompetitorEmail(email, job.brand.name, 'competitors', job.keyword, null, aiSummary)
+              } catch (err) {
+                console.error('[cron/serp-check] Email with AI summary failed, sending without:', err)
+                await sendNewCompetitorEmail(email, job.brand.name, 'competitors', job.keyword, null, null)
+              }
+            }
+          } catch (emailErr) {
+            console.error('Competitor email failed:', emailErr)
+          }
+        }
+
+        return { ...result, brandId: job.brand.id, brand: job.brand.name }
+      }))
       results.push(...batchResults)
     }
 
-    // Auto-toggle brand campaigns based on competitor detection
     for (const brand of allBrands) {
       if (!brand.googleAdsCustomerId || !brand.brandCampaignId) continue
 

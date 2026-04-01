@@ -82,7 +82,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Run Free Brand Audit
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
               href="/sign-up"
@@ -178,7 +178,7 @@ export default function HomePage() {
                 key={card.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-3"
               >
-                <card.icon className={`h-5 w-5 ${card.accent}`} />
+                <card.icon className={`h-5 w-5 ${card.accent}`} aria-hidden="true" />
                 <h3 className="font-semibold text-foreground">{card.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {card.description}
@@ -285,7 +285,7 @@ export default function HomePage() {
                 key={feature.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-2"
               >
-                <feature.icon className="h-5 w-5 text-primary" />
+                <feature.icon className="h-5 w-5 text-primary" aria-hidden="true" />
                 <h3 className="font-semibold text-foreground">
                   {feature.title}
                 </h3>

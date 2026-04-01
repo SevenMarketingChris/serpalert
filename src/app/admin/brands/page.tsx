@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { getAllActiveBrands, getLastCheckForBrand } from '@/lib/db/queries'
 import type { SerpCheck } from '@/lib/db/schema'
 import { Badge } from '@/components/ui/badge'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { AppHeader } from '@/components/app-header'
 import { Shield } from 'lucide-react'
 import { getRelativeTime } from '@/lib/time'
 import { auth } from '@clerk/nextjs/server'
@@ -31,24 +31,14 @@ export default async function AdminBrandsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card px-6 py-4">
-        <div className="container mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
-            <Badge className="font-mono text-xs tracking-widest">ADMIN</Badge>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Dashboard
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </div>
+      <AppHeader maxWidth="max-w-6xl" badge={<Badge className="font-mono text-xs tracking-widest">ADMIN</Badge>}>
+        <Link
+          href="/dashboard"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Dashboard
+        </Link>
+      </AppHeader>
 
       <div className="container mx-auto p-6 max-w-6xl space-y-6">
         {/* Stats */}

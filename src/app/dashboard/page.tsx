@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
-import { getBrandsForUser, getAllActiveBrands, getLastCheckForBrand, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
-import type { Brand, SerpCheck } from '@/lib/db/schema'
+import { getBrandsForUser, getAllActiveBrands, getLastChecksForBrands, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
+import type { Brand } from '@/lib/db/schema'
+import { AppHeader } from '@/components/app-header'
 import { getRelativeTime } from '@/lib/time'
 import { SubscribeBanner } from '@/components/subscribe-banner'
 import { SubscribeButton } from '@/components/subscribe-button'
@@ -32,36 +33,13 @@ export default async function DashboardPage() {
   const planLimit = PLAN_LIMITS[currentPlan]?.brands ?? PLAN_LIMITS.free.brands
   const canAddBrand = brandCount < planLimit
 
-  const lastChecks = await Promise.all(
-    brands.map(async (b) => {
-      const check = await getLastCheckForBrand(b.id)
-      return { brandId: b.id, check }
-    })
-  )
-  const checkMap = new Map<string, SerpCheck | null>(
-    lastChecks.map(({ brandId, check }) => [brandId, check])
-  )
+  const checkMap = await getLastChecksForBrands(brands.map(b => b.id))
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="container mx-auto max-w-5xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-black tracking-tight text-indigo-600">SerpAlert</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="text-xs font-mono text-indigo-600 hover:text-indigo-700 transition-colors"
-              >
-                Admin
-              </Link>
-            )}
-            <UserButton />
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <AppHeader>
+        <UserButton />
+      </AppHeader>
 
       <div className="container mx-auto p-6 max-w-5xl space-y-6">
         {brands.map((b) => {

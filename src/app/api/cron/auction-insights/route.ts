@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const CONCURRENCY = 3
     for (let i = 0; i < allBrands.length; i += CONCURRENCY) {
       const batch = allBrands.slice(i, i + CONCURRENCY)
-      await Promise.allSettled(batch.map(async (brand) => {
+      await Promise.all(batch.map(async (brand) => {
         if (!brand.googleAdsCustomerId) {
           results.push({ brand: brand.name, status: 'skipped' })
           return

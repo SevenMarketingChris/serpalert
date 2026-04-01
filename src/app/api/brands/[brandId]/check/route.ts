@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { getBrandById, insertSerpCheck, insertCompetitorAds, getCompetitorDomainsLastNDays, getLastCheckForBrand } from '@/lib/db/queries'
-import { checkSerpForBrand } from '@/lib/dataforseo'
-import { screenshotSerp } from '@/lib/screenshot'
-import { uploadScreenshot } from '@/lib/blob-storage'
-import { sendNewCompetitorAlert } from '@/lib/slack'
-const MANUAL_CHECK_COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
+import { getBrandById, getCompetitorDomainsLastNDays, getLastCheckForBrand } from '@/lib/db/queries'
+import { processKeywordCheck } from '@/lib/process-keyword-check'
+import { rateLimit } from '@/lib/rate-limit'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const MANUAL_CHECK_COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
 
 export const maxDuration = 300
 
@@ -57,56 +55,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
   const results = []
 
   for (const keyword of brand.keywords) {
-    try {
-      const { ads, taskId, adCheckDegraded } = await checkSerpForBrand(keyword, 'United Kingdom', {
-        brandDomain: brand.domain ?? undefined,
-      })
-
-      let screenshotUrl: string | undefined
-      if (taskId) {
-        try {
-          const buffer = await screenshotSerp(taskId)
-          screenshotUrl = await uploadScreenshot(
-            buffer,
-            `${brand.id}/${new Date().toISOString().replace(/[:.]/g, '-')}-${encodeURIComponent(keyword)}.png`
-          )
-        } catch (ssErr) {
-          console.error(`Screenshot failed for "${keyword}":`, ssErr)
-        }
-      } else {
-        console.warn(`No taskId for "${keyword}" — screenshot skipped`)
-      }
-
-      const check = await insertSerpCheck({
-        brandId: brand.id, keyword, competitorCount: new Set(ads.map(a => a.domain)).size, screenshotUrl,
-      })
-
-      if (ads.length > 0) {
-        const now = new Date()
-        await insertCompetitorAds(ads.map(ad => ({
-          serpCheckId: check.id, brandId: brand.id, domain: ad.domain,
-          headline: ad.headline ?? undefined, description: ad.description ?? undefined,
-          displayUrl: ad.displayUrl ?? undefined, destinationUrl: ad.destinationUrl ?? undefined,
-          position: ad.position, firstSeenAt: now,
-        })))
-
-        for (const ad of ads) {
-          if (!recentDomains.includes(ad.domain)) {
-            try {
-              await sendNewCompetitorAlert({
-                webhookUrl: brand.slackWebhookUrl, brandName: brand.name,
-                brandId: brand.id, domain: ad.domain, keyword,
-              })
-            } catch (err) { console.error('[brands/check] Failed to send Slack alert:', err) }
-          }
-        }
-      }
-
-      results.push({ keyword, competitorCount: new Set(ads.map(a => a.domain)).size, status: 'ok', adCheckDegraded })
-    } catch (err) {
-      console.error(`Manual check failed: ${brand.name}/${keyword}`, err)
-      results.push({ keyword, status: 'error', error: 'Check failed' })
-    }
+    const result = await processKeywordCheck({
+      brandId: brand.id,
+      brandName: brand.name,
+      keyword,
+      brandDomain: brand.domain,
+      slackWebhookUrl: brand.slackWebhookUrl,
+      recentDomains,
+    })
+    results.push(result)
   }
 
   return NextResponse.json({ results, timestamp: new Date().toISOString() })
