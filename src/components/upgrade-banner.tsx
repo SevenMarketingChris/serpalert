@@ -30,8 +30,9 @@ export function UpgradeBanner({ brandId, isExpired, isCanceled, daysLeft }: Prop
         return
       }
       window.location.href = data.url
-    } catch {
-      setError('Network error. Please try again.')
+    } catch (err) {
+      console.error('Checkout error:', err)
+      setError('Unable to connect. Please try again.')
       setLoading(false)
     }
   }

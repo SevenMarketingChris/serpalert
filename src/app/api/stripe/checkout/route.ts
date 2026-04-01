@@ -80,7 +80,13 @@ export async function POST(request: Request) {
     sessionParams.customer = brand.stripeCustomerId
   }
 
-  const session = await stripe.checkout.sessions.create(sessionParams)
+  let session
+  try {
+    session = await stripe.checkout.sessions.create(sessionParams)
+  } catch (err) {
+    console.error('Stripe checkout session creation failed:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Failed to create checkout session. Please try again.' }, { status: 500 })
+  }
 
   await emitServerAnalyticsEvent({
     name: 'checkout_started',
