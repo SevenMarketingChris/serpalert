@@ -16,13 +16,39 @@ export async function checkIsAdmin(): Promise<boolean> {
 }
 
 /**
- * Sync check for middleware/proxy context where currentUser() isn't available.
- * Falls back to publicMetadata.role check.
+ * Sync check for middleware/proxy context.
+ * Checks email from session claims OR publicMetadata.role.
  */
 export function isAdminFromClaims(sessionClaims: Record<string, unknown> | null | undefined): boolean {
   if (!sessionClaims) return false
-  const role = (sessionClaims as { publicMetadata?: { role?: string } })?.publicMetadata?.role
-  return role === 'admin'
+  // Check email from Clerk JWT claims
+  const claims = sessionClaims as {
+    email?: string
+    primaryEmail?: string
+    publicMetadata?: { role?: string }
+  }
+  const email = (claims.email || claims.primaryEmail || '').toLowerCase()
+  if (email && ADMIN_EMAILS.includes(email)) return true
+  // Fallback to metadata role
+  return claims.publicMetadata?.role === 'admin'
+}
+
+/**
+ * Assert that the current user is authorized to access the given brand.
+ * Agency admins can access agency-managed brands; regular users can only
+ * access brands they own (non-agency-managed).
+ */
+export function authorizeBrandAccess(
+  brand: { agencyManaged: boolean; userId: string | null },
+  userId: string | undefined,
+  isAdmin: boolean,
+): void {
+  if (brand.agencyManaged && !isAdmin) {
+    throw new Error('Not authorized: agency-managed brands require admin access')
+  }
+  if (!brand.agencyManaged && brand.userId !== userId) {
+    throw new Error('Not authorized: you do not own this brand')
+  }
 }
 
 export function safeCompare(a: string, b: string): boolean {

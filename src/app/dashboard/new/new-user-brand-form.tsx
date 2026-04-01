@@ -46,7 +46,7 @@ export function NewUserBrandForm({ keywordLimit }: Props) {
               placeholder="Acme Corp, Acme Corp reviews, buy Acme"
             />
             <p className="text-xs text-muted-foreground">
-              Up to {keywordLimit} keywords on the free plan
+              Up to {keywordLimit} keywords on your current plan
             </p>
           </div>
 

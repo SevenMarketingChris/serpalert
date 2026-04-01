@@ -45,9 +45,9 @@ export function SubscribeButton({ brandId }: { brandId: string }) {
         onClick={handleSubscribe}
         disabled={loading}
         size="sm"
-        className="bg-primary text-primary-foreground"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap"
       >
-        {loading ? 'Loading…' : 'Subscribe — £149/mo'}
+        {loading ? 'Loading...' : 'Subscribe — £149/mo'}
       </Button>
       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </div>

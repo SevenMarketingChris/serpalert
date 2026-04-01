@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background: #f3f4f6; font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+  .email-wrapper { max-width: 600px; margin: 0 auto 40px; }
+  .email-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #6366f1; font-weight: 700; margin-bottom: 8px; }
+  .email-trigger { font-size: 12px; color: #9ca3af; margin-bottom: 12px; }
+  .email-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+  .email-header { background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .email-from { font-size: 12px; color: #111; font-weight: 600; }
+  .email-subject { font-size: 12px; color: #555; }
+  .email-body { padding: 24px; }
+  h1 { font-size: 20px; color: #111; margin: 0 0 12px; }
+  h2 { font-size: 14px; color: #111; margin: 20px 0 8px; }
+  p { color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .alert-box { border-radius: 8px; padding: 16px; margin: 16px 0; }
+  .alert-red { background: #fef2f2; border: 1px solid #fecaca; }
+  .alert-blue { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .alert-amber { background: #fffbeb; border: 1px solid #fde68a; }
+  .btn { display: inline-block; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; color: #fff; }
+  .btn-indigo { background: #4f46e5; }
+  .btn-amber { background: #f59e0b; }
+  .stat-row { display: flex; gap: 12px; margin: 16px 0; }
+  .stat-card { flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; }
+  .stat-value { font-size: 24px; font-weight: 700; font-family: monospace; color: #111; }
+  .stat-red { color: #dc2626; }
+  .stat-green { color: #22c55e; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 8px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; background: #f9fafb; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; font-family: monospace; font-size: 13px; }
+  .footer { color: #999; font-size: 12px; margin-top: 24px; }
+  .footer a { color: #999; }
+  .screenshot-placeholder { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; height: 120px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; margin-bottom: 12px; }
+  .divider { border-top: 2px solid #e5e7eb; margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<!-- 1. WELCOME EMAIL -->
+<div class="email-wrapper">
+  <div class="email-label">1. Welcome Email</div>
+  <div class="email-trigger">Trigger: When a user creates their first brand</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">Welcome to SerpAlert — Tide is now being monitored</span>
+    </div>
+    <div class="email-body">
+      <h1>Welcome to SerpAlert</h1>
+      <p>Your brand <strong>Tide</strong> is now being monitored for competitor ads on Google.</p>
+      <p>We check your brand keywords every hour. If a competitor starts bidding on your brand, you'll be alerted immediately.</p>
+      <h2>What happens next?</h2>
+      <ul style="color: #555; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+        <li>Your first SERP check will run within the hour</li>
+        <li>Set up Slack alerts in Settings for instant notifications</li>
+        <li>Your 7-day free trial has started — no credit card needed yet</li>
+      </ul>
+      <p style="margin-top: 20px;"><a href="#" class="btn btn-indigo">Go to Dashboard</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 2. NEW COMPETITOR -->
+<div class="email-wrapper">
+  <div class="email-label">2. New Competitor Alert</div>
+  <div class="email-trigger">Trigger: First time a domain is detected on a brand (once per domain, not per check)</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">New competitor detected on "Tide" — revolut.com</span>
+    </div>
+    <div class="email-body">
+      <h1>New Competitor Alert</h1>
+      <p>A new competitor has been detected bidding on your brand keyword.</p>
+      <div class="alert-box alert-red">
+        <p style="margin: 0; font-size: 14px;"><strong style="color: #111;">Competitor:</strong> <span style="color: #dc2626; font-family: monospace;">revolut.com</span></p>
+        <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Keyword:</strong> <span style="font-family: monospace;">tide business account</span></p>
+        <p style="margin: 8px 0 0; font-size: 14px;"><strong style="color: #111;">Brand:</strong> Tide</p>
+      </div>
+      <div class="screenshot-placeholder">📸 SERP screenshot attached showing the competitor ad</div>
+      <p><a href="#" class="btn btn-indigo">View Dashboard</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 3. TRIAL EXPIRING -->
+<div class="email-wrapper">
+  <div class="email-label">3. Trial Expiring</div>
+  <div class="email-trigger">Trigger: 3 days before trial ends (sent once)</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">Your SerpAlert trial expires in 3 days</span>
+    </div>
+    <div class="email-body">
+      <h1>Your trial is ending soon</h1>
+      <p>Your free trial for <strong>Tide</strong> expires in <strong>3 days</strong>.</p>
+      <p>After your trial ends, monitoring will pause. Subscribe now to keep protecting your brand.</p>
+      <p style="margin-top: 20px;"><a href="#" class="btn btn-indigo">Subscribe Now — £149/mo</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 4. TRIAL EXPIRED -->
+<div class="email-wrapper">
+  <div class="email-label">4. Trial Expired</div>
+  <div class="email-trigger">Trigger: Day trial ends (sent once)</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">Your SerpAlert trial has expired — Tide</span>
+    </div>
+    <div class="email-body">
+      <h1>Your trial has ended</h1>
+      <p>Your free trial for <strong>Tide</strong> has expired. Monitoring is now paused — but all your historical data is still available.</p>
+      <p>Subscribe now to resume hourly monitoring and keep protecting your brand.</p>
+      <p style="margin-top: 20px;"><a href="#" class="btn btn-indigo">Subscribe — £149/mo</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 5. PAYMENT FAILED -->
+<div class="email-wrapper">
+  <div class="email-label">5. Payment Failed</div>
+  <div class="email-trigger">Trigger: Stripe invoice.payment_failed webhook</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">Payment failed for Tide — action required</span>
+    </div>
+    <div class="email-body">
+      <h1>Payment failed</h1>
+      <p>We were unable to process your payment for <strong>Tide</strong>. Your monitoring is still running but will be paused if payment is not updated.</p>
+      <p>Please update your payment method to avoid any interruption.</p>
+      <p style="margin-top: 20px;"><a href="#" class="btn btn-amber">Update Payment Method</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 6. MONTHLY REPORT -->
+<div class="email-wrapper">
+  <div class="email-label">6. Monthly Report</div>
+  <div class="email-trigger">Trigger: 1st of every month at 9am</div>
+  <div class="email-card">
+    <div class="email-header">
+      <span class="email-from">SerpAlert &lt;noreply@serpalert.co.uk&gt;</span>
+      <span class="email-subject">Monthly Report — Tide — March 2026</span>
+    </div>
+    <div class="email-body">
+      <h1>Monthly Report</h1>
+      <p>Here's your brand protection summary for <strong>Tide</strong> over the last 30 days.</p>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">Checks</div>
+          <div class="stat-value">720</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Competitors</div>
+          <div class="stat-value stat-red">4</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Keywords</div>
+          <div class="stat-value">2</div>
+        </div>
+      </div>
+
+      <div class="alert-box alert-red">
+        <p style="margin: 0; font-size: 13px; color: #555;">Most active competitor: <strong style="color: #dc2626; font-family: monospace;">revolut.com</strong></p>
+      </div>
+
+      <h2>Competitors Detected</h2>
+      <table>
+        <thead>
+          <tr><th>Domain</th><th style="text-align: right;">Times Seen</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>revolut.com</td><td style="text-align: right; font-family: monospace;">47x</td></tr>
+          <tr><td>starlingbank.com</td><td style="text-align: right; font-family: monospace;">23x</td></tr>
+          <tr><td>monzo.com</td><td style="text-align: right; font-family: monospace;">12x</td></tr>
+          <tr><td>wise.com</td><td style="text-align: right; font-family: monospace;">5x</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Recent Screenshots</h2>
+      <p style="color: #999; font-size: 12px; margin-bottom: 12px;">Latest SERP captures showing competitor activity</p>
+      <div class="screenshot-placeholder">📸 Screenshot 1 — "tide business account" — revolut.com ad visible</div>
+      <div class="screenshot-placeholder">📸 Screenshot 2 — "tide bank" — starlingbank.com ad visible</div>
+      <div class="screenshot-placeholder">📸 Screenshot 3 — "tide business account" — monzo.com ad visible</div>
+
+      <p style="margin-top: 20px;"><a href="#" class="btn btn-indigo">View Full Dashboard</a></p>
+      <p class="footer">SerpAlert — Brand keyword monitoring by <a href="#">Seven Marketing</a></p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

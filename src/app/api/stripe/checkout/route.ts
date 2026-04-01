@@ -4,6 +4,8 @@ import { getStripe } from '@/lib/stripe'
 import type Stripe from 'stripe'
 import { getBrandById } from '@/lib/db/queries'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function POST(request: Request) {
   const { userId } = await auth()
   if (!userId) {
@@ -17,8 +19,8 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
-  if (!brandId) {
-    return NextResponse.json({ error: 'brandId required' }, { status: 400 })
+  if (!brandId || !UUID_RE.test(brandId)) {
+    return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
   }
 
   const brand = await getBrandById(brandId)
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
   const origin = new URL(request.url).origin
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
-    mode: 'subscription',
+    mode: 'subscription' as const,
     line_items: [{ price: priceId, quantity: 1 }],
     metadata: { brandId, userId },
     subscription_data: { metadata: { brandId } },

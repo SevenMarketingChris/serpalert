@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { updateBrandSubscription, getBrandByStripeSubscriptionId, getBrandByStripeCustomerId } from '@/lib/db/queries'
+import { db } from '@/lib/db'
+import { sql } from 'drizzle-orm'
 
 export async function POST(request: Request) {
-  // Note: No event ID deduplication. All operations are idempotent (upsert/update),
-  // so duplicate webhook deliveries are safe. Add event.id tracking if side effects
-  // (emails, credits) are added later.
   const stripe = getStripe()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -14,7 +13,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
   }
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const webhookSecret=process.env.STRIPE_WEBHOOK_SECRET
   if (!webhookSecret) {
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
   }
@@ -25,6 +24,32 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('Stripe webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
+  // Deduplicate: skip already-processed event IDs
+  try {
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS processed_events (
+        event_id TEXT PRIMARY KEY,
+        processed_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `)
+  } catch (err) {
+    console.error('Failed to create processed_events table:', err)
+  }
+
+  try {
+    await db.execute(sql`
+      INSERT INTO processed_events (event_id) VALUES (${event.id})
+    `)
+  } catch (err) {
+    const pgErr = err as { code?: string }
+    if (pgErr.code === '23505') {
+      console.info(`Stripe event ${event.id} already processed — skipping`)
+      return NextResponse.json({ received: true, dedup: true })
+    }
+    console.error(`processed_events insert error for ${event.id}:`, err)
+    // Fall through — don't block processing on dedup table failure
   }
 
   switch (event.type) {
@@ -104,9 +129,24 @@ export async function POST(request: Request) {
 
       const brand = await getBrandByStripeCustomerId(customerId)
       if (!brand) break
+      if (brand.subscriptionStatus === 'canceled') break
 
       await updateBrandSubscription(brand.id, { subscriptionStatus: 'past_due' })
       console.info(`Brand ${brand.id} payment failed — marked past_due`)
+
+      // Send payment failed email (non-blocking)
+      try {
+        if (brand.userId) {
+          const { getUserEmail, sendPaymentFailedEmail } = await import('@/lib/email')
+          const email = await getUserEmail(brand.userId)
+          if (email) {
+            await sendPaymentFailedEmail(email, brand.name)
+          }
+        }
+      } catch (emailErr) {
+        console.error('Payment failed email error:', emailErr)
+      }
+
       break
     }
 

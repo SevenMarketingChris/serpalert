@@ -2,25 +2,27 @@ import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import Link from 'next/link'
 import { getBrandById, getAuctionInsightsLast30Days } from '@/lib/db/queries'
-import { DashboardTabs } from '@/components/dashboard-tabs'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { AuctionChart } from '@/components/auction-chart'
 
 export default async function InsightsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+  const isAdmin = await checkIsAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged) notFound()
-  if (brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const hasGoogleAds = !!brand.googleAdsCustomerId
 
   return (
     <div className="max-w-5xl space-y-4">
-      <DashboardTabs brandId={brandId} hasGoogleAds={hasGoogleAds} />
-
       {hasGoogleAds ? (
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">

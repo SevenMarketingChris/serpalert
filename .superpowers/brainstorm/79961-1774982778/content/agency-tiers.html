@@ -1,0 +1,90 @@
+<h2>Agency Partner Model — How should we structure it?</h2>
+<p class="subtitle">Agencies manage multiple client brands. What pricing model drives the most partner signups?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Tiered: Bronze / Silver / Gold</h3>
+      <table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem;">
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+          <th style="text-align:left; padding:0.5rem;">Tier</th>
+          <th style="text-align:center; padding:0.5rem;">Brands</th>
+          <th style="text-align:center; padding:0.5rem;">Price/mo</th>
+          <th style="text-align:center; padding:0.5rem;">Per brand</th>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:0.5rem;">🥉 Bronze</td>
+          <td style="text-align:center;">Up to 5</td>
+          <td style="text-align:center;">£499</td>
+          <td style="text-align:center;">£99.80</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:0.5rem;">🥈 Silver</td>
+          <td style="text-align:center;">Up to 15</td>
+          <td style="text-align:center;">£999</td>
+          <td style="text-align:center;">£66.60</td>
+        </tr>
+        <tr>
+          <td style="padding:0.5rem;">🥇 Gold</td>
+          <td style="text-align:center;">Up to 40</td>
+          <td style="text-align:center;">£1,999</td>
+          <td style="text-align:center;">£49.98</td>
+        </tr>
+      </table>
+      <p>Agencies pick a tier, get white-label client portals, bulk pricing. They upsell to clients at whatever margin they want.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Predictable MRR per agency</li><li>Encourages agencies to fill their allocation</li><li>Clear upgrade path</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Agency with 6 brands pays for 15 (Silver) — feels wasteful</li><li>More complex billing logic</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Per-Brand: £99/brand/month (agency rate)</h3>
+      <p>Flat discount from £149 retail. Agency pays £99/brand/month, no tiers, no minimums. Volume discount kicks in at thresholds:</p>
+      <table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem;">
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+          <th style="text-align:left; padding:0.5rem;">Brands</th>
+          <th style="text-align:center; padding:0.5rem;">Per brand/mo</th>
+          <th style="text-align:center; padding:0.5rem;">Discount</th>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:0.5rem;">1–5</td>
+          <td style="text-align:center;">£99</td>
+          <td style="text-align:center;">33% off retail</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:0.5rem;">6–15</td>
+          <td style="text-align:center;">£79</td>
+          <td style="text-align:center;">47% off retail</td>
+        </tr>
+        <tr>
+          <td style="padding:0.5rem;">16+</td>
+          <td style="text-align:center;">£59</td>
+          <td style="text-align:center;">60% off retail</td>
+        </tr>
+      </table>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Pay only for what you use — zero waste</li><li>Low barrier to start (1 brand = £99)</li><li>Simple to understand</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Less predictable revenue per agency</li><li>No commitment incentive</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Setup Fee + Reduced Monthly</h3>
+      <p>One-time £199 setup per brand (covers onboarding, keyword research, initial audit). Then £79/brand/month ongoing. Agency keeps the setup fee as margin or passes to client.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Upfront cash — helps fund early growth</li><li>Qualifies serious agencies (skin in the game)</li><li>Lower monthly makes it easier to sell to clients</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Setup fee is friction for first sale</li><li>Harder to pitch "free trial" alongside a fee</li><li>More complex pricing page</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 2rem;">💡 <strong>Margin note:</strong> API cost is ~£20/brand/month. At £59/brand (lowest tier), you still have 66% gross margin. All tiers are profitable.</p>

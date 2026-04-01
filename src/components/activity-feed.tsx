@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import { StatusFilter } from '@/components/status-filter'
 import { ThreatCard } from '@/components/threat-card'
 import { groupChecksIntoRuns, type CheckItem, type ScanRun } from '@/lib/group-checks'
 import { isSafeUrl } from '@/lib/utils'
@@ -126,28 +125,12 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
 }
 
 export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps) {
-  const [filter, setFilter] = useState('unresolved')
   const [displayCount, setDisplayCount] = useState(10)
 
   const runs = useMemo(() => groupChecksIntoRuns(checks), [checks])
 
-  const filtered = runs.filter(run => {
-    switch (filter) {
-      case 'all':
-        return true
-      case 'new':
-        return run.totalThreats > 0 && run.checks.some(c => c.ads.some(a => a.status === 'new'))
-      case 'unresolved':
-        return run.hasUnresolved
-      case 'resolved':
-        return run.totalThreats > 0 && !run.hasUnresolved
-      default:
-        return true
-    }
-  })
-
-  const visible = filtered.slice(0, displayCount)
-  const hasMore = filtered.length > displayCount
+  const visible = runs.slice(0, displayCount)
+  const hasMore = runs.length > displayCount
 
   if (checks.length === 0) {
     return (
@@ -159,16 +142,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold font-mono">Activity Feed</h2>
-        <StatusFilter value={filter} onChange={setFilter} />
-      </div>
-
-      {visible.length === 0 && (
-        <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground text-sm">
-          No checks match the current filter.
-        </div>
-      )}
+      <h2 className="text-sm font-semibold font-mono">Activity Feed</h2>
 
       {visible.map((run, i) => (
         <ScanRunCard
@@ -185,7 +159,7 @@ export function ActivityFeed({ checks, brandId, brandToken }: ActivityFeedProps)
           onClick={() => setDisplayCount(c => c + 10)}
           className="w-full bg-card border border-border rounded-lg py-2.5 text-xs font-mono text-muted-foreground hover:bg-card/80 transition-colors cursor-pointer"
         >
-          Load more ({filtered.length - displayCount} remaining)
+          Load more ({runs.length - displayCount} remaining)
         </button>
       )}
     </div>

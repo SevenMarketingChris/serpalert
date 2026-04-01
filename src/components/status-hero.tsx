@@ -58,7 +58,7 @@ export function StatusHero({
             </p>
           </div>
         </div>
-        {showCheckButton && <ManualCheckButton brandId={brandId} />}
+        {showCheckButton && <ManualCheckButton brandId={brandId} lastCheckAt={lastCheckAt} />}
       </div>
 
       {(checksToday > 0 || keywordCount > 0) && (

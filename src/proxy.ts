@@ -1,24 +1,18 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { isAdminFromClaims } from '@/lib/auth'
 
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/admin(.*)'])
-const isAdminRoute = createRouteMatcher(['/admin(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    const { userId, sessionClaims } = await auth()
+    const { userId } = await auth()
     if (!userId) {
       const signInUrl = new URL('/sign-in', req.url)
       signInUrl.searchParams.set('redirect_url', req.url)
       return NextResponse.redirect(signInUrl)
     }
-
-    if (isAdminRoute(req)) {
-      if (!isAdminFromClaims(sessionClaims)) {
-        return NextResponse.redirect(new URL('/unauthorized', req.url))
-      }
-    }
+    // Admin role check is handled server-side by AdminLayout using checkIsAdmin()
+    // which verifies the user's email against the ADMIN_EMAILS allowlist
   }
 })
 

@@ -1,153 +1,76 @@
 import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
-import { DashboardTabs } from '@/components/dashboard-tabs'
-import { Shield } from 'lucide-react'
-import { WastedSpendBadge } from '@/components/wasted-spend-badge'
-import { getRelativeTime } from '@/lib/time'
-
-const rankBorderColors: Record<number, string> = {
-  1: '#D4AF37',
-  2: '#A8A9AD',
-  3: '#CD7F32',
-}
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { Shield, Download } from 'lucide-react'
+import { CompetitorTable } from '@/components/competitor-table'
 
 export default async function CompetitorsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+  const isAdmin = await checkIsAdmin()
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged) notFound() // agency brands are admin-only via admin panel
-  if (brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const competitors = await getCompetitorSummaryForBrand(brandId)
 
   return (
     <div className="max-w-5xl space-y-4">
-      <DashboardTabs brandId={brandId} hasGoogleAds={!!brand.googleAdsCustomerId} />
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
+        <Link href={`/dashboard/${brandId}`} className="hover:text-indigo-600 transition-colors">&larr; Overview</Link>
+        <span>/</span>
+        <span className="text-gray-600">Competitors</span>
+      </div>
 
       {competitors.length === 0 ? (
-        <div className="bg-card border border-border rounded-lg p-12 text-center space-y-3">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mx-auto">
+        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center space-y-3 shadow-sm">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 mx-auto">
             <Shield className="h-6 w-6" />
           </div>
-          <p className="font-semibold text-foreground">No competitors detected yet</p>
-          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-            When competitors start bidding on your brand keywords, they&apos;ll appear here with full details.
+          <p className="font-semibold text-gray-900">No competitors detected yet</p>
+          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+            When competitors start bidding on your brand keywords, they&apos;ll appear here with full details including their ad copy, position, and frequency.
+          </p>
+          <p className="text-xs text-gray-400 mt-2">
+            Checks run every hour — if your brand is new, check back after the first scan completes.
           </p>
         </div>
       ) : (
         <>
-          {/* Desktop Table */}
-          <div className="hidden md:block bg-card border border-border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase tracking-wider">
-                  <th className="px-4 py-3 font-medium">Rank</th>
-                  <th className="px-4 py-3 font-medium">Domain</th>
-                  <th className="px-4 py-3 font-medium">Avg Position</th>
-                  <th className="px-4 py-3 font-medium">Last 30d</th>
-                  <th className="px-4 py-3 font-medium">Total</th>
-                  <th className="px-4 py-3 font-medium">Keywords</th>
-                  <th className="px-4 py-3 font-medium">First Seen</th>
-                  <th className="px-4 py-3 font-medium">Last Seen</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {competitors.map((competitor, index) => {
-                  const rank = index + 1
-                  const borderColor = rankBorderColors[rank]
-                  return (
-                    <tr
-                      key={competitor.domain}
-                      className="border-b border-border last:border-b-0 hover:bg-card/80 transition-colors"
-                      style={borderColor ? { borderLeftWidth: '3px', borderLeftColor: borderColor } : undefined}
-                    >
-                      <td className="px-4 py-3 text-sm text-muted-foreground">#{rank}</td>
-                      <td className="px-4 py-3">
-                        <span className="font-mono text-sm font-bold">{competitor.domain}</span>
-                        <WastedSpendBadge detections={competitor.recentCount} avgPosition={competitor.avgPosition} />
-                      </td>
-                      <td className="px-4 py-3">
-                        {competitor.avgPosition != null ? (
-                          <span className={`font-mono text-xs px-2 py-0.5 rounded ${
-                            competitor.avgPosition <= 2 ? 'bg-red-500/10 text-red-500' : 'bg-muted text-muted-foreground'
-                          }`}>
-                            Pos {competitor.avgPosition}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">&mdash;</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 font-mono font-bold text-sm">{competitor.recentCount}</td>
-                      <td className="px-4 py-3 font-mono text-sm text-muted-foreground">{competitor.totalCount}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {competitor.keywords.slice(0, 3).map((kw) => (
-                            <span
-                              key={kw}
-                              className="bg-tech-purple/10 text-tech-purple text-xs font-mono px-2 py-0.5 rounded"
-                            >
-                              {kw}
-                            </span>
-                          ))}
-                          {competitor.keywords.length > 3 && (
-                            <span className="text-muted-foreground text-xs">
-                              +{competitor.keywords.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                        {new Date(competitor.firstSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                        {getRelativeTime(competitor.lastSeen)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-xs">
-                          <span
-                            className={`inline-block w-2 h-2 rounded-full ${competitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`}
-                          />
-                          {competitor.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">Competitors</h1>
+              <p className="text-sm text-gray-500">
+                {competitors.length} competitor{competitors.length !== 1 ? 's' : ''} detected in last 90 days
+              </p>
+            </div>
+            <a
+              href={`/api/brands/${brandId}/export`}
+              className="inline-flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Export CSV
+            </a>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-3">
-            {competitors.map((competitor, index) => (
-              <div
-                key={competitor.domain}
-                className="bg-card border border-border rounded-lg p-4 space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-sm">{competitor.domain}</span>
-                  <span className="inline-flex items-center gap-1.5 text-xs">
-                    <span
-                      className={`inline-block w-2 h-2 rounded-full ${competitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`}
-                    />
-                    {competitor.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>
-                    <span className="font-mono font-bold text-foreground">{competitor.recentCount}</span> last 30d
-                    <span className="mx-1">&middot;</span>
-                    <span className="font-mono text-foreground">{competitor.totalCount}</span> total
-                  </span>
-                  <span className="font-mono text-xs">{getRelativeTime(competitor.lastSeen)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Table */}
+          <CompetitorTable
+            competitors={competitors.map((c) => ({
+              ...c,
+              firstSeen: c.firstSeen.toISOString(),
+              lastSeen: c.lastSeen.toISOString(),
+            }))}
+            brandId={brandId}
+          />
         </>
       )}
     </div>

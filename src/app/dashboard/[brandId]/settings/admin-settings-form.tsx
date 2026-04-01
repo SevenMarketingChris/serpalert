@@ -11,9 +11,6 @@ interface Props {
   brandId: string
   monthlyBrandSpend: string
   brandRoas: string
-  googleAdsCustomerId: string
-  brandCampaignId: string
-  slackWebhookUrl: string
   watchlistDomains: string
   active: boolean
 }
@@ -22,24 +19,42 @@ export function AdminSettingsForm({
   brandId,
   monthlyBrandSpend,
   brandRoas,
-  googleAdsCustomerId,
-  brandCampaignId,
-  slackWebhookUrl,
   watchlistDomains,
   active,
 }: Props) {
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateAdminSettings, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateAdminSettings(prev, formData, brandId),
+    null,
+  )
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
-        Admin Settings
-      </h3>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Admin Settings</h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Advanced settings for agency administrators. These control monitoring behaviour, financial data used in ROI calculations, and competitor watchlists.
+        </p>
+      </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
+
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="active"
+            name="active"
+            defaultChecked={active}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <div>
+            <Label htmlFor="active">Active Monitoring</Label>
+            <p className="text-[11px] text-gray-400">
+              When enabled, SerpAlert runs scheduled SERP checks for this brand. Disable to pause monitoring without deleting the brand or its data.
+            </p>
+          </div>
+        </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="monthlyBrandSpend">Monthly Brand Spend</Label>
+          <Label htmlFor="monthlyBrandSpend">Monthly Brand Spend (GBP)</Label>
           <Input
             id="monthlyBrandSpend"
             name="monthlyBrandSpend"
@@ -48,6 +63,9 @@ export function AdminSettingsForm({
             defaultValue={monthlyBrandSpend}
             placeholder="0.00"
           />
+          <p className="text-[11px] text-gray-400">
+            How much this brand currently spends per month on brand keyword campaigns in Google Ads. Used to calculate potential savings in the budget redirect calculator on the homepage.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -60,39 +78,9 @@ export function AdminSettingsForm({
             defaultValue={brandRoas}
             placeholder="0.00"
           />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="googleAdsCustomerId">Google Ads Customer ID</Label>
-          <Input
-            id="googleAdsCustomerId"
-            name="googleAdsCustomerId"
-            defaultValue={googleAdsCustomerId}
-            placeholder="123-456-7890"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="brandCampaignId">Brand Campaign ID</Label>
-          <Input
-            id="brandCampaignId"
-            name="brandCampaignId"
-            defaultValue={brandCampaignId}
-            placeholder="e.g. 12345678"
-          />
-          <p className="text-[11px] text-muted-foreground">
-            The Google Ads campaign ID for your brand campaign. SerpAlert will automatically enable this campaign when competitors are detected and pause it when clear.
+          <p className="text-[11px] text-gray-400">
+            The return on ad spend for brand campaigns (e.g. 6.0 means every 1 GBP spent returns 6 GBP in revenue). Used alongside monthly spend for ROI calculations.
           </p>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="slackWebhookUrl">Slack Webhook URL</Label>
-          <Input
-            id="slackWebhookUrl"
-            name="slackWebhookUrl"
-            defaultValue={slackWebhookUrl}
-            placeholder="https://hooks.slack.com/..."
-          />
         </div>
 
         <div className="space-y-1.5">
@@ -103,20 +91,9 @@ export function AdminSettingsForm({
             defaultValue={watchlistDomains}
             placeholder="rival.com, competitor.co.uk"
           />
-          <p className="text-[11px] text-muted-foreground">
-            Comma-separated domains to watch for. Get priority alerts when these specific competitors appear.
+          <p className="text-[11px] text-gray-400">
+            Comma-separated list of competitor domains to prioritise. When these specific domains appear in SERP checks, they&apos;ll be flagged with higher priority in alerts and reports. Useful for tracking known competitors.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="active"
-            name="active"
-            defaultChecked={active}
-            className="h-4 w-4 rounded border-input"
-          />
-          <Label htmlFor="active">Active</Label>
         </div>
 
         <Button type="submit" disabled={isPending}>

@@ -3,12 +3,11 @@ import { auth } from '@clerk/nextjs/server'
 import {
   getBrandById,
   getBrandsForUser,
-  PLAN_LIMITS,
-  getUnresolvedThreatCount,
+  getAllActiveBrands,
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
 export default async function BrandDashboardLayout({
   children,
@@ -25,31 +24,32 @@ export default async function BrandDashboardLayout({
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
-  if (brand.agencyManaged && !isAdmin) notFound()
-  if (!brand.agencyManaged && brand.userId !== userId) notFound()
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    notFound()
+  }
 
   const userBrands = await getBrandsForUser(userId)
+  // Admin sees all brands (personal + agency) in the switcher
+  const allBrands = isAdmin
+    ? await getAllActiveBrands()
+    : userBrands
+  const sidebarBrands = allBrands.map(b => ({ id: b.id, name: b.name }))
 
-  const [unresolvedCount, lastCheck] = await Promise.all([
-    getUnresolvedThreatCount(brandId),
-    getLastCheckForBrand(brandId),
-  ])
-
-  const plan = brand.plan ?? 'free'
-  const limits = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? PLAN_LIMITS.free
+  const lastCheck = await getLastCheckForBrand(brandId)
 
   return (
     <div className="flex min-h-screen">
       <Sidebar
         brandId={brandId}
         brandName={brand.name}
-        brands={userBrands.map((b) => ({ id: b.id, name: b.name }))}
-        plan={plan}
-        keywordCount={brand.keywords.length}
-        keywordLimit={limits.keywords}
+        brands={sidebarBrands}
+        lastCheckTime={lastCheck ? new Date(lastCheck.checkedAt) : null}
         isAdmin={isAdmin}
-        unresolvedCount={unresolvedCount}
-        lastCheckAt={lastCheck ? new Date(lastCheck.checkedAt).toISOString() : null}
+        subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
+        trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt) : null}
+        agencyManaged={brand.agencyManaged ?? false}
       />
       <main className="flex-1 min-w-0 p-6">{children}</main>
     </div>

@@ -38,6 +38,19 @@ export async function createBrand(
 
   try {
     await createBrandForUser({ name, domain, keywords }, userId)
+
+    // Send welcome email (non-blocking)
+    try {
+      const { currentUser } = await import('@clerk/nextjs/server')
+      const user = await currentUser()
+      const email = user?.emailAddresses?.[0]?.emailAddress
+      if (email) {
+        const { sendWelcomeEmail } = await import('@/lib/email')
+        await sendWelcomeEmail(email, name)
+      }
+    } catch (emailErr) {
+      console.error('Welcome email failed:', emailErr)
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : ''
     if (msg.includes('unique') || msg.includes('duplicate')) {

@@ -21,6 +21,7 @@ export const brands = pgTable('brands', {
   agencyManaged: boolean('agency_managed').notNull().default(false),
   trialEndsAt: timestamp('trial_ends_at'),
   subscriptionStatus: text('subscription_status').notNull().default('trialing'),
+  alertConfig: text('alert_config'), // JSON string for alert settings
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => [
@@ -73,7 +74,21 @@ export const auctionInsights = pgTable('auction_insights', {
   uniqueIndex('auction_insights_brand_date_domain_idx').on(table.brandId, table.date, table.competitorDomain),
 ])
 
+export const auditLeads = pgTable('audit_leads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').notNull(),
+  keyword: text('keyword').notNull(),
+  competitorCount: integer('competitor_count').notNull().default(0),
+  weeklyChecksRemaining: integer('weekly_checks_remaining').notNull().default(8),
+  lastCheckedAt: timestamp('last_checked_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  unsubscribed: boolean('unsubscribed').notNull().default(false),
+}, (table) => [
+  uniqueIndex('audit_leads_email_keyword_idx').on(table.email, table.keyword),
+])
+
 export type Brand = typeof brands.$inferSelect
 export type SerpCheck = typeof serpChecks.$inferSelect
 export type CompetitorAd = typeof competitorAds.$inferSelect
 export type AuctionInsight = typeof auctionInsights.$inferSelect
+export type AuditLead = typeof auditLeads.$inferSelect

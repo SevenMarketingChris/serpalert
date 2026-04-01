@@ -31,16 +31,48 @@ export async function GET(request: Request) {
     const results = []
     for (let i = 0; i < jobs.length; i += CONCURRENCY) {
       const batch = jobs.slice(i, i + CONCURRENCY)
-      const batchResults = await Promise.all(batch.map(job =>
-        processKeywordCheck({
+      const batchResults = await Promise.all(batch.map(async (job) => {
+        const result = await processKeywordCheck({
           brandId: job.brand.id,
           brandName: job.brand.name,
           keyword: job.keyword,
           brandDomain: job.brand.domain,
           slackWebhookUrl: job.brand.slackWebhookUrl,
           recentDomains: job.recentDomains,
-        }).then(r => ({ ...r, brandId: job.brand.id, brand: job.brand.name }))
-      ))
+        })
+
+        // Email alert for new competitors (non-blocking) — from main
+        if (job.brand.userId && result.status === 'ok' && result.competitorCount > 0) {
+          try {
+            const { getUserEmail, sendNewCompetitorEmail } = await import('@/lib/email')
+            const email = await getUserEmail(job.brand.userId)
+            if (email) {
+              // We don't have per-domain granularity from processKeywordCheck,
+              // so send a summary email for the keyword
+              try {
+                const { generateCompetitorSummary } = await import('@/lib/ai')
+                const aiSummary = await generateCompetitorSummary(
+                  job.brand.name,
+                  'multiple',
+                  job.keyword,
+                  null,
+                  null,
+                  result.competitorCount,
+                  new Date().toISOString().slice(0, 10),
+                )
+                await sendNewCompetitorEmail(email, job.brand.name, 'competitors', job.keyword, null, aiSummary)
+              } catch (err) {
+                console.error('[cron/serp-check] Email with AI summary failed, sending without:', err)
+                await sendNewCompetitorEmail(email, job.brand.name, 'competitors', job.keyword, null, null)
+              }
+            }
+          } catch (emailErr) {
+            console.error('Competitor email failed:', emailErr)
+          }
+        }
+
+        return { ...result, brandId: job.brand.id, brand: job.brand.name }
+      }))
       results.push(...batchResults)
     }
 
@@ -48,6 +80,10 @@ export async function GET(request: Request) {
       if (!brand.googleAdsCustomerId || !brand.brandCampaignId) continue
 
       const brandResults = results.filter(r => r.brandId === brand.id)
+      if (brandResults.length === 0) {
+        console.warn(`Skipping campaign toggle for ${brand.name} — no keywords checked`)
+        continue
+      }
       const anyError = brandResults.some(r => r.status === 'error')
       const anyDegraded = brandResults.some(r => r.adCheckDegraded)
       if (anyError || anyDegraded) {

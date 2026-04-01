@@ -1,0 +1,235 @@
+<h2>SerpAlert Growth Features — Full Design</h2>
+<p class="subtitle">5 workstreams. Review each section below and let me know if anything needs changing.</p>
+
+<!-- 1. FREE BRAND AUDIT PAGE -->
+<div class="section">
+  <h3>1. Free Brand Audit Page <span style="opacity:0.5">/audit</span></h3>
+  <div class="mockup">
+    <div class="mockup-header">Page Flow: /audit</div>
+    <div class="mockup-body" style="font-size:0.85rem;">
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong style="font-size:1.1rem;">Hero:</strong> "Are Competitors Stealing Your Brand Clicks?"<br>
+        <span style="opacity:0.7;">Enter your brand keyword below — we'll check Google right now.</span>
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Step 1:</strong> Input field for brand keyword + "Check Now" button<br>
+        <span style="opacity:0.5;">Loading state: animated SERP scan visual (2-5 sec)</span>
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Step 2 — Partial Results:</strong><br>
+        ✅ "We found <strong>3 competitors</strong> bidding on your brand"<br>
+        🔓 <strong>1 competitor shown in full</strong> — domain, headline, description, position<br>
+        🔒 <strong>2 more blurred</strong> — "Enter your email to see the full report"
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Step 3 — Email Gate:</strong><br>
+        Email input + "Send My Full Report" button<br>
+        <span style="opacity:0.5;">On submit: reveal all competitors + send email copy</span>
+      </div>
+      <div style="padding:1rem;">
+        <strong>Step 4 — Full Results + Upsell:</strong><br>
+        All competitors revealed on page. Below: "Want weekly monitoring? Start your 7-day free trial"<br>
+        <span style="opacity:0.5;">Email also triggers: welcome email + weekly free check for 8 weeks (max)</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+    <strong>Technical:</strong>
+    <ul style="margin:0.5rem 0; padding-left:1.5rem; opacity:0.8;">
+      <li>New API route: <code>POST /api/audit</code> — runs SerpAPI check (no screenshot, no DataForSEO)</li>
+      <li>Cost: ~£0.01 per audit (SerpAPI only)</li>
+      <li>Rate limit: 1 audit per IP per hour (prevent abuse)</li>
+      <li>No DB storage for audit — stateless, results in response only</li>
+      <li>Email captured → stored in new <code>audit_leads</code> table (email, keyword, competitor_count, created_at)</li>
+      <li>Weekly cron: runs one SerpAPI check per lead, emails results. Stops after 8 weeks.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 2. CALCULATOR PAGE -->
+<div class="section" style="margin-top:2rem;">
+  <h3>2. Full Calculator Page <span style="opacity:0.5">/calculator</span></h3>
+  <div class="mockup">
+    <div class="mockup-header">Page Flow: /calculator</div>
+    <div class="mockup-body" style="font-size:0.85rem;">
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong style="font-size:1.1rem;">Hero:</strong> "The True Cost of Brand Campaigns"<br>
+        <span style="opacity:0.7;">Most businesses waste 60-80% of their brand ad spend. Calculate your hidden cost — and what happens when you redirect it.</span>
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Section 1 — The Problem (educational):</strong><br>
+        • 80% of brand clicks come organically anyway (with stat sources)<br>
+        • Brand ROAS is artificially high — it inflates your numbers<br>
+        • Every £1 on brand ads = £0.20 of incremental value<br>
+        • Google's own incrementality studies back this up
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Section 2 — Interactive Calculator (walkthrough style):</strong><br>
+        <em>Step 1:</em> "What do you spend monthly on brand campaigns?" → slider<br>
+        <em>Step 2:</em> "Here's what you're likely wasting" → animated reveal of wasted spend<br>
+        <em>Step 3:</em> "What if you put that into non-brand campaigns?" → show projected ROI<br>
+        <em>Step 4:</em> Final impact card — annual savings + growth projection
+      </div>
+      <div style="padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <strong>Section 3 — The Alternative:</strong><br>
+        "Instead of paying to protect brand clicks, monitor for free and only react when competitors appear"<br>
+        → How SerpAlert works (3 steps)<br>
+        → "When competitors DO bid, you get alerted in &lt;60 minutes"
+      </div>
+      <div style="padding:1rem;">
+        <strong>CTA Section:</strong><br>
+        Primary: "Check if competitors are bidding on your brand" → /audit<br>
+        Secondary: "Start your 7-day free trial" → /sign-up
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+    <strong>SEO targets:</strong> "brand campaign waste", "should I bid on my own brand", "brand ads ROI", "brand campaign incrementality"
+  </div>
+</div>
+
+<!-- 3. EXIT INTENT POPUP -->
+<div class="section" style="margin-top:2rem;">
+  <h3>3. Exit Intent Popup</h3>
+  <div class="mockup">
+    <div class="mockup-header">Exit Intent — All Public Pages</div>
+    <div class="mockup-body" style="text-align:center; padding:2rem;">
+      <div style="font-size:1.3rem; font-weight:bold; margin-bottom:0.5rem;">Before you go...</div>
+      <div style="opacity:0.7; margin-bottom:1.5rem;">Are competitors stealing your brand clicks right now?</div>
+      <div style="display:inline-block; padding:0.75rem 2rem; background:rgba(59,130,246,0.2); border:1px solid rgba(59,130,246,0.4); border-radius:8px; font-weight:600; cursor:pointer;">
+        Free Brand Audit →
+      </div>
+      <div style="opacity:0.4; margin-top:1rem; font-size:0.8rem;">Takes 10 seconds. No signup required.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+    <strong>Behaviour:</strong>
+    <ul style="margin:0.5rem 0; padding-left:1.5rem; opacity:0.8;">
+      <li>Triggers on mouse leaving viewport (desktop) / back button (mobile)</li>
+      <li>Shows once per session (cookie/localStorage)</li>
+      <li>Only on public pages (homepage, calculator, pricing) — NOT dashboard</li>
+      <li>Links to <code>/audit</code></li>
+      <li>Dismiss button (X) in corner</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 4. AGENCY PRICING -->
+<div class="section" style="margin-top:2rem;">
+  <h3>4. Agency Partner Model</h3>
+  <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.15);">
+        <th style="text-align:left; padding:0.75rem;">Brands</th>
+        <th style="text-align:center; padding:0.75rem;">Per Brand/mo</th>
+        <th style="text-align:center; padding:0.75rem;">Discount</th>
+        <th style="text-align:center; padding:0.75rem;">Example (10 brands)</th>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:0.75rem;">1–5 brands</td>
+        <td style="text-align:center;">£109</td>
+        <td style="text-align:center;">27% off</td>
+        <td style="text-align:center;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:0.75rem;">6–15 brands</td>
+        <td style="text-align:center;">£89</td>
+        <td style="text-align:center;">40% off</td>
+        <td style="text-align:center;">£890/mo</td>
+      </tr>
+      <tr>
+        <td style="padding:0.75rem;">16+ brands</td>
+        <td style="text-align:center;">£69</td>
+        <td style="text-align:center;">54% off</td>
+        <td style="text-align:center;">—</td>
+      </tr>
+    </table>
+    <div style="margin-top:1rem; opacity:0.8;">
+      <strong>Includes:</strong> White-label client portals, bulk brand management, dedicated onboarding<br>
+      <strong>Billing:</strong> Per-brand monthly, auto-adjusts as brands are added/removed<br>
+      <strong>Scope for now:</strong> Pricing model defined, but no new pages yet — agency enquiries via contact form. Build agency dashboard later when demand proves out.
+    </div>
+  </div>
+</div>
+
+<!-- 5. CONTENT MAP -->
+<div class="section" style="margin-top:2rem;">
+  <h3>5. Content Marketing Map</h3>
+  <p class="subtitle">All relevant topic clusters for SerpAlert, grouped by funnel stage</p>
+
+  <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:1rem;">
+    <h4 style="color:rgba(239,68,68,0.9); margin-bottom:0.5rem;">🔴 Bottom of Funnel (High Intent, Direct Conversion)</h4>
+    <ol style="padding-left:1.5rem; opacity:0.85; font-size:0.85rem; line-height:1.8;">
+      <li>How to stop competitors bidding on your brand name in Google Ads</li>
+      <li>Best brand bidding monitoring tools [2026 comparison]</li>
+      <li>Competitor ad monitoring for Google Ads — complete guide</li>
+      <li>How to detect if competitors are bidding on your brand keywords</li>
+      <li>Brand keyword monitoring tools — automated alerts for competitor ads</li>
+      <li>Google Ads brand protection: the complete guide</li>
+      <li>PPC brand monitoring: how to track competitor ads on your brand</li>
+    </ol>
+  </div>
+
+  <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:1rem;">
+    <h4 style="color:rgba(251,191,36,0.9); margin-bottom:0.5rem;">🟡 Middle of Funnel (Problem Aware, Evaluating Solutions)</h4>
+    <ol start="8" style="padding-left:1.5rem; opacity:0.85; font-size:0.85rem; line-height:1.8;">
+      <li>Should you bid on your own brand name in Google Ads? [Data-driven answer]</li>
+      <li>Brand campaign incrementality: how to test if brand ads are worth it</li>
+      <li>How much of your brand ad spend is wasted? [Calculator]</li>
+      <li>What happens when you pause your Google Ads brand campaign</li>
+      <li>Brand ROAS is a lie: why your best-performing campaign is your worst</li>
+      <li>Affiliate brand bidding: how to detect and prevent it</li>
+      <li>Google Ads Auction Insights explained: what competitor data tells you</li>
+      <li>Google trademark policy for ads [2026 update]: what's allowed and what isn't</li>
+      <li>Can you sue a competitor for bidding on your brand name?</li>
+      <li>How to write a cease and desist letter for brand bidding</li>
+      <li>Branded vs non-branded keywords: where should you spend your budget?</li>
+      <li>Why your branded CPC suddenly increased (and what to do about it)</li>
+      <li>How to use Google Ads brand exclusions to stop budget waste</li>
+    </ol>
+  </div>
+
+  <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:1rem;">
+    <h4 style="color:rgba(34,197,94,0.9); margin-bottom:0.5rem;">🟢 Top of Funnel (Awareness, Education)</h4>
+    <ol start="21" style="padding-left:1.5rem; opacity:0.85; font-size:0.85rem; line-height:1.8;">
+      <li>What is brand bidding? A complete guide for marketers</li>
+      <li>How Google Ads works for brand keywords (and why competitors exploit it)</li>
+      <li>The brand campaign trap: how Google profits from your brand loyalty</li>
+      <li>How to run a brand campaign incrementality test (step-by-step)</li>
+      <li>How to read your Google Ads Auction Insights report</li>
+      <li>Competitor is bidding on my brand name — what are my options?</li>
+      <li>Google Ads brand campaign best practices [2026]</li>
+      <li>How Performance Max cannibalises your brand traffic (and what to do)</li>
+      <li>What is SERP monitoring and why does it matter for brand protection?</li>
+      <li>The true cost of Google Ads brand campaigns [industry benchmarks]</li>
+    </ol>
+  </div>
+
+  <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+    <h4 style="color:rgba(147,51,234,0.9); margin-bottom:0.5rem;">🟣 Link-Worthy / Resource Pages</h4>
+    <ol start="31" style="padding-left:1.5rem; opacity:0.85; font-size:0.85rem; line-height:1.8;">
+      <li>Brand campaign savings calculator [interactive tool — /calculator]</li>
+      <li>Free brand audit: check if competitors are bidding on your brand [/audit]</li>
+      <li>Google Ads trademark complaint template [downloadable]</li>
+      <li>Cease and desist letter template for brand bidding [downloadable]</li>
+      <li>Brand bidding policy template for affiliate programmes</li>
+      <li>Brand protection checklist for PPC managers [PDF]</li>
+    </ol>
+  </div>
+</div>
+
+<div style="margin-top:2rem; padding:1.5rem; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:8px;">
+  <h3 style="margin-bottom:0.5rem;">📦 What Gets Built Now</h3>
+  <ol style="padding-left:1.5rem; font-size:0.9rem; line-height:2;">
+    <li><strong>/audit page</strong> — Free brand audit with partial reveal + email gate + weekly monitoring (8 weeks)</li>
+    <li><strong>/calculator page</strong> — Long-form educational + interactive walkthrough calculator</li>
+    <li><strong>Exit intent popup</strong> — Client component on all public pages, links to /audit</li>
+    <li><strong>Content map</strong> — 36 topics documented (no articles written yet)</li>
+    <li><strong>Agency pricing model</strong> — Documented, not yet built into billing</li>
+    <li><strong>Enable indexing</strong> — Flip robots to index:true, add sitemap</li>
+  </ol>
+  <p style="opacity:0.6; margin-top:0.5rem; font-size:0.85rem;">Agency dashboard, content articles, and case studies are future phases.</p>
+</div>

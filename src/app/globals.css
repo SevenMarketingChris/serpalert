@@ -45,10 +45,6 @@
   --sidebar-accent-foreground: oklch(13% 0.015 250);
   --sidebar-border: oklch(88% 0.006 250);
   --sidebar-ring: oklch(44% 0.22 250);
-  --status-new: oklch(52% 0.22 15);
-  --status-acknowledged: oklch(44% 0.22 250);
-  --status-reported: oklch(55% 0.15 55);
-  --status-resolved: oklch(50% 0.15 195);
 }
 
 .dark {
@@ -85,10 +81,6 @@
   --sidebar-accent-foreground: oklch(95% 0.005 250);
   --sidebar-border: oklch(25% 0.03 250);
   --sidebar-ring: oklch(62% 0.22 250);
-  --status-new: oklch(65% 0.22 15);
-  --status-acknowledged: oklch(62% 0.22 250);
-  --status-reported: oklch(72% 0.15 55);
-  --status-resolved: oklch(72% 0.15 195);
 }
 
 @theme inline {
@@ -257,48 +249,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Status Badge Utilities ── */
-.badge-new {
-  background: oklch(52% 0.22 15 / 0.12);
-  color: var(--status-new);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-acknowledged {
-  background: oklch(52% 0.22 250 / 0.12);
-  color: var(--status-acknowledged);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-reported {
-  background: oklch(52% 0.15 55 / 0.12);
-  color: var(--status-reported);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-.badge-resolved {
-  background: oklch(52% 0.15 195 / 0.12);
-  color: var(--status-resolved);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-
 /* ── Sidebar Utilities ── */
 .sidebar-bg {
   background-color: var(--sidebar);
@@ -323,4 +273,51 @@ body {
 }
 .action-btn:hover {
   background-color: var(--accent);
+}
+
+/* ── Print Styles ── */
+@media print {
+  /* Hide navigation, buttons, and decorative elements */
+  nav,
+  footer,
+  button,
+  script,
+  .bg-dot-pattern {
+    display: none !important;
+  }
+  /* Force white background, black text */
+  * {
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-color: #aaa !important;
+  }
+  /* Page breaks between sections */
+  section,
+  .space-y-8 section {
+    page-break-inside: avoid;
+  }
+  /* Ensure links show their URLs in print */
+  a[href^="http"]::after,
+  a[href^="/privacy"]::after,
+  a[href^="/terms"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666 !important;
+  }
+  /* Improve section spacing for print */
+  h1 {
+    font-size: 24pt !important;
+    margin-top: 2rem !important;
+  }
+  h2 {
+    font-size: 18pt !important;
+    margin-top: 1.5rem !important;
+    page-break-after: avoid;
+  }
+  /* Ensure good margins */
+  body {
+    margin: 0.75in;
+  }
 }

@@ -25,6 +25,16 @@ export default async function NewBrandPage() {
           </p>
         </div>
 
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-700 space-y-2">
+          <p className="font-semibold">Quick setup guide:</p>
+          <ol className="list-decimal list-inside space-y-1 text-indigo-600">
+            <li><strong>Brand name</strong> — enter your brand exactly as customers would search for it</li>
+            <li><strong>Domain</strong> — your website (e.g. yourbrand.com) so we don&apos;t flag your own ads</li>
+            <li><strong>Keywords</strong> — the search terms to monitor (e.g. your brand name, common misspellings)</li>
+          </ol>
+          <p className="text-indigo-500 text-xs">Your first check will run within the hour. You&apos;ll get alerts if any competitors are bidding on your brand.</p>
+        </div>
+
         <div className="max-w-lg mx-auto">
           <NewUserBrandForm keywordLimit={keywordLimit} />
         </div>

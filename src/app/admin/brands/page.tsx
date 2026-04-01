@@ -5,8 +5,14 @@ import { Badge } from '@/components/ui/badge'
 import { AppHeader } from '@/components/app-header'
 import { Shield } from 'lucide-react'
 import { getRelativeTime } from '@/lib/time'
+import { auth } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
+import { checkIsAdmin } from '@/lib/auth'
 
 export default async function AdminBrandsPage() {
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
+  if (!await checkIsAdmin()) redirect('/unauthorized')
 
   const brands = await getAllActiveBrands()
 

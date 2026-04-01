@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
+import { createPageMetadata, siteConfig } from "@/lib/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,27 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  ...createPageMetadata(),
   title: {
-    default: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
-    template: "%s | SerpAlert",
+    default: `${siteConfig.name} | ${siteConfig.defaultTitle}`,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms, with SERP screenshots as evidence.",
-  metadataBase: new URL("https://serpalert.co.uk"),
-  openGraph: {
-    type: "website",
-    locale: "en_GB",
-    url: "https://serpalert.co.uk",
-    siteName: "SerpAlert",
-    title: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
-    description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms, with SERP screenshots as evidence.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
-    description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms.",
-  },
-  alternates: {
-    canonical: "https://serpalert.co.uk",
+  robots: { index: true, follow: true },
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  category: "Marketing",
+  referrer: "origin-when-cross-origin",
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "48x48" }],
   },
 };
 
@@ -52,14 +44,51 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable}`}
       >
         <body className="antialiased">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+          >
+            Skip to main content
+          </a>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
-            enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div id="main-content">{children}</div>
           </ThemeProvider>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: siteConfig.name,
+                description:
+                  "Brand keyword monitoring tool. Get hourly SERP alerts when competitors bid on your brand name.",
+                url: siteConfig.url,
+                applicationCategory: "BusinessApplication",
+                operatingSystem: "Web",
+                offers: {
+                  "@type": "Offer",
+                  price: "149",
+                  priceCurrency: "GBP",
+                  priceSpecification: {
+                    "@type": "UnitPriceSpecification",
+                    price: "149",
+                    priceCurrency: "GBP",
+                    billingDuration: "P1M",
+                  },
+                },
+                provider: {
+                  "@type": "Organization",
+                  name: siteConfig.name,
+                  url: siteConfig.url,
+                  logo: `${siteConfig.url}/favicon.ico`,
+                },
+              }),
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>

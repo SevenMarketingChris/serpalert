@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import { ScreenshotModal } from '@/components/screenshot-modal'
 import { EvidenceModal } from '@/components/evidence-modal'
 import { isSafeUrl } from '@/lib/utils'
@@ -20,7 +19,6 @@ interface ThreatCardProps {
     displayUrl: string | null
     destinationUrl: string | null
     position: number | null
-    status: string
   }[]
   keyword: string
   checkedAt: string
@@ -42,44 +40,15 @@ const nextStatusMap: Record<string, { label: string; next: string }> = {
 }
 
 export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checkedAt, screenshotUrl, competitorCount }: ThreatCardProps) {
-  const router = useRouter()
-  const [patching, setPatching] = useState(false)
-
   const firstAd = ads[0]
   if (!firstAd) return null
 
-  const status = firstAd.status
-  const badgeClass = badgeClassMap[status] ?? badgeClassMap.new
-  const isResolved = status === 'resolved'
-  const transition = nextStatusMap[status]
-
-  async function handleStatusChange() {
-    if (!transition) return
-    setPatching(true)
-    try {
-      const res = await fetch(`/api/brands/${brandId}/checks/${checkId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: transition.next }),
-      })
-      if (res.ok) {
-        router.refresh()
-      }
-    } catch (error) {
-      console.error('Status update failed:', error)
-      alert('Failed to update status. Please try again.')
-    } finally {
-      setPatching(false)
-    }
-  }
-
   return (
-    <div className={`flex flex-col sm:flex-row gap-4 ${isResolved ? 'opacity-60' : ''}`}>
+    <div className="flex flex-col sm:flex-row gap-4">
       {/* Left: details + context */}
       <div className="flex-1 min-w-0 space-y-3">
-        {/* Header: status + keyword + time */}
+        {/* Header: keyword + time */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={badgeClass}>{status.toUpperCase()}</span>
           <span className="text-tech-purple font-mono text-sm">{keyword}</span>
           <span className="ml-auto text-muted-foreground font-mono text-xs">{formatScanTime(checkedAt)}</span>
         </div>
@@ -138,15 +107,6 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
               position: a.position,
             }))}
           />
-          {transition && (
-            <button
-              onClick={handleStatusChange}
-              disabled={patching}
-              className="action-btn disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {patching ? '...' : transition.label}
-            </button>
-          )}
         </div>
       </div>
 

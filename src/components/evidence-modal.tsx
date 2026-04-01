@@ -52,7 +52,7 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
         <DialogTitle className="font-semibold">Evidence Report</DialogTitle>
 
         {/* Screenshot */}
-        {screenshotUrl && (
+        {screenshotUrl && isSafeUrl(screenshotUrl) && (
           <div className="relative rounded-lg overflow-hidden">
             <Image
               src={screenshotUrl}

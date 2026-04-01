@@ -10,53 +10,54 @@ import {
   Shield,
 } from "lucide-react";
 import { BudgetCalculator } from "@/components/budget-calculator";
-import { AppHeader } from "@/components/app-header";
-import type { Metadata } from "next";
+import { ExitIntentPopup } from "@/components/exit-intent-popup";
+import { MarketingCta } from "@/components/marketing-cta";
+import { MarketingFooter } from "@/components/marketing-footer";
+import { MarketingHeader } from "@/components/marketing-header";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://serpalert.co.uk",
-  },
-};
+export const metadata = createPageMetadata({
+  title: "Block Competitor Brand Bidding",
+  description:
+    "Monitor competitor ad activity on your brand keywords. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
+  path: "/",
+  keywords: [
+    "brand bidding monitoring",
+    "competitor brand ads",
+    "brand protection software",
+    "google ads brand monitoring",
+  ],
+});
 
-const jsonLd = {
+const saasJsonLd = `{
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "SerpAlert",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  url: "https://serpalert.co.uk",
-  description:
-    "Monitor your brand keywords on Google Search and get alerted when competitors bid on your brand terms.",
-  offers: {
+  "name": "SerpAlert",
+  "description": "Monitor competitor ad activity on your brand keywords on Google Search. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
+  "url": "https://serpalert.co.uk",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {
     "@type": "Offer",
-    price: "0",
-    priceCurrency: "GBP",
-    description: "7-day free trial, no credit card required",
+    "price": "149",
+    "priceCurrency": "GBP",
+    "description": "Monthly subscription"
   },
-};
+  "brand": {
+    "@type": "Brand",
+    "name": "SerpAlert"
+  }
+}`;
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: saasJsonLd }}
       />
-      <AppHeader>
-        <Link
-          href="/sign-in"
-          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="/sign-up"
-          className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-        >
-          Start Free Trial
-        </Link>
-      </AppHeader>
+      <MarketingHeader />
 
       {/* Hero */}
       <section className="bg-background">
@@ -72,19 +73,25 @@ export default function HomePage() {
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Turn off brand campaigns and redirect that budget to winning new
-            customers. SerpAlert watches your brand keywords every hour and
+            customers. SerpAlert watches your brand keyword every hour and
             alerts you the moment a competitor moves in.
           </p>
-          <div className="mt-10 flex flex-col items-center gap-3">
+          <div className="mt-10 flex flex-col items-center gap-4">
             <Link
-              href="/sign-up"
+              href="/audit"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Start Your Free Trial
+              Run Free Brand Audit
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
+            <Link
+              href="/sign-up"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card"
+            >
+              Start Your Free Trial
+            </Link>
             <span className="text-sm text-muted-foreground">
-              No credit card required
+              Free audit first. Trial when you are ready for hourly monitoring.
             </span>
           </div>
         </div>
@@ -162,7 +169,7 @@ export default function HomePage() {
               {
                 title: "We watch for competitors, you grow",
                 description:
-                  "SerpAlert monitors your brand SERPs every hour. If a competitor bids on your name, you'll know in under 60 minutes with proof.",
+                  "SerpAlert monitors your brand SERPs every hour. If a competitor bids on your name, you'll get an alert with screenshot proof.",
                 icon: Shield,
                 accent: "text-emerald-500",
               },
@@ -194,19 +201,19 @@ export default function HomePage() {
             {[
               {
                 step: "01",
-                title: "Add your brand keywords",
+                title: "Add your brand keyword",
                 description:
-                  "Enter the brand terms you want to protect. We'll start monitoring them immediately.",
+                  "Enter the brand term you want to protect. We'll start monitoring it immediately.",
               },
               {
                 step: "02",
-                title: "Turn off brand campaigns",
+                title: "Optionally pause brand campaigns",
                 description:
-                  "Pause your brand ads and redirect that budget into acquisition campaigns that drive new revenue.",
+                  "If you choose to, pause your brand ads and redirect that budget into acquisition campaigns — non-brand keywords, product categories, competitor terms.",
               },
               {
                 step: "03",
-                title: "Get alerted within the hour",
+                title: "Get alerted when competitors appear",
                 description:
                   "If a competitor starts bidding on your brand, you'll get an alert with SERP screenshots as evidence.",
               },
@@ -241,7 +248,7 @@ export default function HomePage() {
                 icon: Clock,
                 title: "Hourly checks",
                 description:
-                  "We check Google SERPs every hour so you catch threats fast.",
+                  "We check Google SERPs every hour — 24 times a day — so you catch threats fast.",
               },
               {
                 icon: Camera,
@@ -291,30 +298,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA footer */}
-      <section className="bg-card border-t border-border">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            Reclaim your brand budget today
-          </h2>
-          <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Stop wasting money on brand defence. Let SerpAlert watch your back
-            while you focus on growth.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Start Your Free Trial
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <span className="text-sm text-muted-foreground">
-              7-day free trial &middot; No credit card required
-            </span>
-          </div>
-        </div>
-      </section>
+      <MarketingCta
+        title="Reclaim your brand budget today"
+        description="Start with a free audit to see whether competitors are actually bidding on your brand. Move to the trial when you want hourly monitoring and alerts."
+        note="7-day free trial. No credit card required."
+      />
+      <MarketingFooter />
+      <ExitIntentPopup />
     </div>
   );
 }

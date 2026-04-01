@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { getBrandById, getCompetitorDomainsLastNDays } from '@/lib/db/queries'
+import { getBrandById, getCompetitorDomainsLastNDays, getLastCheckForBrand } from '@/lib/db/queries'
 import { processKeywordCheck } from '@/lib/process-keyword-check'
 import { rateLimit } from '@/lib/rate-limit'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const MANUAL_CHECK_COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
 
 export const maxDuration = 300
 
@@ -19,23 +20,35 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { checkIsAdmin } = await import('@/lib/auth')
+  const { checkIsAdmin, authorizeBrandAccess } = await import('@/lib/auth')
   const isAdmin = await checkIsAdmin()
-
-  const { ok } = rateLimit(`manual-check:${brandId}`, { limit: 3, windowMs: 300_000 })
-  if (!ok) {
-    return NextResponse.json({ error: 'Too many requests. Try again in a few minutes.' }, { status: 429 })
-  }
 
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-  if (brand.agencyManaged && !isAdmin) {
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
-  if (!brand.agencyManaged && brand.userId !== userId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  // DB-backed cooldown: 1 manual check per 4 hours per brand
+  const lastCheck = await getLastCheckForBrand(brandId)
+  if (lastCheck) {
+    const elapsed = Date.now() - new Date(lastCheck.checkedAt).getTime()
+    if (elapsed < MANUAL_CHECK_COOLDOWN_MS) {
+      const remainingMs = MANUAL_CHECK_COOLDOWN_MS - elapsed
+      const remainingMins = Math.ceil(remainingMs / 60_000)
+      const hours = Math.floor(remainingMins / 60)
+      const mins = remainingMins % 60
+      const waitText = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
+      return NextResponse.json({
+        error: `Manual checks are limited to once every 4 hours. Next check available in ${waitText}.`,
+        nextCheckAt: new Date(Date.now() + remainingMs).toISOString(),
+        cooldownMs: remainingMs,
+      }, { status: 429 })
+    }
   }
 
   const recentDomains = await getCompetitorDomainsLastNDays(brand.id, 7)

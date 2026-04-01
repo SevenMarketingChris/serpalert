@@ -1,7 +1,9 @@
 {
   "crons": [
-    { "path": "/api/cron/serp-check", "schedule": "0 8,13,19 * * *" },
+    { "path": "/api/cron/serp-check", "schedule": "0 * * * *" },
     { "path": "/api/cron/auction-insights", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/cleanup-screenshots", "schedule": "0 3 * * 0" }
+    { "path": "/api/cron/cleanup-screenshots", "schedule": "0 3 * * 0" },
+    { "path": "/api/cron/monthly-report", "schedule": "0 9 1 * *" },
+    { "path": "/api/cron/weekly-audit", "schedule": "0 9 * * 1" }
   ]
 }

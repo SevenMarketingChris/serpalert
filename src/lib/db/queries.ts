@@ -1,9 +1,9 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, ne, sql, max } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql, max } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
-  free:         { brands: 1,  keywords: 3   },
+  free:         { brands: 1,  keywords: 2   },
   starter:      { brands: 3,  keywords: 25  },
   professional: { brands: 10, keywords: 100 },
   agency:       { brands: 50, keywords: 500 },
@@ -96,10 +96,16 @@ export async function createBrandForUser(
   data: { name: string; keywords: string[]; domain?: string },
   userId: string,
 ): Promise<Brand> {
-  const slug = data.name
+  // Enforce brand limit
+  const currentCount = await getUserBrandCount(userId)
+  if (currentCount >= PLAN_LIMITS.free.brands) {
+    throw new Error('Brand limit reached for your plan')
+  }
+  const baseSlug = data.name
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
+  const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
   const trialEndsAt = new Date()
   trialEndsAt.setDate(trialEndsAt.getDate() + 7)
   const rows = await db.insert(brands).values({
@@ -168,6 +174,7 @@ export async function updateBrand(
     monthlyBrandSpend?: string | null; brandRoas?: string | null
     brandCampaignId?: string | null
     watchlistDomains?: string[]
+    alertConfig?: string | null
     active?: boolean
   },
 ): Promise<Brand> {
@@ -179,7 +186,9 @@ export async function updateBrand(
   return rows[0]
 }
 
-// Stub functions for upcoming Ahrefs SEO features (no tables yet)
+// Not implemented: Ahrefs SEO integration is planned but tables are not yet created.
+// These functions will be re-implemented once the ahrefs_domains and ahrefs_keywords
+// tables exist in the database schema.
 export type AhrefsMetrics = {
   domainRating: string | null
   organicTraffic: number | null
@@ -187,19 +196,19 @@ export type AhrefsMetrics = {
 }
 
 export async function getBrandAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics | null> {
-  return null
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getCompetitorAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics[]> {
-  return []
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getTopKeywordsForDomain(_brandId: string, _domain: string): Promise<{ keyword: string; position: number; volume: number }[]> {
-  return []
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getMonthlyReports(_brandId: string): Promise<{ id: string; month: string; summary: string }[]> {
-  return []
+  throw new Error('Not implemented: Monthly reports feature pending database schema')
 }
 
 export async function upsertAhrefsDomainMetrics(_data: {
@@ -207,44 +216,14 @@ export async function upsertAhrefsDomainMetrics(_data: {
   domainRating: string | null; organicTraffic: number | null
   organicKeywords: number | null; referringDomains: number | null; backlinks: number | null
 }): Promise<void> {
-  // Stub — tables not yet created
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function replaceTopKeywords(
   _brandId: string, _domain: string, _date: string,
   _keywords: { keyword: string; position: number | null; volume: number | null; traffic: number | null }[],
 ): Promise<void> {
-  // Stub — tables not yet created
-}
-
-const VALID_STATUSES = ['new', 'acknowledged', 'reported', 'resolved'] as const
-type AdStatus = typeof VALID_STATUSES[number]
-
-export async function updateCompetitorAdStatus(id: string, status: string): Promise<CompetitorAd> {
-  if (!VALID_STATUSES.includes(status as AdStatus)) {
-    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
-  }
-  const rows = await db.update(competitorAds)
-    .set({ status: status as AdStatus })
-    .where(eq(competitorAds.id, id))
-    .returning()
-  if (!rows[0]) throw new Error('Competitor ad not found')
-  return rows[0]
-}
-
-export async function updateAllAdsStatusForCheck(checkId: string, status: string): Promise<void> {
-  if (!VALID_STATUSES.includes(status as AdStatus)) {
-    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`)
-  }
-  await db.update(competitorAds)
-    .set({ status: status as AdStatus })
-    .where(eq(competitorAds.serpCheckId, checkId))
-}
-
-export async function getUnresolvedAdsForBrand(brandId: string): Promise<CompetitorAd[]> {
-  return db.select().from(competitorAds)
-    .where(and(eq(competitorAds.brandId, brandId), ne(competitorAds.status, 'resolved')))
-    .orderBy(desc(competitorAds.firstSeenAt))
+  throw new Error('Not implemented: Ahrefs integration pending database schema')
 }
 
 export async function getCompetitorAdById(id: string): Promise<CompetitorAd | null> {
@@ -348,10 +327,12 @@ export async function getCompetitorSummaryForBrand(brandId: string): Promise<{
 }
 
 export async function deleteBrand(id: string): Promise<void> {
-  await db.delete(competitorAds).where(eq(competitorAds.brandId, id))
-  await db.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
-  await db.delete(serpChecks).where(eq(serpChecks.brandId, id))
-  await db.delete(brands).where(eq(brands.id, id))
+  await db.transaction(async (tx) => {
+    await tx.delete(competitorAds).where(eq(competitorAds.brandId, id))
+    await tx.delete(auctionInsights).where(eq(auctionInsights.brandId, id))
+    await tx.delete(serpChecks).where(eq(serpChecks.brandId, id))
+    await tx.delete(brands).where(eq(brands.id, id))
+  })
 }
 
 export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck | null> {
@@ -404,7 +385,12 @@ export async function createBrand(data: {
   agencyManaged?: boolean; subscriptionStatus?: string
   trialEndsAt?: Date
 }): Promise<Brand> {
-  const rows = await db.insert(brands).values(data).returning()
+  const baseSlug = data.slug
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+  const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
+  const rows = await db.insert(brands).values({ ...data, slug }).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
 }
@@ -454,16 +440,6 @@ export async function getAdCopyHistory(brandId: string, domain: string): Promise
     lastSeen: r.lastSeen,
     count: r.count,
   }))
-}
-
-export async function getUnresolvedThreatCount(brandId: string): Promise<number> {
-  const rows = await db.select({ count: countDistinct(competitorAds.serpCheckId) })
-    .from(competitorAds)
-    .where(and(
-      eq(competitorAds.brandId, brandId),
-      inArray(competitorAds.status, ['new', 'acknowledged', 'reported']),
-    ))
-  return rows[0]?.count ?? 0
 }
 
 export async function updateBrandSubscription(

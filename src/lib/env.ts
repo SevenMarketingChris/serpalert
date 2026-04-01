@@ -10,10 +10,10 @@ function requireEnv(name: string): string {
 export function validateEnv(): void {
   const errors: string[] = [];
 
-  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN'] as const;
+  const critical = ['DATABASE_URL', 'DATAFORSEO_LOGIN', 'DATAFORSEO_PASSWORD', 'SERPAPI_KEY', 'ADMIN_SECRET', 'CRON_SECRET', 'BLOB_READ_WRITE_TOKEN', 'CLERK_SECRET_KEY', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY'] as const;
 
   // Stripe vars are optional at startup — only needed for billing routes
-  const recommended = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID'] as const;
+  const recommended = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'RESEND_API_KEY', 'ANTHROPIC_API_KEY'] as const;
   for (const name of recommended) {
     const val = process.env[name];
     if (!val || val.trim() === '') {
@@ -24,6 +24,19 @@ export function validateEnv(): void {
     const val = process.env[name];
     if (!val || val.trim() === '') {
       errors.push(`${name} is missing or empty`);
+    }
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY ?? '';
+    const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
+
+    if (clerkSecretKey.startsWith('sk_test_')) {
+      errors.push('CLERK_SECRET_KEY must use a live Clerk key in production');
+    }
+
+    if (clerkPublishableKey.startsWith('pk_test_')) {
+      errors.push('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY must use a live Clerk key in production');
     }
   }
 

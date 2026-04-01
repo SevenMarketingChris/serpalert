@@ -16,24 +16,37 @@ interface Props {
 }
 
 export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit }: Props) {
-  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(updateBrandDetails, null)
+  const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
+    (prev, formData) => updateBrandDetails(prev, formData, brandId),
+    null,
+  )
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground font-mono mb-4">
-        Brand Details
-      </h3>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+      <div>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">
+          Brand Details
+        </h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Basic information about the brand you&apos;re monitoring. We use these details to identify competitor ads targeting your brand.
+        </p>
+      </div>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="brandId" value={brandId} />
 
         <div className="space-y-1.5">
           <Label htmlFor="name">Brand Name <span className="text-destructive">*</span></Label>
           <Input id="name" name="name" defaultValue={name} required />
+          <p className="text-[11px] text-gray-400">
+            The name of your brand as it appears in Google search results. This is used to identify your brand in SERP checks.
+          </p>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="domain">Domain</Label>
           <Input id="domain" name="domain" defaultValue={domain} placeholder="yourbrand.com" />
+          <p className="text-[11px] text-gray-400">
+            Your website domain (e.g. yourbrand.com). Used to filter out your own ads from competitor results so you don&apos;t get false alerts.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -50,7 +63,9 @@ export function BrandDetailsForm({ brandId, name, domain, keywords, keywordLimit
             defaultValue={keywords.join('\n')}
             placeholder="One keyword per line"
           />
-          <p className="text-xs text-muted-foreground">One keyword per line</p>
+          <p className="text-[11px] text-gray-400">
+            The brand keywords you want to monitor. One per line. These are the search terms we check for competitor ads — typically your brand name and common misspellings. You can use up to {keywordLimit} keywords on your current plan.
+          </p>
         </div>
 
         <Button type="submit" disabled={isPending}>
