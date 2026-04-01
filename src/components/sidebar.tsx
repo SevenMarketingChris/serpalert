@@ -198,7 +198,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-gray-200 bg-[#f5f5f7] px-4 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-gray-200 bg-white/70 backdrop-blur-xl px-4 md:hidden">
         <button
           onClick={() => setMobileOpen(true)}
           className="p-1.5 text-gray-600 hover:text-gray-900 transition-colors"
@@ -222,7 +222,7 @@ export function Sidebar({
             className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative flex h-full w-[260px] flex-col bg-[#f5f5f7]">
+          <aside className="relative flex h-full w-[260px] flex-col bg-white/60 backdrop-blur-2xl">
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute right-3 top-4 p-1 text-gray-600 hover:text-gray-900 transition-colors"
@@ -236,7 +236,7 @@ export function Sidebar({
       )}
 
       {/* Tablet icon rail (md) + Desktop full sidebar (lg) */}
-      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-[#f5f5f7] border-r border-gray-200 min-h-screen sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex md:w-14 lg:w-[220px] shrink-0 flex-col bg-white/60 backdrop-blur-2xl border-r border-white/50 min-h-screen sticky top-0 h-screen overflow-y-auto">
         {renderSidebarContent(false)}
       </aside>
     </>

@@ -22,7 +22,7 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
   )
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+    <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg shadow-gray-200/20 space-y-4">
       <div>
         <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 font-mono">Alert Configuration</h3>
         <p className="text-sm text-gray-500 mt-1">

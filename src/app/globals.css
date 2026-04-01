@@ -324,6 +324,15 @@ body {
   }
 }
 
+/* ── Apple Glass Utilities ── */
+.glass-bg {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 40%, #eef2ff 100%);
+}
+
+.btn-glass {
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.25);
+}
+
 /* ── Disabled Button Styling ── */
 button:disabled, .btn:disabled {
   opacity: 0.5;

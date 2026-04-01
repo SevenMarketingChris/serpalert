@@ -52,7 +52,7 @@ const saasJsonLd = `{
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <PageViewTracker properties={{ page: "home" }} />
       {/* JSON-LD Structured Data */}
       <script
@@ -112,7 +112,7 @@ export default function HomePage() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="bg-card border border-border rounded-lg p-6 text-center"
+                className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 text-center shadow-lg shadow-gray-200/20"
               >
                 <div className="font-mono font-bold text-2xl text-gradient-tech">
                   {stat.value}
@@ -180,7 +180,7 @@ export default function HomePage() {
             ].map((card) => (
               <div
                 key={card.title}
-                className="bg-card border border-border rounded-lg p-6 space-y-3"
+                className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 space-y-3 shadow-lg shadow-gray-200/20"
               >
                 <card.icon className={`h-5 w-5 ${card.accent}`} />
                 <h3 className="font-semibold text-foreground">{card.title}</h3>
@@ -287,7 +287,7 @@ export default function HomePage() {
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="bg-card border border-border rounded-lg p-6 space-y-2"
+                className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 space-y-2 shadow-lg shadow-gray-200/20"
               >
                 <feature.icon className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold text-foreground">

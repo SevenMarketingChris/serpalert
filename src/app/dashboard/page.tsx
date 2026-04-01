@@ -36,7 +36,7 @@ export default async function DashboardPage() {
   const checkMap = await getLastChecksForBrands(brands.map(b => b.id))
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <AppHeader>
         <UserButton />
       </AppHeader>
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
               )}
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-4 text-sm shadow-sm">
+            <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl px-4 py-3 flex items-center gap-4 text-sm shadow-lg shadow-gray-200/20">
               <span className="text-gray-500">
                 <span className="font-mono font-bold text-gray-900">{brands.length}</span> brand{brands.length !== 1 ? 's' : ''}
               </span>
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
                   <div key={b.id} className="relative">
                     <Link
                       href={`/dashboard/${b.id}`}
-                      className={`block bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow ${(isExpired || isCanceled) ? 'opacity-60' : ''}`}
+                      className={`block bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-5 shadow-lg shadow-gray-200/20 hover:shadow-md transition-shadow ${(isExpired || isCanceled) ? 'opacity-60' : ''}`}
                     >
                       <div className="space-y-3">
                         <div>

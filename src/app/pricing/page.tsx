@@ -94,7 +94,7 @@ const faqs = [
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <PageViewTracker properties={{ page: "pricing" }} />
       {/* JSON-LD Structured Data */}
       <script
@@ -115,7 +115,7 @@ export default function PricingPage() {
 
       {/* Pricing Card */}
       <section className="px-6 pb-20">
-        <div className="mx-auto max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+        <div className="mx-auto max-w-md bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl shadow-lg shadow-gray-200/20 p-8">
           <div className="text-center">
             <h2 className="text-lg font-semibold text-gray-900">
               Brand Monitoring
@@ -166,7 +166,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mx-auto max-w-xl bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+        <div className="mx-auto max-w-xl bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl shadow-lg shadow-gray-200/20 p-8">
           <table className="w-full text-sm mb-8">
             <thead>
               <tr className="bg-gray-50">

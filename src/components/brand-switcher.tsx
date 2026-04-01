@@ -59,7 +59,7 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
 
       {open && (
         <div
-          className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden"
+          className="absolute left-0 right-0 top-full z-50 mt-1 rounded-2xl border border-white/60 bg-white/80 backdrop-blur-2xl shadow-lg overflow-hidden"
           onKeyDown={(e) => {
             if (e.key === 'Escape') { setOpen(false); setQuery('') }
           }}

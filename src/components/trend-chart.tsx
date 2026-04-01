@@ -18,7 +18,7 @@ export function TrendChart({ data }: TrendChartProps) {
   if (data.length === 0) return null
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20">
       <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-mono mb-4">
         30-Day Activity
       </h3>

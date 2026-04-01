@@ -27,7 +27,7 @@ export function RecentScan({ run }: RecentScanProps) {
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-gray-200/20">
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">Latest Scan</h3>
           <span className="text-xs text-gray-400 font-mono">{formatScanTime(run.timestamp)}</span>

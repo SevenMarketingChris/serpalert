@@ -96,7 +96,7 @@ export function CompetitorTable({
   return (
     <>
       {/* Desktop Table */}
-      <div className="hidden md:block bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="hidden md:block bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-gray-200/20">
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50 text-[10px] uppercase tracking-wider text-gray-400 font-mono">
@@ -265,7 +265,7 @@ export function CompetitorTable({
           return (
             <div
               key={competitor.domain}
-              className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+              className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20"
             >
               <div
                 className="cursor-pointer"

@@ -36,7 +36,7 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
 
   if (screenshots.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-12 text-center space-y-3 shadow-sm">
+      <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-12 text-center space-y-3 shadow-lg shadow-gray-200/20">
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-500 mx-auto">
           <Camera className="h-6 w-6" />
         </div>
@@ -91,7 +91,7 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                 return (
                 <div
                   key={check.id}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm group"
+                  className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-gray-200/20 group"
                 >
                   <button
                     type="button"

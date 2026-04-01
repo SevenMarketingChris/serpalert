@@ -149,10 +149,10 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   return (
     <div className="space-y-4 max-w-5xl">
       {/* (a) Status Banner */}
-      <div className={`rounded-xl overflow-hidden ${
+      <div className={`rounded-2xl overflow-hidden ${
         isProtected
-          ? 'bg-emerald-50 border border-emerald-200'
-          : 'bg-red-50 border border-red-200'
+          ? 'bg-emerald-50/70 backdrop-blur-lg border border-emerald-200/50 shadow-lg shadow-emerald-100/20'
+          : 'bg-red-50/70 backdrop-blur-lg border border-red-200/50 shadow-lg shadow-red-100/20'
       }`}>
         <div className="p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -186,19 +186,19 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
       {/* (b) Metric Cards — clickable */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Link href={`/dashboard/${brandId}/screenshots`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+        <Link href={`/dashboard/${brandId}/screenshots`} className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20 hover:shadow-md hover:border-indigo-200 transition-all group">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Checks Today</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{checksToday.length}</p>
         </Link>
-        <Link href={`/dashboard/${brandId}/competitors`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+        <Link href={`/dashboard/${brandId}/competitors`} className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20 hover:shadow-md hover:border-indigo-200 transition-all group">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Active Competitors</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{activeCompetitors}</p>
         </Link>
-        <Link href={`/dashboard/${brandId}/settings`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group">
+        <Link href={`/dashboard/${brandId}/settings`} className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20 hover:shadow-md hover:border-indigo-200 transition-all group">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono group-hover:text-indigo-500 transition-colors">Keywords</p>
           <p className="text-2xl font-bold font-mono text-gray-900 mt-1">{brand.keywords.length}</p>
         </Link>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-mono">7d Trend</p>
           <div className="mt-2">
             <SparklineBars data={last7Days} />
@@ -208,7 +208,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
       {/* AI Recommendation */}
       {aiRecommendation && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-start gap-3">
+        <div className="bg-indigo-50/60 backdrop-blur-lg border border-indigo-200/40 rounded-2xl p-4 shadow-lg shadow-indigo-100/10 flex items-start gap-3">
           <div className="shrink-0 mt-0.5">
             <Sparkles className="h-4 w-4 text-indigo-500" />
           </div>
@@ -221,7 +221,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
 
       {/* Getting Started card for new brands */}
       {checks.length === 0 && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 space-y-3">
+        <div className="bg-indigo-50/60 backdrop-blur-lg border border-indigo-200/40 rounded-2xl p-5 shadow-lg shadow-indigo-100/10 space-y-3">
           <h3 className="font-semibold text-indigo-900">Getting started</h3>
           <p className="text-sm text-indigo-700">Your brand has been created and is queued for monitoring. Here&apos;s what happens next:</p>
           <ol className="list-decimal list-inside text-sm text-indigo-600 space-y-1.5">

@@ -15,7 +15,7 @@ interface CompetitorSummaryProps {
 
 export function CompetitorSummary({ competitors, brandId }: CompetitorSummaryProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-gray-200/20">
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-900">Top Competitors (30d)</h3>
         <Link

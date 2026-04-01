@@ -25,7 +25,7 @@ function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
   const screenshots = run.checks.filter(c => c.screenshotUrl)
 
   return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden">
+    <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
         className={`w-full flex items-center gap-3 p-3.5 text-left hover:bg-accent/50 transition-colors ${
