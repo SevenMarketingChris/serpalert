@@ -6,6 +6,7 @@ import { TrackedLink } from '@/components/analytics/tracked-link'
 
 const navLinks = [
   { href: '/calculator', label: 'Calculator' },
+  { href: '/blog', label: 'Blog' },
   { href: '/pricing', label: 'Pricing' },
 ]
 
