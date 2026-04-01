@@ -37,8 +37,8 @@ export async function sendNewCompetitorAlert(params: {
               type: 'button',
               text: { type: 'plain_text', text: 'View Dashboard' },
               url: params.brandId
-                ? `https://serpalert.vercel.app/dashboard/${params.brandId}`
-                : `https://serpalert.vercel.app/dashboard`,
+                ? `https://serpalert.co.uk/dashboard/${params.brandId}`
+                : `https://serpalert.co.uk/dashboard`,
               style: 'primary'
             }
           ]

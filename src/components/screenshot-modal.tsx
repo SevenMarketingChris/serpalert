@@ -9,7 +9,7 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
   const [imageError, setImageError] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
-  if (!screenshotUrl) return null
+  if (!screenshotUrl || !isSafeUrl(screenshotUrl)) return null
   return (
     <Dialog>
       <DialogTrigger

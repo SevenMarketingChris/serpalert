@@ -37,12 +37,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ bra
 
   const rows = competitors.map((c) => [
     escapeCsv(c.domain),
-    c.avgPosition != null ? String(c.avgPosition) : '',
-    String(c.recentCount),
-    String(c.totalCount),
+    escapeCsv(c.avgPosition != null ? String(c.avgPosition) : ''),
+    escapeCsv(String(c.recentCount)),
+    escapeCsv(String(c.totalCount)),
     escapeCsv(c.keywords.join('; ')),
-    new Date(c.firstSeen).toISOString().split('T')[0],
-    new Date(c.lastSeen).toISOString().split('T')[0],
+    escapeCsv(new Date(c.firstSeen).toISOString().split('T')[0]),
+    escapeCsv(new Date(c.lastSeen).toISOString().split('T')[0]),
   ])
 
   const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')

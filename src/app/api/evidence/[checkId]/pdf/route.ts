@@ -8,6 +8,10 @@ export async function GET(
   { params }: { params: Promise<{ checkId: string }> }
 ) {
   const { checkId } = await params
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!UUID_RE.test(checkId)) {
+    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
+  }
   const token = new URL(request.url).searchParams.get('token')
 
   // Validate token pattern BEFORE any DB fetch

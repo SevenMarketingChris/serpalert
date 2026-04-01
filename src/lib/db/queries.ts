@@ -26,7 +26,7 @@ export async function getAllActiveBrands(): Promise<Brand[]> {
       eq(brands.active, true),
       sql`(
         ${brands.agencyManaged} = true
-        OR ${brands.subscriptionStatus} IN ('active', 'past_due', 'agency')
+        OR ${brands.subscriptionStatus} IN ('active', 'past_due')
         OR (${brands.subscriptionStatus} = 'trialing' AND (${brands.trialEndsAt} IS NULL OR ${brands.trialEndsAt} > ${now}))
       )`
     )

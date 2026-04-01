@@ -95,6 +95,7 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
         0
       )
       setStatus('done')
+      inFlight.current = false
       setResult(
         `Checked ${total} keyword${total !== 1 ? 's' : ''} — ${competitors} competitor${competitors !== 1 ? 's' : ''} found`
       )

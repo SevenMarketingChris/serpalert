@@ -183,7 +183,13 @@ export function CompetitorTable({
                         ) : fetchErrors[competitor.domain] ? (
                           <p
                             className="text-sm text-red-500 cursor-pointer"
-                            onClick={(e) => { e.stopPropagation(); setExpandedDomain(null); setTimeout(() => toggleRow(competitor.domain), 0) }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setAdCopyCache(prev => { const next = {...prev}; delete next[competitor.domain]; return next })
+                              setFetchErrors(prev => ({...prev, [competitor.domain]: false}))
+                              setExpandedDomain(null)
+                              setTimeout(() => toggleRow(competitor.domain), 0)
+                            }}
                           >
                             Failed to load. Click to retry.
                           </p>
@@ -204,9 +210,9 @@ export function CompetitorTable({
                                 </tr>
                               </thead>
                               <tbody>
-                                {adCopies.map((ad, i) => (
+                                {adCopies.map((ad) => (
                                   <tr
-                                    key={i}
+                                    key={`${ad.headline ?? ''}-${ad.firstSeen}`}
                                     className="border-t border-gray-100 text-gray-600"
                                   >
                                     <td className="py-2 pr-3 text-gray-800 max-w-[200px] truncate">
@@ -309,7 +315,13 @@ export function CompetitorTable({
                   ) : fetchErrors[competitor.domain] ? (
                     <p
                       className="text-sm text-red-500 cursor-pointer"
-                      onClick={(e) => { e.stopPropagation(); setExpandedDomain(null); setTimeout(() => toggleRow(competitor.domain), 0) }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setAdCopyCache(prev => { const next = {...prev}; delete next[competitor.domain]; return next })
+                        setFetchErrors(prev => ({...prev, [competitor.domain]: false}))
+                        setExpandedDomain(null)
+                        setTimeout(() => toggleRow(competitor.domain), 0)
+                      }}
                     >
                       Failed to load. Click to retry.
                     </p>
@@ -318,8 +330,8 @@ export function CompetitorTable({
                       <p className="text-[10px] uppercase tracking-wider text-gray-400 font-mono">
                         Ad Copy History
                       </p>
-                      {adCopies.map((ad, i) => (
-                        <div key={i} className="text-sm space-y-1 border-b border-gray-50 pb-2 last:border-0">
+                      {adCopies.map((ad) => (
+                        <div key={`${ad.headline ?? ''}-${ad.firstSeen}`} className="text-sm space-y-1 border-b border-gray-50 pb-2 last:border-0">
                           <p className="text-gray-800 font-medium truncate">{ad.headline || 'No headline'}</p>
                           <p className="text-gray-500 text-xs truncate">{ad.description || 'No description'}</p>
                           {ad.displayUrl && (

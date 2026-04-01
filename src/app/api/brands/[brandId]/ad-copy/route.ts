@@ -3,8 +3,13 @@ import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getAdCopyHistory } from '@/lib/db/queries'
 import { checkIsAdmin } from '@/lib/auth'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function GET(request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+  if (!UUID_RE.test(brandId)) {
+    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
+  }
   const { userId } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

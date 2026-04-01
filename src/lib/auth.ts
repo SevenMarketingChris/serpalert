@@ -10,7 +10,7 @@ export async function checkIsAdmin(): Promise<boolean> {
   const { currentUser } = await import('@clerk/nextjs/server')
   const user = await currentUser()
   if (!user) return false
-  const email = user.emailAddresses?.[0]?.emailAddress
+  const email = user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress
   if (!email) return false
   return ADMIN_EMAILS.includes(email.toLowerCase())
 }
@@ -46,7 +46,7 @@ export function authorizeBrandAccess(
   if (brand.agencyManaged && !isAdmin) {
     throw new Error('Not authorized: agency-managed brands require admin access')
   }
-  if (!brand.agencyManaged && brand.userId !== userId) {
+  if (!brand.agencyManaged && brand.userId !== userId && !isAdmin) {
     throw new Error('Not authorized: you do not own this brand')
   }
 }

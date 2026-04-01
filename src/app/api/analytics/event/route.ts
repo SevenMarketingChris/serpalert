@@ -2,8 +2,14 @@ import { NextResponse } from 'next/server'
 import { analyticsEventPayloadSchema } from '@/lib/analytics/contracts'
 import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
+  const { ok } = rateLimit('analytics-event', { limit: 100, windowMs: 60_000 })
+  if (!ok) {
+    return NextResponse.json({ error: 'Rate limited' }, { status: 429 })
+  }
+
   let body: unknown
   try {
     body = await request.json()

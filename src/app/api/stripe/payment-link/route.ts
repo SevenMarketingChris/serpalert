@@ -3,12 +3,23 @@ import { isAdminRequest } from '@/lib/auth'
 import { getStripe } from '@/lib/stripe'
 import { getBrandById } from '@/lib/db/queries'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function POST(request: Request) {
   if (!isAdminRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { brandId } = await request.json()
+  let brandId: string
+  try {
+    const body = await request.json()
+    brandId = body.brandId
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+  if (!brandId || !UUID_RE.test(brandId)) {
+    return NextResponse.json({ error: 'Invalid brand ID' }, { status: 400 })
+  }
   const brand = await getBrandById(brandId)
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })

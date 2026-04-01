@@ -24,7 +24,11 @@ export async function updateBrandDetails(
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  authorizeBrandAccess(brand, userId, isAdmin)
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return { error: 'Not authorized' }
+  }
 
   const name = ((formData.get('name') as string) ?? '').trim()
   if (!name) return { error: 'Brand name is required' }
@@ -106,7 +110,11 @@ export async function updateAlertConfig(
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
-  authorizeBrandAccess(brand, userId, isAdmin)
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return { error: 'Not authorized' }
+  }
 
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const alertThreshold = parseInt(formData.get('alertThreshold') as string) || 1
@@ -138,7 +146,11 @@ export async function updateGoogleAds(
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
-  authorizeBrandAccess(brand, userId, isAdmin)
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return { error: 'Not authorized' }
+  }
 
   const googleAdsCustomerId = ((formData.get('googleAdsCustomerId') as string) ?? '').trim() || null
   const brandCampaignId = ((formData.get('brandCampaignId') as string) ?? '').trim() || null
@@ -160,7 +172,11 @@ export async function deleteBrandAction(brandId: string): Promise<{ error?: stri
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
-  authorizeBrandAccess(brand, userId, isAdmin)
+  try {
+    authorizeBrandAccess(brand, userId, isAdmin)
+  } catch {
+    return { error: 'Not authorized' }
+  }
 
   await deleteBrand(brandId)
   redirect('/dashboard')
