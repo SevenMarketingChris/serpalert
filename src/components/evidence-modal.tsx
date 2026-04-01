@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
@@ -30,6 +31,7 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
     const url = `${window.location.origin}/evidence/${checkId}?token=${brandToken}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
+      toast.success('Evidence link copied')
       setTimeout(() => setCopied(false), 2000)
     })
   }

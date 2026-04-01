@@ -186,31 +186,8 @@ export async function updateBrand(
   return rows[0]
 }
 
-// Not implemented: Ahrefs SEO integration is planned but tables are not yet created.
-// These functions will be re-implemented once the ahrefs_domains and ahrefs_keywords
-// tables exist in the database schema.
-export type AhrefsMetrics = {
-  domainRating: string | null
-  organicTraffic: number | null
-  referringDomains: number | null
-}
-
-export async function getBrandAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics | null> {
-  throw new Error('Not implemented: Ahrefs integration pending database schema')
-}
-
-export async function getCompetitorAhrefsMetrics(_brandId: string): Promise<AhrefsMetrics[]> {
-  throw new Error('Not implemented: Ahrefs integration pending database schema')
-}
-
-export async function getTopKeywordsForDomain(_brandId: string, _domain: string): Promise<{ keyword: string; position: number; volume: number }[]> {
-  throw new Error('Not implemented: Ahrefs integration pending database schema')
-}
-
-export async function getMonthlyReports(_brandId: string): Promise<{ id: string; month: string; summary: string }[]> {
-  throw new Error('Not implemented: Monthly reports feature pending database schema')
-}
-
+// Ahrefs integration stubs: called by cron but tables not yet created.
+// Will be re-implemented once ahrefs_domains and ahrefs_keywords tables exist.
 export async function upsertAhrefsDomainMetrics(_data: {
   brandId: string; domain: string; isBrandDomain: boolean; date: string
   domainRating: string | null; organicTraffic: number | null

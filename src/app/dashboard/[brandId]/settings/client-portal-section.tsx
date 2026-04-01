@@ -28,6 +28,7 @@ export function ClientPortalSection({ clientToken }: Props) {
     const link = `${window.location.origin}/client/${clientToken}`
     navigator.clipboard.writeText(link).then(() => {
       setCopiedLink(true)
+      toast.success('Portal link copied to clipboard')
       setTimeout(() => setCopiedLink(false), 2000)
     })
   }

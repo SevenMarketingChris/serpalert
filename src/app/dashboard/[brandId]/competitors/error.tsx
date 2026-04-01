@@ -1,32 +1,22 @@
 'use client'
 
-import { useEffect } from 'react'
-import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
+export default function CompetitorsError({ reset }: { reset: () => void }) {
   return (
-    <div className="max-w-5xl py-12 text-center space-y-4">
-      <AlertTriangle className="h-8 w-8 text-destructive mx-auto" />
-      <h2 className="text-lg font-semibold">Competitors failed to load</h2>
-      <p className="text-sm text-muted-foreground">
-        The competitors section encountered an error. Try refreshing.
-      </p>
-      <button
-        onClick={reset}
-        className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-      >
-        Try Again
-      </button>
+    <div className="max-w-5xl" role="alert">
+      <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-8 text-center space-y-4 shadow-lg shadow-gray-200/20">
+        <h2 className="text-lg font-semibold text-gray-900">Failed to load competitors</h2>
+        <p className="text-sm text-gray-500">There was a problem loading competitor data. This is usually temporary.</p>
+        <div className="flex items-center justify-center gap-3">
+          <button onClick={reset} className="inline-flex h-9 items-center justify-center rounded-lg bg-indigo-600 px-5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+            Try Again
+          </button>
+          <Link href="/dashboard" className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }
