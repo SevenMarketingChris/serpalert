@@ -122,9 +122,15 @@ export const analyticsEvents = pgTable('analytics_events', {
   index('analytics_events_brand_happened_idx').on(table.brandId, table.happenedAt),
 ])
 
+export const processedEvents = pgTable('processed_events', {
+  eventId: text('event_id').primaryKey(),
+  processedAt: timestamp('processed_at').notNull().defaultNow(),
+})
+
 export type Brand = typeof brands.$inferSelect
 export type SerpCheck = typeof serpChecks.$inferSelect
 export type CompetitorAd = typeof competitorAds.$inferSelect
 export type AuctionInsight = typeof auctionInsights.$inferSelect
 export type AuditLead = typeof auditLeads.$inferSelect
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect
+export type ProcessedEvent = typeof processedEvents.$inferSelect

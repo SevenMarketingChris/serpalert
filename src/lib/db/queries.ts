@@ -343,6 +343,22 @@ export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck |
   return rows[0] ?? null
 }
 
+export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<string, SerpCheck>> {
+  if (brandIds.length === 0) return new Map()
+
+  const rows = await db.select().from(serpChecks)
+    .where(inArray(serpChecks.brandId, brandIds))
+    .orderBy(desc(serpChecks.checkedAt))
+
+  const latestByBrand = new Map<string, SerpCheck>()
+  for (const row of rows) {
+    if (!latestByBrand.has(row.brandId)) {
+      latestByBrand.set(row.brandId, row)
+    }
+  }
+  return latestByBrand
+}
+
 export async function getSerpCheckCountForBrand(brandId: string): Promise<number> {
   const rows = await db
     .select({ count: count() })

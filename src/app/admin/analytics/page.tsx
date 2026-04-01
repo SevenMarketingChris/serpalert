@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getFunnelMetricsSummary, type FunnelWindowMetrics } from '@/lib/analytics/funnel'
 
 function pct(value: number): string {
@@ -115,8 +116,20 @@ function RateRow({ label, value }: { label: string; value: number }) {
   )
 }
 
-export default async function AdminAnalyticsPage() {
+export default async function AdminAnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>
+}) {
   const metrics = await getFunnelMetricsSummary()
+  const { range } = await searchParams
+  const selectedRange = range === '30' ? 30 : 7
+  const selectableRanges = [
+    { label: '7 Days', value: 7 as const, window: metrics.last7Days },
+    { label: '30 Days', value: 30 as const, window: metrics.last30Days },
+  ]
+  const selectedWindow = selectedRange === 30 ? metrics.last30Days : metrics.last7Days
+  const hasNoData = Object.values(selectedWindow.counts).every((count) => count === 0)
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-6 py-10">
@@ -127,8 +140,35 @@ export default async function AdminAnalyticsPage() {
         </p>
       </header>
 
-      {renderWindow(metrics.last7Days)}
-      {renderWindow(metrics.last30Days)}
+      <section className="rounded-lg border border-border bg-card p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date Range</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {selectableRanges.map((range) => (
+            <Link
+              key={range.value}
+              href={`/admin/analytics?range=${range.value}`}
+              className={`inline-flex rounded-md border px-3 py-1.5 text-sm ${
+                range.value === selectedWindow.windowDays
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border text-muted-foreground'
+              }`}
+            >
+              {range.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {hasNoData ? (
+        <section className="rounded-lg border border-dashed border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-foreground">No analytics events in the selected window</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Data will appear here after tracked events are emitted from public pages and signup/billing flows.
+          </p>
+        </section>
+      ) : null}
+
+      {renderWindow(selectedWindow)}
     </div>
   )
 }

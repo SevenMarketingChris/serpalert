@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { updateBrandSubscription, getBrandByStripeSubscriptionId, getBrandByStripeCustomerId } from '@/lib/db/queries'
 import { db } from '@/lib/db'
-import { sql } from 'drizzle-orm'
+import { processedEvents } from '@/lib/db/schema'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
 import type { AttributionContext } from '@/lib/attribution'
 
@@ -53,30 +53,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  // Deduplicate: skip already-processed event IDs
+  // Deduplicate: skip already-processed event IDs.
   try {
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS processed_events (
-        event_id TEXT PRIMARY KEY,
-        processed_at TIMESTAMP NOT NULL DEFAULT now()
-      )
-    `)
-  } catch (err) {
-    console.error('Failed to create processed_events table:', err)
-  }
-
-  try {
-    await db.execute(sql`
-      INSERT INTO processed_events (event_id) VALUES (${event.id})
-    `)
-  } catch (err) {
-    const pgErr = err as { code?: string }
-    if (pgErr.code === '23505') {
+    const inserted = await db.insert(processedEvents)
+      .values({ eventId: event.id })
+      .onConflictDoNothing({ target: processedEvents.eventId })
+      .returning({ eventId: processedEvents.eventId })
+    if (inserted.length === 0) {
       console.info(`Stripe event ${event.id} already processed — skipping`)
       return NextResponse.json({ received: true, dedup: true })
     }
+  } catch (err) {
     console.error(`processed_events insert error for ${event.id}:`, err)
-    // Fall through — don't block processing on dedup table failure
+    // Fall through so we do not block subscription state updates.
   }
 
   switch (event.type) {

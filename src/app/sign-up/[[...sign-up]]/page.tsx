@@ -1,4 +1,5 @@
 import { SignUp } from '@clerk/nextjs'
+import { SignupStartTracker } from '@/components/analytics/signup-start-tracker'
 
 export const metadata = {
   title: 'Sign Up — SerpAlert',
@@ -8,6 +9,7 @@ export const metadata = {
 export default function SignUpPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+      <SignupStartTracker />
       <div>
         <h1 className="text-2xl font-bold text-foreground mb-6 text-center">Sign Up</h1>
         <SignUp fallbackRedirectUrl="/dashboard" />
