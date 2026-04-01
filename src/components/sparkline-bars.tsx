@@ -1,10 +1,12 @@
 'use client'
 
+import { memo } from 'react'
+
 interface SparklineBarsProps {
   data: number[]
 }
 
-export function SparklineBars({ data }: SparklineBarsProps) {
+export const SparklineBars = memo(function SparklineBars({ data }: SparklineBarsProps) {
   const max = Math.max(...data, 1)
 
   return (
@@ -22,4 +24,4 @@ export function SparklineBars({ data }: SparklineBarsProps) {
       })}
     </div>
   )
-}
+})

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getBrandByToken, getRecentSerpChecks, getCompetitorAdsForChecks, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { ScreenshotModal } from '@/components/screenshot-modal'
@@ -9,6 +10,8 @@ import { BarChart3 } from 'lucide-react'
 import { ShareReportButton } from '@/components/share-report-button'
 import type { CompetitorAd, SerpCheck } from '@/lib/db/schema'
 import { AppHeader } from '@/components/app-header'
+
+export const metadata: Metadata = { title: 'Brand Monitoring Report', robots: { index: false, follow: false } }
 
 type CheckWithAds = SerpCheck & { ads: CompetitorAd[] }
 

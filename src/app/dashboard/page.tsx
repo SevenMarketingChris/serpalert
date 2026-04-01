@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
@@ -9,6 +10,8 @@ import { getRelativeTime } from '@/lib/time'
 import { SubscribeBanner } from '@/components/subscribe-banner'
 import { SubscribeButton } from '@/components/subscribe-button'
 import { checkIsAdmin } from '@/lib/auth'
+
+export const metadata: Metadata = { title: 'Dashboard', robots: { index: false, follow: false } }
 
 export default async function DashboardPage() {
   const { userId } = await auth()

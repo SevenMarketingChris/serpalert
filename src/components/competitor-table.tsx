@@ -119,6 +119,10 @@ export function CompetitorTable({
                   <tr
                     className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => toggleRow(competitor.domain)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(competitor.domain) } }}
+                    tabIndex={0}
+                    role="button"
+                    aria-expanded={isExpanded}
                   >
                     <td className="px-4 py-3 text-gray-400">
                       {isExpanded ? (
@@ -238,9 +242,9 @@ export function CompetitorTable({
                               </tbody>
                             </table>
                           {aiAnalysis[competitor.domain] && (
-                            <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 8, padding: 12, marginTop: 8 }}>
-                              <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#818cf8', marginBottom: 4 }}>AI Analysis</p>
-                              <p style={{ fontSize: 13, color: '#4338ca', lineHeight: 1.5 }}>{aiAnalysis[competitor.domain]}</p>
+                            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mt-2">
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400 mb-1">AI Analysis</p>
+                              <p className="text-[13px] text-indigo-700 leading-relaxed">{aiAnalysis[competitor.domain]}</p>
                             </div>
                           )}
                           </div>
@@ -270,6 +274,10 @@ export function CompetitorTable({
               <div
                 className="cursor-pointer"
                 onClick={() => toggleRow(competitor.domain)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(competitor.domain) } }}
+                tabIndex={0}
+                role="button"
+                aria-expanded={isExpanded}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono font-medium text-gray-900">{competitor.domain}</span>
@@ -343,9 +351,9 @@ export function CompetitorTable({
                         </div>
                       ))}
                     {aiAnalysis[competitor.domain] && (
-                      <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 8, padding: 12, marginTop: 8 }}>
-                        <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#818cf8', marginBottom: 4 }}>AI Analysis</p>
-                        <p style={{ fontSize: 13, color: '#4338ca', lineHeight: 1.5 }}>{aiAnalysis[competitor.domain]}</p>
+                      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mt-2">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400 mb-1">AI Analysis</p>
+                        <p className="text-[13px] text-indigo-700 leading-relaxed">{aiAnalysis[competitor.domain]}</p>
                       </div>
                     )}
                     </div>

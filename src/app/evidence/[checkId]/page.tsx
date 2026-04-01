@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getSerpCheckWithAds } from '@/lib/db/queries'
 import Image from 'next/image'
@@ -5,6 +6,8 @@ import { CopyLinkButton } from '@/components/copy-link-button'
 import { safeCompare } from '@/lib/auth'
 import { isSafeUrl } from '@/lib/utils'
 import { AppHeader } from '@/components/app-header'
+
+export const metadata: Metadata = { title: 'Evidence Report', robots: { index: false, follow: false } }
 
 function formatDateTime(date: Date): string {
   const d = new Date(date)

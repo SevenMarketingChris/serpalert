@@ -17,18 +17,24 @@
 
 const hits = new Map<string, { count: number; resetAt: number }>()
 
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, entry] of hits) {
-    if (entry.resetAt < now) hits.delete(key)
-  }
-}, 5 * 60 * 1000).unref?.()
+// Lazy-init cleanup to avoid side effects at module load
+let cleanupStarted = false
+function ensureCleanup() {
+  if (cleanupStarted) return
+  cleanupStarted = true
+  setInterval(() => {
+    const now = Date.now()
+    for (const [key, entry] of hits) {
+      if (entry.resetAt < now) hits.delete(key)
+    }
+  }, 5 * 60 * 1000).unref?.()
+}
 
 export function rateLimit(
   key: string,
   { limit = 60, windowMs = 60_000 }: { limit?: number; windowMs?: number } = {}
 ): { ok: boolean; remaining: number } {
+  ensureCleanup()
   const now = Date.now()
   const entry = hits.get(key)
 

@@ -34,9 +34,19 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   const todayStr = toUTCDate(new Date())
   const checksToday = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === todayStr)
   const allAds = await getCompetitorAdsForChecks(checks.map(c => c.id))
+
+  // O(1) lookups: check by id, ads by check id
+  const checkById = new Map(checks.map(c => [c.id, c]))
+  const adsByCheckId = new Map<string, typeof allAds>()
+  for (const ad of allAds) {
+    const existing = adsByCheckId.get(ad.serpCheckId) || []
+    existing.push(ad)
+    adsByCheckId.set(ad.serpCheckId, existing)
+  }
+
   const threatsToday = new Set(
     allAds.filter(a => {
-      const check = checks.find(c => c.id === a.serpCheckId)
+      const check = checkById.get(a.serpCheckId)
       return check && toUTCDate(new Date(check.checkedAt)) === todayStr
     }).map(a => a.domain)
   ).size
@@ -46,7 +56,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
   const activeCompetitors = new Set(
     allAds.filter(a => {
-      const check = checks.find(c => c.id === a.serpCheckId)
+      const check = checkById.get(a.serpCheckId)
       return check && new Date(check.checkedAt) >= sevenDaysAgo
     }).map(a => a.domain)
   ).size
@@ -72,8 +82,13 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     d.setDate(d.getDate() - i)
     const dayStr = toUTCDate(d)
     const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
-    const dayCheckIds = dayChecks.map(c => c.id)
-    last7Days.push(new Set(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).map(a => a.domain)).size)
+    const dayDomains = new Set<string>()
+    for (const c of dayChecks) {
+      for (const ad of adsByCheckId.get(c.id) || []) {
+        dayDomains.add(ad.domain)
+      }
+    }
+    last7Days.push(dayDomains.size)
   }
 
   // Build 30-day activity data for trend chart
@@ -83,8 +98,13 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     d.setDate(d.getDate() - i)
     const dayStr = toUTCDate(d)
     const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
-    const dayCheckIds = dayChecks.map(c => c.id)
-    const dayThreats = new Set(allAds.filter(a => dayCheckIds.includes(a.serpCheckId)).map(a => a.domain)).size
+    const dayDomains30 = new Set<string>()
+    for (const c of dayChecks) {
+      for (const ad of adsByCheckId.get(c.id) || []) {
+        dayDomains30.add(ad.domain)
+      }
+    }
+    const dayThreats = dayDomains30.size
     last30Days.push({
       date: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
       checks: dayChecks.length,
@@ -103,7 +123,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     checkedAt: new Date(c.checkedAt).toISOString(),
     competitorCount: c.competitorCount,
     screenshotUrl: c.screenshotUrl ?? null,
-    ads: allAds.filter(a => a.serpCheckId === c.id).map(a => ({
+    ads: (adsByCheckId.get(c.id) || []).map(a => ({
       id: a.id,
       domain: a.domain,
       headline: a.headline,
@@ -124,7 +144,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
   const competitorFreq: Record<string, { count: number; keywords: Set<string>; lastSeen: Date }> = {}
   for (const ad of allAds) {
-    const check = checks.find(c => c.id === ad.serpCheckId)
+    const check = checkById.get(ad.serpCheckId)
     if (!check) continue
     const checkDate = new Date(check.checkedAt)
     if (checkDate < thirtyDaysAgo) continue

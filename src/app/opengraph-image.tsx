@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "SerpAlert social preview";
+export const alt = "SerpAlert — Hourly Google SERP monitoring with screenshot evidence";
 export const size = {
   width: 1200,
   height: 630,

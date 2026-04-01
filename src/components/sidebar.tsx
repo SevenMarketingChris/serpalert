@@ -198,7 +198,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-gray-200 bg-white/70 backdrop-blur-xl px-4 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-gray-200 bg-white/70 backdrop-blur-xl px-4 md:hidden" role="banner" aria-label="Mobile navigation">
         <button
           onClick={() => setMobileOpen(true)}
           className="p-1.5 text-gray-600 hover:text-gray-900 transition-colors"
@@ -217,7 +217,7 @@ export function Sidebar({
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
