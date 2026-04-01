@@ -51,26 +51,26 @@ export function UpgradeBanner({ brandId, isExpired, isCanceled, daysLeft }: Prop
           </div>
           <div>
             <p className={`text-sm font-semibold ${isExpired || isCanceled ? 'text-red-900' : 'text-indigo-900'}`}>
-              {isExpired && 'Your trial has ended'}
-              {isCanceled && 'Your subscription is canceled'}
+              {isExpired && 'Your monitoring has paused'}
+              {isCanceled && 'Your monitoring has paused'}
               {!isExpired && !isCanceled && daysLeft !== null && (
                 daysLeft <= 3
-                  ? `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left in your free trial`
-                  : 'You\'re on a free trial'
+                  ? `Your brand protection ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`
+                  : 'Keep your brand protected'
               )}
             </p>
             <p className={`text-xs mt-0.5 ${isExpired || isCanceled ? 'text-red-600' : 'text-indigo-600'}`}>
               {isExpired || isCanceled
-                ? 'Monitoring is paused. Upgrade to resume hourly protection.'
-                : 'Upgrade to keep monitoring after your trial. No interruption to service.'
+                ? 'Your competitors could be bidding right now. Upgrade to resume protection.'
+                : 'Lock in continuous hourly monitoring so you never miss a competitor.'
               }
             </p>
             {!isExpired && !isCanceled && (
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> Hourly SERP checks</span>
-                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> Screenshot evidence</span>
-                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> AI insights</span>
-                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> Slack alerts</span>
+                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> 24/7 hourly monitoring</span>
+                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> AI-powered insights</span>
+                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> Instant Slack alerts</span>
+                <span className="text-[11px] text-indigo-500 flex items-center gap-1"><Check className="w-3 h-3" /> Monthly reports</span>
               </div>
             )}
           </div>
@@ -85,7 +85,7 @@ export function UpgradeBanner({ brandId, isExpired, isCanceled, daysLeft }: Prop
                 : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/25'
             } disabled:opacity-50`}
           >
-            {loading ? 'Loading...' : 'Upgrade — £149/mo'}
+            {loading ? 'Loading...' : isExpired || isCanceled ? 'Resume Protection — £149/mo' : 'Continue Protection — £149/mo'}
           </button>
           <p className="text-[10px] text-gray-400">Cancel anytime</p>
         </div>

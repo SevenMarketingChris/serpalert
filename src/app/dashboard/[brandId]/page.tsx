@@ -259,8 +259,8 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
         </div>
       </div>
 
-      {/* AI Recommendation */}
-      {aiRecommendation && (
+      {/* AI Recommendation / Countdown */}
+      {aiRecommendation ? (
         <div className="bg-indigo-50/60 backdrop-blur-lg border border-indigo-200/40 rounded-2xl p-4 shadow-lg shadow-indigo-100/10 flex items-start gap-3">
           <div className="shrink-0 mt-0.5">
             <Sparkles className="h-4 w-4 text-indigo-500" />
@@ -270,7 +270,27 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
             <p className="text-sm text-indigo-700">{aiRecommendation}</p>
           </div>
         </div>
-      )}
+      ) : checks.length > 0 && checks.length < 4 ? (
+        <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-lg shadow-gray-200/20 flex items-start gap-3">
+          <div className="shrink-0 mt-0.5">
+            <Sparkles className="h-4 w-4 text-gray-300" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 font-mono mb-1">AI Insights</p>
+            <p className="text-sm text-gray-500">
+              Analysing your brand&apos;s competitive landscape — {4 - checks.length} more scan{4 - checks.length !== 1 ? 's' : ''} until your first AI recommendation.
+            </p>
+            <div className="flex gap-1.5 mt-2">
+              {[1, 2, 3, 4].map(i => (
+                <div
+                  key={i}
+                  className={`h-1.5 flex-1 rounded-full ${i <= checks.length ? 'bg-indigo-500' : 'bg-gray-200'}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Getting Started — encourage first scan */}
       {checks.length === 0 && (
