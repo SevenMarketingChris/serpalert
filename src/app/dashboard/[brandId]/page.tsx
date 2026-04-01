@@ -10,6 +10,7 @@ import { RecentScan } from '@/components/recent-scan'
 import { CompetitorSummary } from '@/components/competitor-summary'
 import { SparklineBars } from '@/components/sparkline-bars'
 import { DashboardCalculator } from '@/components/dashboard-calculator'
+import { UpgradeBanner } from '@/components/upgrade-banner'
 import { toUTCDate, getRelativeTime } from '@/lib/time'
 import { ShieldCheck, AlertTriangle, Sparkles } from 'lucide-react'
 import { groupChecksIntoRuns } from '@/lib/group-checks'
@@ -176,9 +177,28 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
       lastSeen: data.lastSeen.toISOString(),
     }))
 
+  const isTrialing = brand.subscriptionStatus === 'trialing'
+  const isExpired = isTrialing && brand.trialEndsAt && new Date(brand.trialEndsAt) <= new Date()
+  const isCanceled = brand.subscriptionStatus === 'canceled'
+  const needsUpgrade = isTrialing || isExpired || isCanceled
+  const trialDaysLeft = brand.trialEndsAt && isTrialing && !isExpired
+    ? Math.max(0, Math.ceil((new Date(brand.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null
+
   return (
     <div className="space-y-4 max-w-5xl">
       <h1 className="text-lg font-semibold text-gray-900">{brand.name}</h1>
+
+      {/* Upgrade Banner — visible during trial/expired/canceled */}
+      {needsUpgrade && !brand.agencyManaged && (
+        <UpgradeBanner
+          brandId={brand.id}
+          isExpired={!!isExpired}
+          isCanceled={!!isCanceled}
+          daysLeft={trialDaysLeft}
+        />
+      )}
+
       {/* (a) Status Banner */}
       <div className={`rounded-2xl overflow-hidden ${
         isProtected
