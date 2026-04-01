@@ -75,13 +75,22 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     // AI unavailable — skip recommendation
   }
 
+  // Pre-group checks by date string for O(1) day lookups
+  const checksByDate = new Map<string, typeof checks>()
+  for (const c of checks) {
+    const dateStr = toUTCDate(new Date(c.checkedAt))
+    const existing = checksByDate.get(dateStr) || []
+    existing.push(c)
+    checksByDate.set(dateStr, existing)
+  }
+
   // Build 7-day threat counts for sparkline
   const last7Days: number[] = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
     const dayStr = toUTCDate(d)
-    const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
+    const dayChecks = checksByDate.get(dayStr) || []
     const dayDomains = new Set<string>()
     for (const c of dayChecks) {
       for (const ad of adsByCheckId.get(c.id) || []) {
@@ -97,7 +106,7 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     const d = new Date()
     d.setDate(d.getDate() - i)
     const dayStr = toUTCDate(d)
-    const dayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === dayStr)
+    const dayChecks = checksByDate.get(dayStr) || []
     const dayDomains30 = new Set<string>()
     for (const c of dayChecks) {
       for (const ad of adsByCheckId.get(c.id) || []) {

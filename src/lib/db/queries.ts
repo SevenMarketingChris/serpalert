@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql, max } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
