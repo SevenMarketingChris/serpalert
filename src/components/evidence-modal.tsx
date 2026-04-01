@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { isSafeUrl } from '@/lib/utils'
+import { formatDateTime } from '@/lib/time'
 
 interface EvidenceModalProps {
   checkId: string
@@ -19,18 +20,6 @@ interface EvidenceModalProps {
     destinationUrl: string | null
     position: number | null
   }[]
-}
-
-function formatDateTime(date: string): string {
-  const d = new Date(date)
-  return d.toLocaleString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
 }
 
 export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screenshotUrl, ads }: EvidenceModalProps) {
@@ -71,7 +60,6 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
               width={800}
               height={600}
               className="w-full rounded-lg"
-              unoptimized
             />
             <span className="absolute bottom-2 right-2 bg-black/70 text-white font-mono text-xs px-2 py-1 rounded">
               {formatDateTime(checkedAt)}

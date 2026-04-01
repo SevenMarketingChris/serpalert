@@ -32,7 +32,7 @@ export function DashboardTabs({ brandId, hasGoogleAds }: DashboardTabsProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`text-[11px] uppercase tracking-[1px] font-mono transition-colors px-4 py-2 ${
+            className={`text-xs uppercase tracking-[1px] font-mono transition-colors px-4 py-2.5 ${
               isActive
                 ? 'border-b-2 border-primary text-foreground font-medium'
                 : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getStripe } from '@/lib/stripe'
+import type Stripe from 'stripe'
 import { getBrandById } from '@/lib/db/queries'
 
 export async function POST(request: Request) {
@@ -37,17 +38,14 @@ export async function POST(request: Request) {
 
   const origin = new URL(request.url).origin
 
-  const sessionParams: any = {
-    mode: 'subscription' as const,
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
     metadata: { brandId, userId },
     subscription_data: { metadata: { brandId } },
     success_url: `${origin}/dashboard?subscribed=true`,
     cancel_url: `${origin}/dashboard`,
-  }
-
-  if (brand.stripeCustomerId) {
-    sessionParams.customer = brand.stripeCustomerId
+    ...(brand.stripeCustomerId ? { customer: brand.stripeCustomerId } : {}),
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams)

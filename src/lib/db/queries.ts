@@ -362,6 +362,40 @@ export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck |
   return rows[0] ?? null
 }
 
+export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<string, SerpCheck>> {
+  if (brandIds.length === 0) return new Map()
+
+  // Get the max checkedAt per brand in one query
+  const latestPerBrand = await db
+    .select({
+      brandId: serpChecks.brandId,
+      maxCheckedAt: max(serpChecks.checkedAt).as('maxCheckedAt'),
+    })
+    .from(serpChecks)
+    .where(inArray(serpChecks.brandId, brandIds))
+    .groupBy(serpChecks.brandId)
+
+  if (latestPerBrand.length === 0) return new Map()
+
+  // Fetch full rows for each latest check
+  const result = new Map<string, SerpCheck>()
+  const checks = await Promise.all(
+    latestPerBrand.map(async ({ brandId, maxCheckedAt }) => {
+      if (!maxCheckedAt) return null
+      const rows = await db.select().from(serpChecks)
+        .where(and(eq(serpChecks.brandId, brandId), eq(serpChecks.checkedAt, maxCheckedAt)))
+        .limit(1)
+      return rows[0] ?? null
+    })
+  )
+
+  for (const check of checks) {
+    if (check) result.set(check.brandId, check)
+  }
+
+  return result
+}
+
 export async function createBrand(data: {
   name: string; slug: string; keywords: string[]
   domain?: string

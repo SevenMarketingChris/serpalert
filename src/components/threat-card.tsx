@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ScreenshotModal } from '@/components/screenshot-modal'
 import { EvidenceModal } from '@/components/evidence-modal'
 import { isSafeUrl } from '@/lib/utils'
+import { formatScanTime } from '@/lib/time'
 
 interface ThreatCardProps {
   checkId: string
@@ -38,19 +39,6 @@ const nextStatusMap: Record<string, { label: string; next: string }> = {
   new: { label: 'Acknowledge', next: 'acknowledged' },
   acknowledged: { label: 'Mark Reported', next: 'reported' },
   reported: { label: 'Resolve', next: 'resolved' },
-}
-
-function formatTime(date: string): string {
-  const d = new Date(date)
-  const now = new Date()
-  const diffMs = now.getTime() - d.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
 }
 
 export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checkedAt, screenshotUrl, competitorCount }: ThreatCardProps) {
@@ -93,7 +81,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
         <div className="flex items-center gap-2 flex-wrap">
           <span className={badgeClass}>{status.toUpperCase()}</span>
           <span className="text-tech-purple font-mono text-sm">{keyword}</span>
-          <span className="ml-auto text-muted-foreground font-mono text-xs">{formatTime(checkedAt)}</span>
+          <span className="ml-auto text-muted-foreground font-mono text-xs">{formatScanTime(checkedAt)}</span>
         </div>
 
         {/* Context summary */}

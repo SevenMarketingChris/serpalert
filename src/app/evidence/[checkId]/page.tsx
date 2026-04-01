@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { CopyLinkButton } from '@/components/copy-link-button'
 import { safeCompare } from '@/lib/auth'
 import { isSafeUrl } from '@/lib/utils'
+import { AppHeader } from '@/components/app-header'
 
 function formatDateTime(date: Date): string {
   const d = new Date(date)
@@ -34,12 +35,9 @@ export default async function EvidencePage({
   if (!token || !safeCompare(token, brandClientToken)) notFound()
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center px-4 py-8">
-      <div className="w-full max-w-2xl space-y-6">
-        {/* Logo */}
-        <div className="text-center">
-          <span className="text-gradient-tech font-extrabold text-lg">SerpAlert</span>
-        </div>
+    <div className="min-h-screen bg-background flex flex-col items-center">
+      <AppHeader maxWidth="max-w-2xl" showThemeToggle={true} />
+      <div className="w-full max-w-2xl space-y-6 px-4 py-8">
 
         {/* Evidence Card */}
         <div className="bg-card border border-border rounded-lg p-5 space-y-4">

@@ -12,6 +12,7 @@ export async function GET(
 
   const { brandId } = await params
   const brand = await getBrandById(brandId)
+  const origin = new URL(request.url).origin
   if (!brand) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   // Get last 24h of data
@@ -65,7 +66,7 @@ export async function GET(
   ` : ''}
 
   <div style="text-align: center; margin-top: 32px;">
-    <a href="https://serpalert.vercel.app/dashboard/${brandId}"
+    <a href="${origin}/dashboard/${brandId}"
        style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
       View Full Dashboard
     </a>

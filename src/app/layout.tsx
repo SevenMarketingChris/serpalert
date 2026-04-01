@@ -15,9 +15,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SERP Alert",
-  description: "Monitor competitor ad activity on Google Search",
-  robots: { index: false, follow: false },
+  title: {
+    default: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
+    template: "%s | SerpAlert",
+  },
+  description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms, with SERP screenshots as evidence.",
+  metadataBase: new URL("https://serpalert.co.uk"),
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: "https://serpalert.co.uk",
+    siteName: "SerpAlert",
+    title: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
+    description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms, with SERP screenshots as evidence.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SerpAlert — Brand Protection & Competitor Ad Monitoring",
+    description: "Monitor your brand keywords on Google Search. Get alerted within the hour when competitors bid on your brand terms.",
+  },
+  alternates: {
+    canonical: "https://serpalert.co.uk",
+  },
 };
 
 export default function RootLayout({

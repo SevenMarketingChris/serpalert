@@ -44,7 +44,6 @@ export function ScreenshotModal({ screenshotUrl, keyword }: { screenshotUrl: str
                 height={800}
                 className="w-full h-auto"
                 loading="lazy"
-                unoptimized
                 onError={() => setImageError(true)}
                 onLoad={() => setLoaded(true)}
               />

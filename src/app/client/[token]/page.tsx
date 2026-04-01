@@ -8,6 +8,7 @@ import { getRelativeTime, toUTCDate } from '@/lib/time'
 import { BarChart3 } from 'lucide-react'
 import { ShareReportButton } from '@/components/share-report-button'
 import type { CompetitorAd, SerpCheck } from '@/lib/db/schema'
+import { AppHeader } from '@/components/app-header'
 
 type CheckWithAds = SerpCheck & { ads: CompetitorAd[] }
 
@@ -68,9 +69,11 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 
   return (
     <div className="min-h-screen bg-background">
+      <AppHeader maxWidth="max-w-4xl" showThemeToggle={true} />
+
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
 
-        {/* 1. Header with context */}
+        {/* Brand Report Header */}
         <header className="text-center space-y-1">
           <p className="text-xs uppercase tracking-[2px] text-muted-foreground">
             Brand Protection Report &middot; {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -102,7 +105,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 
         {/* 4. Executive Summary (compact) */}
         <div className="bg-muted/40 border border-border rounded-lg px-5 py-4">
-          <h2 className="text-[10px] uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5 flex items-center gap-2">
+          <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-muted-foreground mb-1.5 flex items-center gap-2">
             <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
             Summary
           </h2>
@@ -118,7 +121,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         {/* 5. Competitor Ads Found — compact rows */}
         {recentThreats.length > 0 && (
           <section className="bg-card border border-border rounded-lg overflow-hidden">
-            <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono text-foreground/70 px-6 pt-6 mb-4 flex items-center gap-2">
+            <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-foreground/70 px-6 pt-6 mb-4 flex items-center gap-2">
               <span className="w-0.5 h-3 bg-destructive rounded-full inline-block" />
               Competitor Ads Found
             </h2>
@@ -159,7 +162,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
         {/* 6. Competitor Domains Table (with First Seen) */}
         {competitorStats.length > 0 && (
           <section className="bg-card border border-border rounded-lg overflow-hidden">
-            <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono font-semibold text-foreground/80 px-6 pt-6 mb-4 flex items-center gap-2">
+            <h2 className="text-xs uppercase tracking-[1.5px] font-mono font-semibold text-foreground/80 px-6 pt-6 mb-4 flex items-center gap-2">
               <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
               Competitor Advertisers
             </h2>
@@ -227,7 +230,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 
         {/* 7. 7-Day Activity Chart (or not-enough-data message) */}
         <section className="bg-card border border-border rounded-lg p-6">
-          <h2 className="text-[11px] uppercase tracking-[1.5px] font-mono text-foreground/70 mb-1 flex items-center gap-2">
+          <h2 className="text-xs uppercase tracking-[1.5px] font-mono text-foreground/70 mb-1 flex items-center gap-2">
             <span className="w-0.5 h-3 bg-primary rounded-full inline-block" />
             This Week
           </h2>

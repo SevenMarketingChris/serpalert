@@ -138,8 +138,8 @@ export function Sidebar({
 
       {/* Footer */}
       <div className="border-t border-sidebar-border px-4 py-3">
-        <p className="truncate text-xs text-muted-foreground lg:block md:hidden">
-          SerpAlert
+        <p className="truncate text-[10px] text-muted-foreground font-mono lg:block md:hidden">
+          &copy; {new Date().getFullYear()} SerpAlert
         </p>
       </div>
     </>

@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
-import { getBrandsForUser, getLastCheckForBrand, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
-import type { Brand, SerpCheck } from '@/lib/db/schema'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { getBrandsForUser, getLastChecksForBrands, getUserBrandCount, PLAN_LIMITS } from '@/lib/db/queries'
+import type { Brand } from '@/lib/db/schema'
+import { AppHeader } from '@/components/app-header'
 import { getRelativeTime } from '@/lib/time'
 import { SubscribeBanner } from '@/components/subscribe-banner'
 import { SubscribeButton } from '@/components/subscribe-button'
@@ -20,29 +20,13 @@ export default async function DashboardPage() {
   const planLimit = PLAN_LIMITS[currentPlan]?.brands ?? PLAN_LIMITS.free.brands
   const canAddBrand = brandCount < planLimit
 
-  const lastChecks = await Promise.all(
-    brands.map(async (b) => {
-      const check = await getLastCheckForBrand(b.id)
-      return { brandId: b.id, check }
-    })
-  )
-  const checkMap = new Map<string, SerpCheck | null>(
-    lastChecks.map(({ brandId, check }) => [brandId, check])
-  )
+  const checkMap = await getLastChecksForBrands(brands.map(b => b.id))
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b border-border bg-card px-6 py-4">
-        <div className="container mx-auto max-w-5xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-black tracking-tight text-gradient-tech">SerpAlert</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <UserButton />
-          </div>
-        </div>
-      </div>
+      <AppHeader>
+        <UserButton />
+      </AppHeader>
 
       <div className="container mx-auto p-6 max-w-5xl space-y-6">
         {brands.map((b) => {

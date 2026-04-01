@@ -10,32 +10,53 @@ import {
   Shield,
 } from "lucide-react";
 import { BudgetCalculator } from "@/components/budget-calculator";
+import { AppHeader } from "@/components/app-header";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://serpalert.co.uk",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "SerpAlert",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: "https://serpalert.co.uk",
+  description:
+    "Monitor your brand keywords on Google Search and get alerted when competitors bid on your brand terms.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "GBP",
+    description: "7-day free trial, no credit card required",
+  },
+};
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <nav className="border-b border-border bg-card px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
-          <span className="text-gradient-tech font-extrabold text-xl">
-            SerpAlert
-          </span>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/sign-up"
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Start Free Trial
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <AppHeader>
+        <Link
+          href="/sign-in"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Sign In
+        </Link>
+        <Link
+          href="/sign-up"
+          className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+        >
+          Start Free Trial
+        </Link>
+      </AppHeader>
 
       {/* Hero */}
       <section className="bg-background">
@@ -60,7 +81,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Start Your Free Trial
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <span className="text-sm text-muted-foreground">
               No credit card required
@@ -150,7 +171,7 @@ export default function HomePage() {
                 key={card.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-3"
               >
-                <card.icon className={`h-5 w-5 ${card.accent}`} />
+                <card.icon className={`h-5 w-5 ${card.accent}`} aria-hidden="true" />
                 <h3 className="font-semibold text-foreground">{card.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {card.description}
@@ -257,7 +278,7 @@ export default function HomePage() {
                 key={feature.title}
                 className="bg-card border border-border rounded-lg p-6 space-y-2"
               >
-                <feature.icon className="h-5 w-5 text-primary" />
+                <feature.icon className="h-5 w-5 text-primary" aria-hidden="true" />
                 <h3 className="font-semibold text-foreground">
                   {feature.title}
                 </h3>
@@ -286,7 +307,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Start Your Free Trial
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <span className="text-sm text-muted-foreground">
               7-day free trial &middot; No credit card required

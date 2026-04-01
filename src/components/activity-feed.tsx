@@ -7,24 +7,12 @@ import { StatusFilter } from '@/components/status-filter'
 import { ThreatCard } from '@/components/threat-card'
 import { groupChecksIntoRuns, type CheckItem, type ScanRun } from '@/lib/group-checks'
 import { isSafeUrl } from '@/lib/utils'
+import { formatScanTime } from '@/lib/time'
 
 interface ActivityFeedProps {
   checks: CheckItem[]
   brandId: string
   brandToken: string
-}
-
-function formatScanTime(date: string): string {
-  const d = new Date(date)
-  const now = new Date()
-  const diffMs = now.getTime() - d.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) +
-    ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
 function ScanRunCard({ run, brandId, brandToken, defaultExpanded }: {
