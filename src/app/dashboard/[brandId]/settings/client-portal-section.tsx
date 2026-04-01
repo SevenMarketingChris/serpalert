@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
 interface Props {
@@ -18,6 +19,7 @@ export function ClientPortalSection({ clientToken }: Props) {
   function copyToken() {
     navigator.clipboard.writeText(clientToken).then(() => {
       setCopiedToken(true)
+      toast.success('Token copied to clipboard')
       setTimeout(() => setCopiedToken(false), 2000)
     })
   }
