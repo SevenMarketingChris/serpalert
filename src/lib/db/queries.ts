@@ -377,18 +377,30 @@ export async function createBrand(data: {
   return rows[0]
 }
 
+export async function getInvitedBrandsForEmail(email: string): Promise<Brand[]> {
+  // Find brands where invitedEmail contains this email (supports comma-separated)
+  const allActive = await db.select().from(brands).where(
+    and(
+      eq(brands.active, true),
+      isNotNull(brands.invitedEmail),
+    )
+  )
+  return allActive.filter(b => {
+    if (!b.invitedEmail) return false
+    const emails = b.invitedEmail.split(',').map(e => e.trim().toLowerCase())
+    return emails.includes(email)
+  })
+}
+
 export async function linkInvitedBrands(email: string, userId: string): Promise<void> {
-  // Match brands where invitedEmail contains this email (supports comma-separated lists)
-  await db.execute(sql`
-    UPDATE brands
-    SET user_id = ${userId}, updated_at = now()
-    WHERE user_id IS NULL
-      AND invited_email IS NOT NULL
-      AND (
-        lower(invited_email) = ${email}
-        OR lower(invited_email) LIKE ${`%${email}%`}
-      )
-  `)
+  // Find brands with this invited email and link them
+  const invited = await getInvitedBrandsForEmail(email)
+  const unlinked = invited.filter(b => !b.userId)
+  for (const brand of unlinked) {
+    await db.update(brands)
+      .set({ userId, updatedAt: new Date() })
+      .where(eq(brands.id, brand.id))
+  }
 }
 
 export async function getThreatCountLast7Days(brandId: string): Promise<number> {

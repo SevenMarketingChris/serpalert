@@ -36,17 +36,38 @@ export default async function DashboardPage() {
       const { linkInvitedBrands } = await import('@/lib/db/queries')
       await linkInvitedBrands(email.toLowerCase(), userId)
     }
-  } catch {
-    // Non-critical — skip silently
+  } catch (err) {
+    console.error('Auto-link invited brands failed:', err instanceof Error ? err.message : err)
   }
 
   const isAdmin = await checkIsAdmin()
   const userBrands: Brand[] = await getBrandsForUser(userId)
-  // Admin sees agency brands too
+
+  // Also find brands where user is invited (linked by email) but userId not yet set
+  // This handles agency-managed brands assigned to this user
+  const { getInvitedBrandsForEmail } = await import('@/lib/db/queries')
+  const { currentUser: getCurrentUser } = await import('@clerk/nextjs/server')
+  let invitedBrands: Brand[] = []
+  try {
+    const user = await getCurrentUser()
+    const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress
+    if (email) {
+      invitedBrands = await getInvitedBrandsForEmail(email.toLowerCase())
+    }
+  } catch {}
+
+  // Admin sees all agency brands too
   const agencyBrands: Brand[] = isAdmin
-    ? (await getAllActiveBrands()).filter(b => b.agencyManaged)
+    ? (await getAllActiveBrands()).filter(b => b.agencyManaged && !userBrands.some(ub => ub.id === b.id) && !invitedBrands.some(ib => ib.id === b.id))
     : []
-  const brands = [...userBrands, ...agencyBrands]
+
+  // Deduplicate
+  const seenIds = new Set<string>()
+  const brands = [...userBrands, ...invitedBrands, ...agencyBrands].filter(b => {
+    if (seenIds.has(b.id)) return false
+    seenIds.add(b.id)
+    return true
+  })
 
   // Auto-redirect single-brand users to their brand dashboard
   if (brands.length === 1 && !isAdmin) {
