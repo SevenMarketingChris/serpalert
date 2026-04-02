@@ -52,7 +52,9 @@ export default async function AgencyDashboard() {
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-gray-400 mt-2">Add more brands to unlock lower per-brand pricing. Next tier: &pound;{brandCount < 3 ? '89' : brandCount < 5 ? '79' : brandCount < 10 ? '69' : '59'}/brand.</p>
+              <p className="text-[10px] text-gray-400 mt-2">
+                Add more brands to unlock lower per-brand pricing.
+              </p>
             </div>
           )}
         </div>

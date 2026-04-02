@@ -119,8 +119,9 @@ export async function sendDailySummary(params: {
 
     let competitorText = ''
     for (const [domain, data] of byDomain) {
-      const avgPos = data.positions.filter(Boolean).length > 0
-        ? (data.positions.filter(Boolean).reduce((a, b) => a! + b!, 0)! / data.positions.filter(Boolean).length).toFixed(1)
+      const validPositions = data.positions.filter((p): p is number => p != null)
+      const avgPos = validPositions.length > 0
+        ? (validPositions.reduce((a, b) => a + b, 0) / validPositions.length).toFixed(1)
         : 'N/A'
       competitorText += `• *${domain}* — position ${avgPos}, keywords: ${data.keywords.join(', ')}\n`
     }

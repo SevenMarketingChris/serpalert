@@ -32,12 +32,18 @@ export async function GET(request: Request) {
     const urls = old.map(r => r.screenshotUrl)
     const ids = old.map(r => r.id)
 
-    // Delete blobs in chunks of 25 to avoid rate limits and timeouts
+    // Delete blobs and nullify DB references in batches — partial failures don't block remaining batches
     for (let i = 0; i < urls.length; i += 25) {
-      await deleteScreenshotFiles(urls.slice(i, i + 25))
+      const batch = urls.slice(i, i + 25)
+      const batchIds = ids.slice(i, i + 25)
+      try {
+        await deleteScreenshotFiles(batch)
+        await nullifyScreenshotUrls(batchIds)
+      } catch (err) {
+        console.error(`Screenshot cleanup batch ${i / 25} failed:`, err instanceof Error ? err.message : err)
+        // Continue with remaining batches
+      }
     }
-    // Only then nullify DB references
-    await nullifyScreenshotUrls(ids)
 
     return NextResponse.json({
       deleted: ids.length,

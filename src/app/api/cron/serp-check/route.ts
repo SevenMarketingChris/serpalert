@@ -100,6 +100,8 @@ export async function GET(request: Request) {
           for (const ad of ads) {
             if (!recentDomains.includes(ad.domain)) {
               newDomains.push(ad.domain)
+              // Push into shared recentDomains so subsequent keywords in this brand's run don't re-alert
+              recentDomains.push(ad.domain)
 
               // AI triage for new competitor (8s timeout)
               let urgency: 'urgent' | 'monitor' | 'ignore' = 'monitor'

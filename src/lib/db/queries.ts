@@ -335,7 +335,8 @@ export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<st
 
   const latestByBrand = new Map<string, SerpCheck>()
 
-  // Fetch latest check per brand — use ORM for proper column mapping
+  // TODO: Replace with DISTINCT ON query when column mapping is resolved.
+  // Current approach is O(N) queries but N is typically <50 brands.
   for (const brandId of brandIds) {
     const rows = await db.select().from(serpChecks)
       .where(eq(serpChecks.brandId, brandId))

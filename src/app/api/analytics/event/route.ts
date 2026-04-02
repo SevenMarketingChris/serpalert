@@ -7,7 +7,7 @@ import { rateLimit } from '@/lib/rate-limit'
 // Public endpoint — rate limited per IP to prevent abuse
 export async function POST(request: Request) {
   const ip = request.headers.get('x-real-ip')
-    ?? request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
+    ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     ?? 'unknown'
   const { ok } = await rateLimit(`analytics-event-${ip}`, { limit: 100, windowMs: 60_000 })
   if (!ok) {

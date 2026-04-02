@@ -30,35 +30,10 @@ export const metadata = createPageMetadata({
   ],
 });
 
-const saasJsonLd = `{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "SerpAlert",
-  "description": "Monitor competitor ad activity on your brand keywords on Google Search. Get hourly SERP checks, screenshot evidence, and instant Slack alerts.",
-  "url": "https://serpalert.co.uk",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web",
-  "offers": {
-    "@type": "Offer",
-    "price": "149",
-    "priceCurrency": "GBP",
-    "description": "Monthly subscription"
-  },
-  "brand": {
-    "@type": "Brand",
-    "name": "SerpAlert"
-  }
-}`;
-
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <PageViewTracker properties={{ page: "home" }} />
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: saasJsonLd }}
-      />
       <MarketingHeader />
 
       {/* Hero */}

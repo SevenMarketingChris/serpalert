@@ -41,10 +41,16 @@ export async function POST(request: Request) {
   const stripe = getStripe()
   const origin = new URL(request.url).origin
 
-  const session = await stripe.billingPortal.sessions.create({
-    customer: brand.stripeCustomerId,
-    return_url: `${origin}/dashboard/${brandId}`,
-  })
+  let session
+  try {
+    session = await stripe.billingPortal.sessions.create({
+      customer: brand.stripeCustomerId,
+      return_url: `${origin}/dashboard/${brandId}`,
+    })
+  } catch (err) {
+    console.error('Stripe portal session failed:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Failed to open billing portal' }, { status: 500 })
+  }
 
   return NextResponse.json({ url: session.url })
 }

@@ -5,10 +5,10 @@ import { neon } from '@neondatabase/serverless'
  * Uses a simple insert + count pattern with automatic cleanup of expired entries.
  */
 
-let tableEnsured = false
-
+// Always call ensureTable — it uses IF NOT EXISTS so it's idempotent.
+// A module-level flag would skip the call in long-lived serverless instances
+// where the table could be dropped/recreated externally, causing silent failures.
 async function ensureTable(sql: ReturnType<typeof neon<false, false>>) {
-  if (tableEnsured) return
   await sql`
     CREATE TABLE IF NOT EXISTS rate_limits (
       id SERIAL PRIMARY KEY,
@@ -19,7 +19,6 @@ async function ensureTable(sql: ReturnType<typeof neon<false, false>>) {
   await sql`
     CREATE INDEX IF NOT EXISTS rate_limits_key_created_idx ON rate_limits (key, created_at)
   `
-  tableEnsured = true
 }
 
 export async function rateLimit(

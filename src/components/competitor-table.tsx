@@ -337,7 +337,8 @@ export function CompetitorTable({
                         e.stopPropagation()
                         setAdCopyCache(prev => { const next = {...prev}; delete next[competitor.domain]; return next })
                         setFetchErrors(prev => ({...prev, [competitor.domain]: false}))
-                        setExpandedDomain(competitor.domain)
+                        setExpandedDomain(null)
+                        setRetryDomain(competitor.domain)
                       }}
                     >
                       Failed to load. Click to retry.

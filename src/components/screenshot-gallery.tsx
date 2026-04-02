@@ -44,9 +44,6 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
           Screenshots are captured automatically during SERP checks. Run a manual check or wait for the next scheduled scan.
         </p>
-        <p className="text-xs text-gray-400 mt-2">
-          Screenshots are captured automatically with every hourly check. Your first screenshots will appear after the next scheduled scan.
-        </p>
       </div>
     )
   }
