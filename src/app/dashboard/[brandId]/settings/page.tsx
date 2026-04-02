@@ -11,6 +11,7 @@ import { GoogleAdsForm } from './google-ads-form'
 import { BillingSection } from './billing-section'
 import { DeleteBrandLink } from './delete-brand-link'
 import { KeywordSuggestions } from '@/components/keyword-suggestions'
+import { SettingsTabs } from './settings-tabs'
 
 export default async function SettingsPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -41,62 +42,63 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
 
       <h1 className="text-lg font-semibold text-gray-900">Settings</h1>
 
-      <div className="max-w-2xl space-y-6">
-        {/* 1. Client Access & Admin (admin only — at the top) */}
-        {isAdmin && (
-          <AdminSettingsForm
+      <SettingsTabs isAdmin={isAdmin} children={{
+        brand: (
+          <div className="space-y-6">
+            <BrandDetailsForm
+              brandId={brand.id}
+              name={brand.name}
+              domain={brand.domain ?? ''}
+              keywords={brand.keywords}
+              keywordLimit={limits.keywords}
+            />
+            <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
+          </div>
+        ),
+        notifications: (
+          <AlertConfigForm
             brandId={brand.id}
-            monthlyBrandSpend={brand.monthlyBrandSpend ?? ''}
-            brandRoas={brand.brandRoas ?? ''}
-            watchlistDomains={(brand.watchlistDomains ?? []).join(', ')}
-            active={brand.active}
-            invitedEmail={brand.invitedEmail ?? ''}
+            slackWebhookUrl={brand.slackWebhookUrl ?? ''}
+            alertConfig={brand.alertConfig ? JSON.stringify(brand.alertConfig) : null}
           />
-        )}
-
-        {/* 2. Alert Configuration */}
-        <AlertConfigForm
-          brandId={brand.id}
-          slackWebhookUrl={brand.slackWebhookUrl ?? ''}
-          alertConfig={brand.alertConfig ? JSON.stringify(brand.alertConfig) : null}
-        />
-
-        {/* 3. Brand Details */}
-        <BrandDetailsForm
-          brandId={brand.id}
-          name={brand.name}
-          domain={brand.domain ?? ''}
-          keywords={brand.keywords}
-          keywordLimit={limits.keywords}
-        />
-
-        {/* 4. Billing */}
-        <BillingSection
-          brandId={brand.id}
-          subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
-          trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt).toISOString() : null}
-          agencyManaged={brand.agencyManaged ?? false}
-          hasStripeCustomer={!!brand.stripeCustomerId}
-        />
-
-        {/* 5. Client Portal */}
-        <ClientPortalSection clientToken={brand.clientToken} />
-
-        {/* 6. Google Ads */}
-        <GoogleAdsForm
-          brandId={brand.id}
-          googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
-          brandCampaignId={brand.brandCampaignId ?? ''}
-        />
-
-        {/* 7. Keyword Suggestions */}
-        <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
-
-        {/* 8. Delete Brand */}
-        <div className="pt-2">
-          <DeleteBrandLink brandId={brand.id} brandName={brand.name} />
-        </div>
-      </div>
+        ),
+        billing: (
+          <div className="space-y-6">
+            <BillingSection
+              brandId={brand.id}
+              subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
+              trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt).toISOString() : null}
+              agencyManaged={brand.agencyManaged ?? false}
+              hasStripeCustomer={!!brand.stripeCustomerId}
+            />
+            <ClientPortalSection clientToken={brand.clientToken} />
+          </div>
+        ),
+        integrations: (
+          <GoogleAdsForm
+            brandId={brand.id}
+            googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
+            brandCampaignId={brand.brandCampaignId ?? ''}
+          />
+        ),
+        ...(isAdmin ? {
+          admin: (
+            <div className="space-y-6">
+              <AdminSettingsForm
+                brandId={brand.id}
+                monthlyBrandSpend={brand.monthlyBrandSpend ?? ''}
+                brandRoas={brand.brandRoas ?? ''}
+                watchlistDomains={(brand.watchlistDomains ?? []).join(', ')}
+                active={brand.active}
+                invitedEmail={brand.invitedEmail ?? ''}
+              />
+              <div className="pt-4 border-t border-gray-200/50">
+                <DeleteBrandLink brandId={brand.id} brandName={brand.name} />
+              </div>
+            </div>
+          ),
+        } : {}),
+      }} />
     </div>
   )
 }
