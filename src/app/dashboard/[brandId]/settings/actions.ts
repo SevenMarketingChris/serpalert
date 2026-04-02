@@ -169,7 +169,8 @@ export async function updateAlertConfig(
   }
 
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
-  const alertThreshold = parseInt(formData.get('alertThreshold') as string) || 1
+  const rawThreshold = parseInt(formData.get('alertThreshold') as string)
+  const alertThreshold = isNaN(rawThreshold) || rawThreshold < 1 ? 1 : Math.min(rawThreshold, 100)
   const emailAlertsEnabled = formData.get('emailAlertsEnabled') === 'on'
   const alertEmail = ((formData.get('alertEmail') as string) ?? '').trim() || null
 

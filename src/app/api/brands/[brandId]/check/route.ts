@@ -70,6 +70,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
   let firstMonitoringResultRecorded = existingCheckCount > 0
   const results = []
 
+  // Note: Currently limited to 1 keyword per brand. If keyword limits increase,
+  // switch to batched Promise.all with concurrency of 3 (matching cron pattern).
   for (const keyword of brand.keywords) {
     try {
       const { ads, taskId, adCheckDegraded } = await checkSerpForBrand(keyword, 'United Kingdom', {

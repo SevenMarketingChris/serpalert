@@ -57,7 +57,7 @@ export async function rateLimit(
 
     return { ok: true, remaining: limit - count }
   } catch (err) {
-    console.error('rate-limit: DB error, failing open:', err)
-    return { ok: true, remaining: limit }
+    console.error('Rate limiter DB error — failing closed:', err instanceof Error ? err.message : err)
+    return { ok: false, remaining: 0 }
   }
 }
