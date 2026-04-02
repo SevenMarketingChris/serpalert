@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,10 +22,50 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
     null,
   )
 
+  const [slackTesting, setSlackTesting] = useState(false)
+  const [emailTesting, setEmailTesting] = useState(false)
+  const slackInputRef = useRef<HTMLInputElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     if (state?.success) toast.success(state.success)
     if (state?.error) toast.error(state.error)
   }, [state])
+
+  async function testSlack() {
+    const url = slackInputRef.current?.value?.trim()
+    if (!url) { toast.error('Enter a Slack webhook URL first'); return }
+    if (!url.startsWith('https://hooks.slack.com/')) { toast.error('URL must start with https://hooks.slack.com/'); return }
+    setSlackTesting(true)
+    try {
+      const res = await fetch(`/api/brands/${brandId}/test-alert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'slack', webhookUrl: url }),
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success(data.message || 'Test sent to Slack!') }
+      else { toast.error(data.error || 'Slack test failed') }
+    } catch { toast.error('Network error') }
+    finally { setSlackTesting(false) }
+  }
+
+  async function testEmail() {
+    const email = emailInputRef.current?.value?.trim()
+    if (!email) { toast.error('Enter an email address first'); return }
+    setEmailTesting(true)
+    try {
+      const res = await fetch(`/api/brands/${brandId}/test-alert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'email', email }),
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success(data.message || 'Test email sent!') }
+      else { toast.error(data.error || 'Email test failed') }
+    } catch { toast.error('Network error') }
+    finally { setEmailTesting(false) }
+  }
 
   return (
     <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg shadow-gray-200/20 space-y-4">
@@ -38,13 +78,27 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
       <form action={formAction} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="slackWebhookUrl">Slack Webhook URL</Label>
-          <Input
-            id="slackWebhookUrl"
-            name="slackWebhookUrl"
-            aria-describedby="slack-help"
-            defaultValue={slackWebhookUrl}
-            placeholder="https://hooks.slack.com/..."
-          />
+          <div className="flex gap-2">
+            <Input
+              ref={slackInputRef}
+              id="slackWebhookUrl"
+              name="slackWebhookUrl"
+              aria-describedby="slack-help"
+              defaultValue={slackWebhookUrl}
+              placeholder="https://hooks.slack.com/..."
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={testSlack}
+              disabled={slackTesting}
+              className="shrink-0 text-xs"
+            >
+              {slackTesting ? 'Sending...' : 'Test'}
+            </Button>
+          </div>
           <p id="slack-help" className="text-[11px] text-gray-400">
             Paste a Slack incoming webhook URL to receive real-time alerts in your chosen Slack channel. To create one, go to your Slack workspace &gt; Apps &gt; Incoming Webhooks &gt; Add to Slack. Leave blank to disable Slack alerts.
           </p>
@@ -85,14 +139,28 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
 
           <div className="space-y-1.5">
             <Label htmlFor="alertEmail">Alert email address</Label>
-            <Input
-              id="alertEmail"
-              name="alertEmail"
-              type="email"
-              aria-describedby="alert-email-help"
-              defaultValue={parsedConfig.alertEmail || ''}
-              placeholder="you@company.com"
-            />
+            <div className="flex gap-2">
+              <Input
+                ref={emailInputRef}
+                id="alertEmail"
+                name="alertEmail"
+                type="email"
+                aria-describedby="alert-email-help"
+                defaultValue={parsedConfig.alertEmail || ''}
+                placeholder="you@company.com"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={testEmail}
+                disabled={emailTesting}
+                className="shrink-0 text-xs"
+              >
+                {emailTesting ? 'Sending...' : 'Test'}
+              </Button>
+            </div>
             <p id="alert-email-help" className="text-[11px] text-gray-400">
               Leave blank to use your account email. Only used for competitor alerts — not marketing.
             </p>
