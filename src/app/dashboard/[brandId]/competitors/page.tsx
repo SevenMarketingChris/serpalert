@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand, getAdCopyHistory } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import { Shield, Download } from 'lucide-react'
 import { CompetitorTable } from '@/components/competitor-table'
 
@@ -13,8 +13,9 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
   const isAdmin = await checkIsAdmin()
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     notFound()
   }

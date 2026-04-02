@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { ensureAttributionCookies } from '@/lib/attribution'
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/admin(.*)'])
+const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/admin(.*)', '/agency(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   const response = NextResponse.next()

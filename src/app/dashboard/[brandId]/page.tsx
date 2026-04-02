@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
-import { authorizeBrandAccess } from '@/lib/auth'
+import { authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import { getBrandByIdCached, checkIsAdminCached } from './layout'
 import { ManualCheckButton } from '@/components/manual-check-button'
 import { ActivityFeed } from '@/components/activity-feed'
@@ -26,8 +26,9 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
     getBrandByIdCached(brandId),
   ])
   if (!brand) notFound()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     notFound()
   }

@@ -8,7 +8,7 @@ import {
   getLastCheckForBrand,
 } from '@/lib/db/queries'
 import { Sidebar } from '@/components/sidebar'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 
 // Deduplicate DB calls shared between layout and page within the same request
 export const getBrandByIdCached = cache(getBrandById)
@@ -27,18 +27,24 @@ export default async function BrandDashboardLayout({
 
   const { brandId } = await params
 
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
+
   const brand = await getBrandByIdCached(brandId)
   if (!brand) notFound()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     notFound()
   }
 
   const userBrands = await getBrandsForUser(userId)
   // Admin sees all brands (personal + agency) in the switcher
+  // Agency users see their agency brands
+  const { getBrandsForAgency } = await import('@/lib/db/queries')
   const allBrands = isAdmin
     ? await getAllActiveBrands()
+    : userAgencyId
+    ? [...userBrands, ...(await getBrandsForAgency(userAgencyId)).filter(ab => !userBrands.some(ub => ub.id === ab.id))]
     : userBrands
   const sidebarBrands = allBrands.map(b => ({ id: b.id, name: b.name }))
 

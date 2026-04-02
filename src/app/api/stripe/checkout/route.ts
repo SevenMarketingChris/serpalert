@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getStripe } from '@/lib/stripe'
 import { getBrandById } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import type Stripe from 'stripe'
 import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
@@ -36,8 +36,9 @@ export async function POST(request: Request) {
   if (!brand) {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }

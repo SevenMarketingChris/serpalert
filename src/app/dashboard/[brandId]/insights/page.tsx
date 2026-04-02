@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import Link from 'next/link'
 import { getBrandById, getAuctionInsightsLast30Days } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import { AuctionChart } from '@/components/auction-chart'
 
 export default async function InsightsPage({ params }: { params: Promise<{ brandId: string }> }) {
@@ -13,8 +13,9 @@ export default async function InsightsPage({ params }: { params: Promise<{ brand
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     notFound()
   }

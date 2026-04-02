@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import { z } from 'zod'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -23,12 +23,13 @@ export async function updateBrandDetails(
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   const isAdmin = await checkIsAdmin()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     return { error: 'Not authorized' }
   }
@@ -115,8 +116,9 @@ export async function updateAlertConfig(
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
+  const { agencyId: userAgencyId1 } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId1)
   } catch {
     return { error: 'Not authorized' }
   }
@@ -154,8 +156,9 @@ export async function updateGoogleAds(
   if (!brand) return { error: 'Brand not found' }
 
   const isAdmin = await checkIsAdmin()
+  const { agencyId: userAgencyId2 } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId2)
   } catch {
     return { error: 'Not authorized' }
   }
@@ -177,12 +180,13 @@ export async function deleteBrandAction(brandId: string): Promise<{ error?: stri
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   const isAdmin = await checkIsAdmin()
+  const { agencyId: userAgencyId3 } = await checkIsAgencyAdmin()
 
   const brand = await getBrandById(brandId)
   if (!brand) return { error: 'Brand not found' }
 
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId3)
   } catch {
     return { error: 'Not authorized' }
   }

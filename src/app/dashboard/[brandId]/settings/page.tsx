@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, PLAN_LIMITS } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 import { BrandDetailsForm } from './brand-details-form'
 import { AdminSettingsForm } from './admin-settings-form'
 import { ClientPortalSection } from './client-portal-section'
@@ -21,8 +21,9 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
 
   const brand = await getBrandById(brandId)
   if (!brand) notFound()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     notFound()
   }

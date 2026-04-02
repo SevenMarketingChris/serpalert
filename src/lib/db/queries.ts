@@ -1,6 +1,6 @@
-import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
+import { db, brands, serpChecks, competitorAds, auctionInsights, agencies } from './index'
 import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, isNull, sql } from 'drizzle-orm'
-import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
+import type { Brand, SerpCheck, CompetitorAd, AuctionInsight, Agency } from './schema'
 
 export const PLAN_LIMITS = {
   free:         { brands: 1,  keywords: 2   },
@@ -363,6 +363,7 @@ export async function createBrand(data: {
   agencyManaged?: boolean; subscriptionStatus?: string
   trialEndsAt?: Date
   invitedEmail?: string | null
+  agencyId?: string
 }): Promise<Brand> {
   const baseSlug = data.slug
     .toLowerCase()
@@ -459,4 +460,43 @@ export async function getBrandByStripeCustomerId(customerId: string): Promise<Br
     .where(eq(brands.stripeCustomerId, customerId))
     .limit(1)
   return rows[0] ?? null
+}
+
+// ── Agency queries ──────────────────────────────────────────────
+
+export async function getAgencyByOwnerEmail(email: string): Promise<Agency | null> {
+  const rows = await db.select().from(agencies).where(eq(agencies.ownerEmail, email.toLowerCase())).limit(1)
+  return rows[0] ?? null
+}
+
+export async function getAgencyById(id: string): Promise<Agency | null> {
+  const rows = await db.select().from(agencies).where(eq(agencies.id, id)).limit(1)
+  return rows[0] ?? null
+}
+
+export async function getAllAgencies(): Promise<Agency[]> {
+  return db.select().from(agencies).orderBy(desc(agencies.createdAt))
+}
+
+export async function createAgency(data: {
+  name: string
+  ownerEmail: string
+  contactName?: string
+}): Promise<Agency> {
+  const rows = await db.insert(agencies).values({
+    name: data.name,
+    ownerEmail: data.ownerEmail.toLowerCase(),
+    contactName: data.contactName,
+  }).returning()
+  if (!rows[0]) throw new Error('Failed to create agency')
+  return rows[0]
+}
+
+export async function getBrandsForAgency(agencyId: string): Promise<Brand[]> {
+  return db.select().from(brands).where(eq(brands.agencyId, agencyId))
+}
+
+export async function getAgencyBrandCount(agencyId: string): Promise<number> {
+  const rows = await db.select({ count: count() }).from(brands).where(and(eq(brands.agencyId, agencyId), eq(brands.active, true)))
+  return rows[0]?.count ?? 0
 }

@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
@@ -10,12 +10,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ bra
   }
 
   const isAdmin = await checkIsAdmin()
+  const { agencyId: userAgencyId } = await checkIsAgencyAdmin()
   const brand = await getBrandById(brandId)
   if (!brand) {
     return new Response('Not found', { status: 404 })
   }
   try {
-    authorizeBrandAccess(brand, userId, isAdmin)
+    authorizeBrandAccess(brand, userId, isAdmin, userAgencyId)
   } catch {
     return new Response('Not found', { status: 404 })
   }

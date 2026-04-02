@@ -1,5 +1,21 @@
 import { pgTable, uuid, text, timestamp, integer, boolean, date, numeric, uniqueIndex, index, jsonb } from 'drizzle-orm/pg-core'
 
+export const agencies = pgTable('agencies', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  ownerEmail: text('owner_email').notNull().unique(),
+  contactName: text('contact_name'),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => [
+  index('agencies_owner_email_idx').on(table.ownerEmail),
+])
+
+export type Agency = typeof agencies.$inferSelect
+
 export const brands = pgTable('brands', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
@@ -20,6 +36,7 @@ export const brands = pgTable('brands', {
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
   agencyManaged: boolean('agency_managed').notNull().default(false),
+  agencyId: uuid('agency_id').references(() => agencies.id),
   trialEndsAt: timestamp('trial_ends_at'),
   subscriptionStatus: text('subscription_status').notNull().default('trialing'),
   alertConfig: jsonb('alert_config').$type<{ emailAlertsEnabled?: boolean; alertEmail?: string | null; slackWebhookUrl?: string | null; alertThreshold?: number }>(),

@@ -6,11 +6,20 @@ import {
   BarChart3,
   Settings,
   Shield,
+  Briefcase,
   ArrowRight,
 } from 'lucide-react'
 
 export default function AdminPage() {
   const adminSections = [
+    {
+      title: 'Agencies',
+      description: 'Manage agency accounts, view brand counts and billing',
+      href: '/admin/agencies',
+      icon: Briefcase,
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-500/10',
+    },
     {
       title: 'Brand Management',
       description: 'Add, edit, or remove monitored brand keywords',

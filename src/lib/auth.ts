@@ -38,20 +38,38 @@ export function isAdminFromClaims(sessionClaims: Record<string, unknown> | null 
 
 /**
  * Assert that the current user is authorized to access the given brand.
- * Agency admins can access agency-managed brands; regular users can only
- * access brands they own (non-agency-managed).
+ * Super admins can access everything, agency users can access their own
+ * agency's brands, regular users can access brands they own.
  */
 export function authorizeBrandAccess(
-  brand: { agencyManaged: boolean; userId: string | null },
+  brand: { agencyManaged: boolean; userId: string | null; agencyId?: string | null },
   userId: string | undefined,
   isAdmin: boolean,
+  userAgencyId?: string | null,
 ): void {
-  if (brand.agencyManaged && !isAdmin) {
-    throw new Error('Not authorized: agency-managed brands require admin access')
+  if (isAdmin) return
+  if (userAgencyId && brand.agencyId === userAgencyId) return
+  if (brand.userId === userId) return
+  throw new Error('Not authorized')
+}
+
+/**
+ * Check if the current user is an agency admin.
+ */
+export async function checkIsAgencyAdmin(): Promise<{ isAgency: boolean; agencyId: string | null; email: string | null }> {
+  const { currentUser } = await import('@clerk/nextjs/server')
+  const user = await currentUser()
+  if (!user) return { isAgency: false, agencyId: null, email: null }
+  const email = user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress
+  if (!email) return { isAgency: false, agencyId: null, email: null }
+
+  // Check if this email is an agency owner
+  const { getAgencyByOwnerEmail } = await import('@/lib/db/queries')
+  const agency = await getAgencyByOwnerEmail(email)
+  if (agency && agency.active) {
+    return { isAgency: true, agencyId: agency.id, email }
   }
-  if (!brand.agencyManaged && brand.userId !== userId && !isAdmin) {
-    throw new Error('Not authorized: you do not own this brand')
-  }
+  return { isAgency: false, agencyId: null, email }
 }
 
 export function safeCompare(a: string, b: string): boolean {

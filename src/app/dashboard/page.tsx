@@ -9,13 +9,16 @@ import { AppHeader } from '@/components/app-header'
 import { getRelativeTime } from '@/lib/time'
 import { SubscribeBanner } from '@/components/subscribe-banner'
 import { SubscribeButton } from '@/components/subscribe-button'
-import { checkIsAdmin } from '@/lib/auth'
+import { checkIsAdmin, checkIsAgencyAdmin } from '@/lib/auth'
 
 export const metadata: Metadata = { title: 'Dashboard', robots: { index: false, follow: false } }
 
 export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+
+  const { isAgency } = await checkIsAgencyAdmin()
+  if (isAgency) redirect('/agency')
 
   // Auto-link invited brands to this user
   try {
