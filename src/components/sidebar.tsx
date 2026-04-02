@@ -33,6 +33,7 @@ const NAV_ITEMS = [
   { icon: Settings, label: 'Settings', path: '/settings' },
 ]
 
+// Note: App is light-mode only. Add dark: variants if dark mode is enabled.
 function SubscriptionBadge({
   subscriptionStatus,
   trialEndsAt,
