@@ -6,6 +6,7 @@ import { ScreenshotModal } from '@/components/screenshot-modal'
 import { EvidenceModal } from '@/components/evidence-modal'
 import { isSafeUrl } from '@/lib/utils'
 import { formatScanTime } from '@/lib/time'
+import { ExternalLink } from 'lucide-react'
 
 interface ThreatCardProps {
   checkId: string
@@ -80,6 +81,7 @@ export function ThreatCard({ checkId, brandId, brandToken, ads, keyword, checked
                   <a href={ad.destinationUrl} target="_blank" rel="noopener noreferrer"
                      className="text-[11px] text-primary/70 hover:text-primary hover:underline truncate block">
                     {ad.destinationUrl}
+                    <ExternalLink className="inline h-3 w-3 ml-1 opacity-50" />
                   </a>
                 ) : ad.destinationUrl ? (
                   <span className="text-muted-foreground text-[11px] truncate block">{ad.destinationUrl}</span>

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Link from 'next/link'
 import { getRelativeTime } from '@/lib/time'
 
@@ -13,7 +14,7 @@ interface CompetitorSummaryProps {
   brandId: string
 }
 
-export function CompetitorSummary({ competitors, brandId }: CompetitorSummaryProps) {
+export const CompetitorSummary = memo(function CompetitorSummary({ competitors, brandId }: CompetitorSummaryProps) {
   return (
     <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-gray-200/20">
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
@@ -51,4 +52,4 @@ export function CompetitorSummary({ competitors, brandId }: CompetitorSummaryPro
       </table>
     </div>
   )
-}
+})

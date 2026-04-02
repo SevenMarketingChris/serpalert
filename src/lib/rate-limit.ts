@@ -49,7 +49,7 @@ export async function rateLimit(
     const count = rows[0]?.count ?? 0
 
     // Clean up expired entries (fire-and-forget)
-    sql`DELETE FROM rate_limits WHERE created_at < ${windowStart}::timestamptz`.catch(() => {})
+    sql`DELETE FROM rate_limits WHERE created_at < ${windowStart}::timestamptz`.catch(err => console.warn('Rate limit cleanup failed:', err instanceof Error ? err.message : err))
 
     if (count > limit) {
       return { ok: false, remaining: 0 }

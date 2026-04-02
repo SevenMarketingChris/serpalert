@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 interface ClientMetricCardsProps {
   keywordCount: number
   totalChecks: number
@@ -5,7 +7,7 @@ interface ClientMetricCardsProps {
   allTimeCompetitors: number
 }
 
-export function ClientMetricCards({
+export const ClientMetricCards = memo(function ClientMetricCards({
   keywordCount,
   totalChecks,
   todayThreats,
@@ -56,4 +58,4 @@ export function ClientMetricCards({
       </div>
     </div>
   )
-}
+})

@@ -1,3 +1,5 @@
+export const revalidate = 3600 // Revalidate every hour
+
 import Link from "next/link";
 import { createPageMetadata } from "@/lib/metadata";
 

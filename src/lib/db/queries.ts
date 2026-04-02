@@ -196,8 +196,8 @@ export async function updateBrand(
   return rows[0]
 }
 
-// Ahrefs integration stubs: called by cron but tables not yet created.
-// Will be re-implemented once ahrefs_domains and ahrefs_keywords tables exist.
+// TODO: Ahrefs integration stubs — called by cron (ahrefs-metrics/route.ts) but tables not yet created.
+// Re-implement once ahrefs_domains and ahrefs_keywords tables exist, then remove these stubs.
 export async function upsertAhrefsDomainMetrics(_data: {
   brandId: string; domain: string; isBrandDomain: boolean; date: string
   domainRating: string | null; organicTraffic: number | null

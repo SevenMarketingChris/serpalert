@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -89,6 +89,11 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const drawerRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (mobileOpen && drawerRef.current) drawerRef.current.focus()
+  }, [mobileOpen])
 
   const basePath = `/dashboard/${brandId}`
 
@@ -217,13 +222,20 @@ export function Sidebar({
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          onKeyDown={(e) => { if (e.key === 'Escape') setMobileOpen(false) }}
+        >
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative flex h-full w-[260px] flex-col bg-white/60 backdrop-blur-2xl">
+          <aside ref={drawerRef} tabIndex={-1} className="relative flex h-full w-[260px] flex-col bg-white/60 backdrop-blur-2xl outline-none">
             <button
+              autoFocus
               onClick={() => setMobileOpen(false)}
               className="absolute right-3 top-4 p-1 text-gray-600 hover:text-gray-900 transition-colors"
               aria-label="Close menu"

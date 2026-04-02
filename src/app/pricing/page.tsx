@@ -1,3 +1,5 @@
+export const revalidate = 3600 // Revalidate every hour
+
 import { Check } from "lucide-react";
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { TrackedLink } from "@/components/analytics/tracked-link";

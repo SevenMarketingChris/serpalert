@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { Camera } from 'lucide-react'
+import { Camera, ExternalLink } from 'lucide-react'
 
 interface Screenshot {
   id: string
@@ -179,6 +179,7 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                 className="text-xs text-indigo-600 hover:underline mt-1 inline-block"
               >
                 Open full size
+                <ExternalLink className="inline h-3 w-3 ml-1 opacity-50" />
               </a>
             </>
           )}

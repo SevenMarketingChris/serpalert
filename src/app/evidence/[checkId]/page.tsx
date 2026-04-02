@@ -6,6 +6,7 @@ import { CopyLinkButton } from '@/components/copy-link-button'
 import { safeCompare } from '@/lib/auth'
 import { isSafeUrl } from '@/lib/utils'
 import { AppHeader } from '@/components/app-header'
+import { ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Evidence Report', robots: { index: false, follow: false } }
 
@@ -100,6 +101,7 @@ export default async function EvidencePage({
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
           >
             Download Report
+            <ExternalLink className="inline h-3 w-3 ml-1 opacity-50" />
           </a>
           <a
             href={`/api/evidence/${check.id}/cease-desist?token=${brandClientToken}`}
@@ -109,6 +111,7 @@ export default async function EvidencePage({
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
           >
             Generate C&D Letter
+            <ExternalLink className="inline h-3 w-3 ml-1 opacity-50" />
           </a>
           <p className="text-[11px] text-gray-400 mt-1">
             Template only — not legal advice. Consult a solicitor before sending.
@@ -120,6 +123,7 @@ export default async function EvidencePage({
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
           >
             Report to Google
+            <ExternalLink className="inline h-3 w-3 ml-1 opacity-50" />
           </a>
         </div>
 

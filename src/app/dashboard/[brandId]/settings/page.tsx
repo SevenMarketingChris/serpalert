@@ -39,6 +39,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
         <span className="text-gray-600">Settings</span>
       </div>
 
+      <h1 className="text-lg font-semibold text-gray-900">Settings</h1>
+
       <div className="max-w-2xl space-y-6">
         {/* 1. Client Access & Admin (admin only — at the top) */}
         {isAdmin && (

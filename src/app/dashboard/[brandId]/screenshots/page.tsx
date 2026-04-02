@@ -31,6 +31,8 @@ export default async function ScreenshotsPage({ params }: { params: Promise<{ br
         <span className="text-gray-600">Screenshots</span>
       </div>
 
+      <h1 className="text-lg font-semibold text-gray-900">Screenshots</h1>
+
       <ScreenshotGallery screenshots={screenshots} />
     </div>
   )

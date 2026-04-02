@@ -292,7 +292,7 @@ body {
     text-shadow: none !important;
     border-color: #aaa !important;
   }
-  body, h1, h2, h3, h4, h5, h6, p, span, li, td, th, label {
+  body, h1, h2, h3, h4, h5, h6, p, span, li, td, th, label, a {
     color: black !important;
   }
   /* Page breaks between sections */

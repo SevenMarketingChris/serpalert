@@ -4,6 +4,7 @@ import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
 import { rateLimit } from '@/lib/rate-limit'
 
+// Public endpoint — rate limited per IP to prevent abuse
 export async function POST(request: Request) {
   const ip = request.headers.get('x-real-ip')
     ?? request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
