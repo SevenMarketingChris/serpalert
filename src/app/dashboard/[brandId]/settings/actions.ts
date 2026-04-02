@@ -74,6 +74,7 @@ export async function updateAdminSettings(
   const watchlistDomainsRaw = ((formData.get('watchlistDomains') as string) ?? '').trim()
   const watchlistDomains = watchlistDomainsRaw ? watchlistDomainsRaw.split(',').map(d => d.trim()).filter(Boolean) : []
   const active = formData.get('active') === 'on'
+  const invitedEmail = ((formData.get('invitedEmail') as string) ?? '').trim() || null
 
   // Validate numeric fields with zod
   if (monthlyBrandSpend !== null) {
@@ -95,7 +96,19 @@ export async function updateAdminSettings(
       brandRoas,
       watchlistDomains,
       active,
+      invitedEmail,
     })
+
+    // Send invite email if a new email was set
+    if (invitedEmail && invitedEmail !== brand.invitedEmail) {
+      try {
+        const { sendInviteEmail } = await import('@/lib/email')
+        await sendInviteEmail(invitedEmail, brand.name)
+      } catch (err) {
+        console.error('Invite email failed:', err instanceof Error ? err.message : err)
+      }
+    }
+
     revalidatePath(`/dashboard/${brandId}`)
     return { success: 'Admin settings updated' }
   } catch {

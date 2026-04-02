@@ -183,6 +183,7 @@ export async function updateBrand(
     brandCampaignId?: string | null
     watchlistDomains?: string[]
     alertConfig?: { emailAlertsEnabled?: boolean; alertEmail?: string | null; slackWebhookUrl?: string | null; alertThreshold?: number } | null
+    invitedEmail?: string | null
     active?: boolean
   },
 ): Promise<Brand> {

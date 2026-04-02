@@ -14,6 +14,7 @@ interface Props {
   brandRoas: string
   watchlistDomains: string
   active: boolean
+  invitedEmail: string
 }
 
 export function AdminSettingsForm({
@@ -22,6 +23,7 @@ export function AdminSettingsForm({
   brandRoas,
   watchlistDomains,
   active,
+  invitedEmail,
 }: Props) {
   const [state, formAction, isPending] = useActionState<SettingsState, FormData>(
     (prev, formData) => updateAdminSettings(prev, formData, brandId),
@@ -57,6 +59,21 @@ export function AdminSettingsForm({
               When enabled, SerpAlert runs scheduled SERP checks for this brand. Disable to pause monitoring without deleting the brand or its data.
             </p>
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="invitedEmail">Client Email</Label>
+          <Input
+            id="invitedEmail"
+            name="invitedEmail"
+            type="email"
+            aria-describedby="invited-email-help"
+            defaultValue={invitedEmail}
+            placeholder="client@company.com"
+          />
+          <p id="invited-email-help" className="text-[11px] text-gray-400">
+            Assign this brand to a client by entering their email. They&apos;ll receive an invite to sign in and view their dashboard. When they sign up with this email, the brand is automatically linked to their account.
+          </p>
         </div>
 
         <div className="space-y-1.5">

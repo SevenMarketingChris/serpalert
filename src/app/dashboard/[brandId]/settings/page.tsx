@@ -85,6 +85,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
             brandRoas={brand.brandRoas ?? ''}
             watchlistDomains={(brand.watchlistDomains ?? []).join(', ')}
             active={brand.active}
+            invitedEmail={brand.invitedEmail ?? ''}
           />
         )}
 
