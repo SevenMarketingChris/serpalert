@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
+export const metadata: Metadata = { title: 'Evidence Report', robots: { index: false, follow: false } }
 import { getSerpCheckWithAds } from '@/lib/db/queries'
 import Image from 'next/image'
 import { CopyLinkButton } from '@/components/copy-link-button'

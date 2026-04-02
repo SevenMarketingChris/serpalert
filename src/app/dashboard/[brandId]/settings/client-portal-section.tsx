@@ -60,9 +60,9 @@ export function ClientPortalSection({ clientToken }: Props) {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">Client Portal Link</label>
+          <label className="text-sm font-medium">Read-Only Report Link</label>
           <p className="text-[11px] text-gray-400">
-            Send this link to your client. They can view their monitoring dashboard, competitor data, and SERP screenshots without needing to sign in.
+            Share this link to give read-only access to monitoring results, competitor data, and screenshots — no sign-in required. This is separate from the main dashboard login.
           </p>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono text-sm truncate">
