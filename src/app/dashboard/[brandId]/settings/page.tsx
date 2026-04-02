@@ -56,7 +56,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
         <AlertConfigForm
           brandId={brand.id}
           slackWebhookUrl={brand.slackWebhookUrl ?? ''}
-          alertConfig={brand.alertConfig ?? null}
+          alertConfig={brand.alertConfig ? JSON.stringify(brand.alertConfig) : null}
         />
 
         {/* 3. Brand Details */}

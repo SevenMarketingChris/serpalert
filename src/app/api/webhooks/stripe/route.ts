@@ -156,8 +156,9 @@ export async function POST(request: Request) {
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object
-      const sub = invoice.subscription
-      const subscriptionId = typeof sub === 'string' ? sub : (sub as { id?: string } | null)?.id
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sub = (invoice as any).subscription
+      const subscriptionId = typeof sub === 'string' ? sub : sub?.id
       if (!subscriptionId) break  // not a subscription invoice
       const customerId = typeof invoice.customer === 'string'
         ? invoice.customer
