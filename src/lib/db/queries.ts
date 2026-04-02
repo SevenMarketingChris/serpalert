@@ -184,6 +184,7 @@ export async function updateBrand(
     watchlistDomains?: string[]
     alertConfig?: { emailAlertsEnabled?: boolean; alertEmail?: string | null; slackWebhookUrl?: string | null; alertThreshold?: number } | null
     invitedEmail?: string | null
+    userId?: string | null
     active?: boolean
   },
 ): Promise<Brand> {
@@ -377,14 +378,17 @@ export async function createBrand(data: {
 }
 
 export async function linkInvitedBrands(email: string, userId: string): Promise<void> {
-  await db.update(brands)
-    .set({ userId, updatedAt: new Date() })
-    .where(
-      and(
-        eq(brands.invitedEmail, email.toLowerCase()),
-        isNull(brands.userId)
+  // Match brands where invitedEmail contains this email (supports comma-separated lists)
+  await db.execute(sql`
+    UPDATE brands
+    SET user_id = ${userId}, updated_at = now()
+    WHERE user_id IS NULL
+      AND invited_email IS NOT NULL
+      AND (
+        lower(invited_email) = ${email}
+        OR lower(invited_email) LIKE ${`%${email}%`}
       )
-    )
+  `)
 }
 
 export async function getThreatCountLast7Days(brandId: string): Promise<number> {

@@ -74,7 +74,8 @@ export async function updateAdminSettings(
   const watchlistDomainsRaw = ((formData.get('watchlistDomains') as string) ?? '').trim()
   const watchlistDomains = watchlistDomainsRaw ? watchlistDomainsRaw.split(',').map(d => d.trim()).filter(Boolean) : []
   const active = formData.get('active') === 'on'
-  const invitedEmail = ((formData.get('invitedEmail') as string) ?? '').trim() || null
+  const invitedEmailRaw = ((formData.get('invitedEmail') as string) ?? '').trim()
+  const invitedEmail = invitedEmailRaw || null
 
   // Validate numeric fields with zod
   if (monthlyBrandSpend !== null) {
@@ -99,13 +100,37 @@ export async function updateAdminSettings(
       invitedEmail,
     })
 
-    // Send invite email if a new email was set
-    if (invitedEmail && invitedEmail !== brand.invitedEmail) {
-      try {
-        const { sendInviteEmail } = await import('@/lib/email')
-        await sendInviteEmail(invitedEmail, brand.name)
-      } catch (err) {
-        console.error('Invite email failed:', err instanceof Error ? err.message : err)
+    // Send invite emails to newly added addresses
+    if (invitedEmail) {
+      const newEmails = invitedEmail.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+      const oldEmails = (brand.invitedEmail || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+      const addedEmails = newEmails.filter(e => !oldEmails.includes(e))
+
+      for (const email of addedEmails) {
+        try {
+          const { sendInviteEmail } = await import('@/lib/email')
+          await sendInviteEmail(email, brand.name)
+        } catch (err) {
+          console.error('Invite email failed:', err instanceof Error ? err.message : err)
+        }
+      }
+    }
+
+    // If emails were removed, unlink their userId (revoke access)
+    if (brand.invitedEmail && invitedEmail !== brand.invitedEmail) {
+      const oldEmails = brand.invitedEmail.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+      const newEmails = (invitedEmail || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+      const removedEmails = oldEmails.filter(e => !newEmails.includes(e))
+
+      if (removedEmails.length > 0 && brand.userId) {
+        // Check if the current userId's email was removed
+        try {
+          const { getUserEmail } = await import('@/lib/email')
+          const userEmail = await getUserEmail(brand.userId)
+          if (userEmail && removedEmails.includes(userEmail.toLowerCase())) {
+            await updateBrand(brandId, { userId: null } as Parameters<typeof updateBrand>[1])
+          }
+        } catch {}
       }
     }
 

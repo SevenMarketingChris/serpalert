@@ -62,17 +62,16 @@ export function AdminSettingsForm({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="invitedEmail">Client Email</Label>
+          <Label htmlFor="invitedEmail">Client Emails</Label>
           <Input
             id="invitedEmail"
             name="invitedEmail"
-            type="email"
             aria-describedby="invited-email-help"
             defaultValue={invitedEmail}
-            placeholder="client@company.com"
+            placeholder="client@company.com, colleague@company.com"
           />
           <p id="invited-email-help" className="text-[11px] text-gray-400">
-            Assign this brand to a client by entering their email. They&apos;ll receive an invite to sign in and view their dashboard. When they sign up with this email, the brand is automatically linked to their account.
+            Comma-separated list of emails with access to this brand&apos;s dashboard. Each person will receive an invite email when added. Remove an email and save to revoke their access. Clear all to unlink everyone.
           </p>
         </div>
 
