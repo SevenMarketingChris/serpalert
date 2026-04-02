@@ -1,3 +1,25 @@
+/**
+ * Parse webhook URLs — supports comma-separated for multiple Slack instances.
+ */
+function parseWebhookUrls(webhookUrl: string | null): string[] {
+  if (!webhookUrl) return []
+  return webhookUrl.split(',').map(u => u.trim()).filter(u => u.startsWith('https://hooks.slack.com/'))
+}
+
+/**
+ * Send a Slack payload to one or more webhook URLs.
+ */
+async function sendToWebhooks(urls: string[], payload: Record<string, unknown>): Promise<void> {
+  await Promise.allSettled(urls.map(url =>
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      redirect: 'error',
+      body: JSON.stringify(payload),
+    }).catch(err => console.error(`Slack webhook failed (${url.slice(0, 40)}...):`, err instanceof Error ? err.message : err))
+  ))
+}
+
 export async function sendNewCompetitorAlert(params: {
   webhookUrl: string | null
   brandName: string
@@ -6,12 +28,8 @@ export async function sendNewCompetitorAlert(params: {
   keyword: string
   urgency?: 'urgent' | 'monitor' | 'ignore' | null
 }): Promise<void> {
-  if (!params.webhookUrl) return
-
-  if (!params.webhookUrl.startsWith('https://hooks.slack.com/')) {
-    console.error('Slack webhook URL does not look valid, skipping')
-    return
-  }
+  const urls = parseWebhookUrls(params.webhookUrl)
+  if (urls.length === 0) return
 
   const urgencyLabel = params.urgency === 'urgent'
     ? '🔴 URGENT'
@@ -19,49 +37,40 @@ export async function sendNewCompetitorAlert(params: {
       ? '⚪ Low Priority'
       : '🟡 Monitor'
 
-  const response = await fetch(params.webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      blocks: [
-        {
-          type: 'header',
-          text: { type: 'plain_text', text: `🚨 New Competitor on "${params.keyword}"` }
-        },
-        {
-          type: 'section',
-          fields: [
-            { type: 'mrkdwn', text: `*Brand:*\n${params.brandName}` },
-            { type: 'mrkdwn', text: `*Competitor:*\n${params.domain}` },
-            { type: 'mrkdwn', text: `*Keyword:*\n${params.keyword}` },
-            { type: 'mrkdwn', text: `*Detected:*\n${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}` },
-            { type: 'mrkdwn', text: `*Priority:*\n${urgencyLabel}` },
-          ]
-        },
-        {
-          type: 'actions',
-          elements: [
-            {
-              type: 'button',
-              text: { type: 'plain_text', text: 'View Dashboard' },
-              url: params.brandId
-                ? `https://serpalert.co.uk/dashboard/${params.brandId}`
-                : `https://serpalert.co.uk/dashboard`,
-              style: 'primary'
-            }
-          ]
-        }
-      ],
-      text: `New competitor ${params.domain} detected on "${params.keyword}" for ${params.brandName}`,
-    }),
-    redirect: 'error',
-    signal: AbortSignal.timeout(10_000),
-  })
-  if (!response.ok) {
-    const body = await response.text().catch(() => '')
-    console.error(`Slack webhook failed: ${response.status}`, body.slice(0, 200))
-    throw new Error(`Slack webhook failed: ${response.status}`)
+  const payload = {
+    blocks: [
+      {
+        type: 'header',
+        text: { type: 'plain_text', text: `🚨 New Competitor on "${params.keyword}"` }
+      },
+      {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: `*Brand:*\n${params.brandName}` },
+          { type: 'mrkdwn', text: `*Competitor:*\n${params.domain}` },
+          { type: 'mrkdwn', text: `*Keyword:*\n${params.keyword}` },
+          { type: 'mrkdwn', text: `*Detected:*\n${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}` },
+          { type: 'mrkdwn', text: `*Priority:*\n${urgencyLabel}` },
+        ]
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'View Dashboard' },
+            url: params.brandId
+              ? `https://serpalert.co.uk/dashboard/${params.brandId}`
+              : `https://serpalert.co.uk/dashboard`,
+            style: 'primary'
+          }
+        ]
+      }
+    ],
+    text: `New competitor ${params.domain} detected on "${params.keyword}" for ${params.brandName}`,
   }
+
+  await sendToWebhooks(urls, payload)
 }
 
 export async function sendDailySummary(params: {
@@ -73,7 +82,8 @@ export async function sendDailySummary(params: {
   screenshotCount: number
   isProtected: boolean
 }): Promise<void> {
-  if (!params.webhookUrl.startsWith('https://hooks.slack.com/')) return
+  const urls = parseWebhookUrls(params.webhookUrl)
+  if (urls.length === 0) return
 
   const { brandName, checksYesterday, competitorsFound, screenshotCount, isProtected } = params
   const uniqueDomains = [...new Set(competitorsFound.map(c => c.domain))]
@@ -139,14 +149,5 @@ export async function sendDailySummary(params: {
     ],
   })
 
-  try {
-    await fetch(params.webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      redirect: 'error',
-      body: JSON.stringify({ blocks }),
-    })
-  } catch (err) {
-    console.error('Slack daily summary failed:', err instanceof Error ? err.message : err)
-  }
+  await sendToWebhooks(urls, { blocks })
 }

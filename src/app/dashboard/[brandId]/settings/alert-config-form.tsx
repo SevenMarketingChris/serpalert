@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { updateAlertConfig, type SettingsState } from './actions'
+import { X, Plus, Send } from 'lucide-react'
 
 interface Props {
   brandId: string
@@ -22,9 +23,12 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
     null,
   )
 
-  const [slackTesting, setSlackTesting] = useState(false)
+  // Slack webhooks — support multiple
+  const initialWebhooks = slackWebhookUrl ? slackWebhookUrl.split(',').map(u => u.trim()).filter(Boolean) : []
+  const [webhooks, setWebhooks] = useState<string[]>(initialWebhooks)
+  const [newWebhook, setNewWebhook] = useState('')
+  const [testingIndex, setTestingIndex] = useState<number | null>(null)
   const [emailTesting, setEmailTesting] = useState(false)
-  const slackInputRef = useRef<HTMLInputElement>(null)
   const emailInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -32,11 +36,23 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
     if (state?.error) toast.error(state.error)
   }, [state])
 
-  async function testSlack() {
-    const url = slackInputRef.current?.value?.trim()
-    if (!url) { toast.error('Enter a Slack webhook URL first'); return }
+  function addWebhook() {
+    const url = newWebhook.trim()
+    if (!url) return
     if (!url.startsWith('https://hooks.slack.com/')) { toast.error('URL must start with https://hooks.slack.com/'); return }
-    setSlackTesting(true)
+    if (webhooks.includes(url)) { toast.error('Webhook already added'); return }
+    setWebhooks([...webhooks, url])
+    setNewWebhook('')
+    toast.success('Webhook added — save to apply')
+  }
+
+  function removeWebhook(url: string) {
+    setWebhooks(webhooks.filter(w => w !== url))
+    toast.success('Webhook removed — save to apply')
+  }
+
+  async function testSlack(url: string, index: number) {
+    setTestingIndex(index)
     try {
       const res = await fetch(`/api/brands/${brandId}/test-alert`, {
         method: 'POST',
@@ -44,10 +60,10 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
         body: JSON.stringify({ type: 'slack', webhookUrl: url }),
       })
       const data = await res.json()
-      if (res.ok) { toast.success(data.message || 'Test sent to Slack!') }
-      else { toast.error(data.error || 'Slack test failed') }
+      if (res.ok) { toast.success(data.message || 'Test sent!') }
+      else { toast.error(data.error || 'Test failed') }
     } catch { toast.error('Network error') }
-    finally { setSlackTesting(false) }
+    finally { setTestingIndex(null) }
   }
 
   async function testEmail() {
@@ -76,31 +92,63 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
         </p>
       </div>
       <form action={formAction} className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="slackWebhookUrl">Slack Webhook URL</Label>
+        <div className="space-y-3">
+          <Label>Slack Webhooks</Label>
+
+          {/* Hidden field sends comma-separated URLs to the server */}
+          <input type="hidden" name="slackWebhookUrl" value={webhooks.join(',')} />
+
+          {/* Current webhooks */}
+          {webhooks.length > 0 && (
+            <div className="space-y-2">
+              {webhooks.map((url, i) => (
+                <div key={url} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                  <span className="text-xs font-mono text-gray-600 truncate flex-1">{url.replace('https://hooks.slack.com/services/', '…/')}</span>
+                  <button
+                    type="button"
+                    onClick={() => testSlack(url, i)}
+                    disabled={testingIndex === i}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
+                  >
+                    <Send className="h-3 w-3" />
+                    {testingIndex === i ? 'Sending...' : 'Test'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeWebhook(url)}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add new webhook */}
           <div className="flex gap-2">
             <Input
-              ref={slackInputRef}
-              id="slackWebhookUrl"
-              name="slackWebhookUrl"
-              aria-describedby="slack-help"
-              defaultValue={slackWebhookUrl}
-              placeholder="https://hooks.slack.com/..."
-              className="flex-1"
+              value={newWebhook}
+              onChange={e => setNewWebhook(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addWebhook() } }}
+              placeholder="https://hooks.slack.com/services/..."
+              className="flex-1 text-xs"
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={testSlack}
-              disabled={slackTesting}
-              className="shrink-0 text-xs"
+              onClick={addWebhook}
+              className="shrink-0 gap-1.5"
             >
-              {slackTesting ? 'Sending...' : 'Test'}
+              <Plus className="h-3.5 w-3.5" />
+              Add
             </Button>
           </div>
-          <p id="slack-help" className="text-[11px] text-gray-400">
-            Paste a Slack incoming webhook URL to receive real-time alerts in your chosen Slack channel. To create one, go to your Slack workspace &gt; Apps &gt; Incoming Webhooks &gt; Add to Slack. Leave blank to disable Slack alerts.
+
+          <p className="text-[11px] text-gray-400">
+            Add multiple Slack webhooks to send alerts to different channels or workspaces. To create a webhook, go to your Slack workspace &gt; Apps &gt; Incoming Webhooks &gt; Add to Slack.
           </p>
         </div>
 
