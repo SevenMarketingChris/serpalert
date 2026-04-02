@@ -40,44 +40,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
       </div>
 
       <div className="max-w-2xl space-y-6">
-        {/* 1. Brand Details */}
-        <BrandDetailsForm
-          brandId={brand.id}
-          name={brand.name}
-          domain={brand.domain ?? ''}
-          keywords={brand.keywords}
-          keywordLimit={limits.keywords}
-        />
-
-        {/* 2. Billing */}
-        <BillingSection
-          brandId={brand.id}
-          subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
-          trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt).toISOString() : null}
-          agencyManaged={brand.agencyManaged ?? false}
-          hasStripeCustomer={!!brand.stripeCustomerId}
-        />
-
-        {/* 3. Keyword Suggestions */}
-        <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
-
-        {/* 4. Alert Configuration */}
-        <AlertConfigForm
-          brandId={brand.id}
-          slackWebhookUrl={brand.slackWebhookUrl ?? ''}
-        />
-
-        {/* 5. Google Ads */}
-        <GoogleAdsForm
-          brandId={brand.id}
-          googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
-          brandCampaignId={brand.brandCampaignId ?? ''}
-        />
-
-        {/* 6. Client Portal */}
-        <ClientPortalSection clientToken={brand.clientToken} />
-
-        {/* 7. Admin Settings (admin only) */}
+        {/* 1. Client Access & Admin (admin only — at the top) */}
         {isAdmin && (
           <AdminSettingsForm
             brandId={brand.id}
@@ -88,6 +51,43 @@ export default async function SettingsPage({ params }: { params: Promise<{ brand
             invitedEmail={brand.invitedEmail ?? ''}
           />
         )}
+
+        {/* 2. Alert Configuration */}
+        <AlertConfigForm
+          brandId={brand.id}
+          slackWebhookUrl={brand.slackWebhookUrl ?? ''}
+        />
+
+        {/* 3. Brand Details */}
+        <BrandDetailsForm
+          brandId={brand.id}
+          name={brand.name}
+          domain={brand.domain ?? ''}
+          keywords={brand.keywords}
+          keywordLimit={limits.keywords}
+        />
+
+        {/* 4. Billing */}
+        <BillingSection
+          brandId={brand.id}
+          subscriptionStatus={brand.subscriptionStatus ?? 'trialing'}
+          trialEndsAt={brand.trialEndsAt ? new Date(brand.trialEndsAt).toISOString() : null}
+          agencyManaged={brand.agencyManaged ?? false}
+          hasStripeCustomer={!!brand.stripeCustomerId}
+        />
+
+        {/* 5. Client Portal */}
+        <ClientPortalSection clientToken={brand.clientToken} />
+
+        {/* 6. Google Ads */}
+        <GoogleAdsForm
+          brandId={brand.id}
+          googleAdsCustomerId={brand.googleAdsCustomerId ?? ''}
+          brandCampaignId={brand.brandCampaignId ?? ''}
+        />
+
+        {/* 7. Keyword Suggestions */}
+        <KeywordSuggestions brandName={brand.name} currentKeywords={brand.keywords} />
 
         {/* 8. Delete Brand */}
         <div className="pt-2">
