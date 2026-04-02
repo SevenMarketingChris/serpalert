@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
+import { isUKHour } from '@/lib/timezone'
 import { getAllActiveBrands, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
 import { sendDailySummary } from '@/lib/slack'
 import { toUTCDate } from '@/lib/time'
@@ -9,6 +10,10 @@ export const maxDuration = 120
 export async function GET(request: Request) {
   if (!isCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!isUKHour(8)) {
+    return NextResponse.json({ skipped: true, reason: 'Not 8am UK time' })
   }
 
   const brands = await getAllActiveBrands()

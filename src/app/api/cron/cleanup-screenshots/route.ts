@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
+import { isUKHour } from '@/lib/timezone'
 import { getScreenshotUrlsOlderThan, nullifyScreenshotUrls } from '@/lib/db/queries'
 import { deleteScreenshotFiles } from '@/lib/blob-storage'
 import { acquireLock, releaseLock } from '@/lib/cron-lock'
@@ -9,6 +10,10 @@ export const maxDuration = 60
 export async function GET(request: Request) {
   if (!isCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!isUKHour(3)) {
+    return NextResponse.json({ skipped: true, reason: 'Not 3am UK time' })
   }
 
   const locked = await acquireLock('cleanup-screenshots')

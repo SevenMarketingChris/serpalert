@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isCronRequest } from '@/lib/auth'
+import { isUKHour } from '@/lib/timezone'
 import { getAllActiveBrands, insertAuctionInsights } from '@/lib/db/queries'
 import { getAuctionInsights } from '@/lib/google-ads'
 import { acquireLock, releaseLock } from '@/lib/cron-lock'
@@ -9,6 +10,10 @@ export const maxDuration = 60
 export async function GET(request: Request) {
   if (!isCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!isUKHour(6)) {
+    return NextResponse.json({ skipped: true, reason: 'Not 6am UK time' })
   }
 
   if (!(await acquireLock('auction-insights'))) {
