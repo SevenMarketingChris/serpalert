@@ -126,11 +126,22 @@ export async function GET(request: Request) {
             }
           }
 
-          // Email alert for new competitor (non-blocking)
-          if (brand.userId && newDomains.length > 0) {
+          // Check if email alerts are enabled for this brand
+          let emailEnabled = false
+          let alertEmailAddress: string | null = null
+          if (brand.alertConfig) {
+            try {
+              const config = JSON.parse(brand.alertConfig)
+              emailEnabled = config.emailAlertsEnabled === true
+              alertEmailAddress = config.alertEmail || null
+            } catch {}
+          }
+
+          // Email alert for new competitor (non-blocking) — only send if enabled
+          if (emailEnabled && brand.userId && newDomains.length > 0) {
             try {
               const { getUserEmail, sendNewCompetitorEmail } = await import('@/lib/email')
-              const email = await getUserEmail(brand.userId)
+              const email = alertEmailAddress || await getUserEmail(brand.userId)
               if (email) {
                 for (const domain of newDomains) {
                   const ad = ads.find(a => a.domain === domain)

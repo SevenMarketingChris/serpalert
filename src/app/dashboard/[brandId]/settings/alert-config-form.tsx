@@ -66,6 +66,39 @@ export function AlertConfigForm({ brandId, slackWebhookUrl, alertConfig }: Props
           </p>
         </div>
 
+        <div className="space-y-3 pt-2 border-t border-gray-100">
+          <div className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="emailAlertsEnabled"
+              name="emailAlertsEnabled"
+              defaultChecked={parsedConfig.emailAlertsEnabled ?? false}
+              className="h-4 w-4 rounded border-gray-300 mt-0.5"
+            />
+            <div>
+              <Label htmlFor="emailAlertsEnabled">Email alerts</Label>
+              <p id="email-alerts-help" className="text-[11px] text-gray-400">
+                Receive an email when a new competitor is detected bidding on your brand keyword. You'll only be emailed once per new competitor, not on every check.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="alertEmail">Alert email address</Label>
+            <Input
+              id="alertEmail"
+              name="alertEmail"
+              type="email"
+              aria-describedby="alert-email-help"
+              defaultValue={parsedConfig.alertEmail || ''}
+              placeholder="you@company.com"
+            />
+            <p id="alert-email-help" className="text-[11px] text-gray-400">
+              Leave blank to use your account email. Only used for competitor alerts — not marketing.
+            </p>
+          </div>
+        </div>
+
         <Button type="submit" disabled={isPending}>
           {isPending ? 'Saving...' : 'Save Alert Settings'}
         </Button>

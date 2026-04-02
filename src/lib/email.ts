@@ -20,6 +20,10 @@ export async function sendWelcomeEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    },
     subject: sanitizeSubject(`Welcome to SerpAlert — ${escapeHtml(brandName)} is now being monitored`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -54,6 +58,12 @@ export async function sendTrialExpiringEmail(to: string, brandName: string, days
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: `Your SerpAlert trial expires in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`,
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -82,6 +92,12 @@ export async function sendNewCompetitorEmail(to: string, brandName: string, comp
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`New competitor detected on "${escapeHtml(brandName)}" — ${competitorDomain}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -121,6 +137,12 @@ export async function sendTrialExpiredEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Your SerpAlert trial has expired — ${escapeHtml(brandName)}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -149,6 +171,10 @@ export async function sendPaymentFailedEmail(to: string, brandName: string) {
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    },
     subject: sanitizeSubject(`Payment failed for ${escapeHtml(brandName)} — action required`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -198,6 +224,12 @@ export async function sendWeeklyDigestEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Weekly Update — ${escapeHtml(brandName)} — ${data.competitorsThisWeek} competitor${data.competitorsThisWeek !== 1 ? 's' : ''} detected`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -274,6 +306,12 @@ export async function sendMonthlyReport(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Monthly Report — ${escapeHtml(brandName)} — ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -381,6 +419,12 @@ export async function sendAuditReportEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Brand Audit: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} found on "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -432,6 +476,12 @@ export async function sendWeeklyAuditEmail(
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Weekly Update: ${competitors.length} competitor${competitors.length !== 1 ? 's' : ''} on "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -459,6 +509,12 @@ export async function sendAuditMonitoringEndedEmail(to: string, keyword: string)
   await resend.emails.send({
     from: 'SerpAlert <noreply@serpalert.co.uk>',
     to,
+    replyTo: 'support@serpalert.co.uk',
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
     subject: sanitizeSubject(`Free monitoring ended for "${escapeHtml(keyword)}"`),
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">

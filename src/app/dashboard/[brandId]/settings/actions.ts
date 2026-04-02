@@ -118,12 +118,14 @@ export async function updateAlertConfig(
 
   const slackWebhookUrl = ((formData.get('slackWebhookUrl') as string) ?? '').trim() || null
   const alertThreshold = parseInt(formData.get('alertThreshold') as string) || 1
+  const emailAlertsEnabled = formData.get('emailAlertsEnabled') === 'on'
+  const alertEmail = ((formData.get('alertEmail') as string) ?? '').trim() || null
 
   if (slackWebhookUrl && !slackWebhookUrl.startsWith('https://hooks.slack.com/')) {
     return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
   }
 
-  const alertConfig = JSON.stringify({ alertThreshold })
+  const alertConfig = JSON.stringify({ alertThreshold, emailAlertsEnabled, alertEmail })
 
   try {
     await updateBrand(brandId, { slackWebhookUrl, alertConfig })
