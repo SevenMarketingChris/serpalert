@@ -116,21 +116,28 @@ export async function updateAdminSettings(
       }
     }
 
-    // If emails were removed, unlink their userId (revoke access)
-    if (brand.invitedEmail && invitedEmail !== brand.invitedEmail) {
+    // If all emails were cleared, unlink userId (full revoke)
+    if (!invitedEmail && brand.invitedEmail && brand.userId) {
+      await updateBrand(brandId, { userId: null })
+    }
+
+    // If specific emails were removed, check if we need to unlink
+    if (brand.invitedEmail && invitedEmail && invitedEmail !== brand.invitedEmail) {
       const oldEmails = brand.invitedEmail.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-      const newEmails = (invitedEmail || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+      const newEmails = invitedEmail.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
       const removedEmails = oldEmails.filter(e => !newEmails.includes(e))
 
       if (removedEmails.length > 0 && brand.userId) {
-        // Check if the current userId's email was removed
         try {
           const { getUserEmail } = await import('@/lib/email')
           const userEmail = await getUserEmail(brand.userId)
           if (userEmail && removedEmails.includes(userEmail.toLowerCase())) {
-            await updateBrand(brandId, { userId: null } as Parameters<typeof updateBrand>[1])
+            await updateBrand(brandId, { userId: null })
           }
-        } catch {}
+        } catch {
+          // If we can't look up the user, clear userId to be safe
+          await updateBrand(brandId, { userId: null })
+        }
       }
     }
 
