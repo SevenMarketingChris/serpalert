@@ -331,19 +331,19 @@ export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck |
 export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<string, SerpCheck>> {
   if (brandIds.length === 0) return new Map()
 
-  // Use DISTINCT ON to efficiently get latest check per brand in SQL
-  const rows = await db.execute(sql`
-    SELECT DISTINCT ON (brand_id) *
-    FROM serp_checks
-    WHERE brand_id = ANY(${brandIds})
-      AND checked_at >= now() - INTERVAL '7 days'
-    ORDER BY brand_id, checked_at DESC
-  `)
-
   const latestByBrand = new Map<string, SerpCheck>()
-  for (const row of rows as unknown as SerpCheck[]) {
-    latestByBrand.set(row.brandId, row)
+
+  // Fetch latest check per brand — use ORM for proper column mapping
+  for (const brandId of brandIds) {
+    const rows = await db.select().from(serpChecks)
+      .where(eq(serpChecks.brandId, brandId))
+      .orderBy(desc(serpChecks.checkedAt))
+      .limit(1)
+    if (rows[0]) {
+      latestByBrand.set(brandId, rows[0])
+    }
   }
+
   return latestByBrand
 }
 
