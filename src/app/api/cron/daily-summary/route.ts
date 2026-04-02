@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      const checks = await getRecentSerpChecks(brand.id, 200)
+      const checks = await getRecentSerpChecks(brand.id, 500)
       const yesterdayChecks = checks.filter(c => toUTCDate(new Date(c.checkedAt)) === yesterdayStr)
 
       if (yesterdayChecks.length === 0) {

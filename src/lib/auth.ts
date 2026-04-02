@@ -48,7 +48,7 @@ export function authorizeBrandAccess(
   userAgencyId?: string | null,
 ): void {
   if (isAdmin) return
-  if (userAgencyId && brand.agencyId === userAgencyId) return
+  if (userAgencyId && brand.agencyId === userAgencyId && brand.agencyManaged) return
   if (brand.userId === userId) return
   throw new Error('Not authorized')
 }

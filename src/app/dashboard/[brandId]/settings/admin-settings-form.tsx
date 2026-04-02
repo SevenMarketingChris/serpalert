@@ -86,7 +86,7 @@ export function AdminSettingsForm({
           <Label>Client Access</Label>
 
           {/* Hidden field sends comma-separated emails to the server action */}
-          <input type="hidden" name="invitedEmail" value={emails.join(', ')} />
+          <input type="hidden" name="invitedEmail" value={emails.join(',')} />
 
           {/* Current users list */}
           {emails.length > 0 && (

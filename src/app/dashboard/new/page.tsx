@@ -2,12 +2,16 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { PLAN_LIMITS, getBrandsForUser } from '@/lib/db/queries'
+import { checkIsAgencyAdmin } from '@/lib/auth'
 import { AppHeader } from '@/components/app-header'
 import { NewUserBrandForm } from './new-user-brand-form'
 
 export default async function NewBrandPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
+
+  const { isAgency } = await checkIsAgencyAdmin()
+  if (isAgency) redirect('/agency/new')
 
   const userBrands = await getBrandsForUser(userId)
   const currentPlan = (userBrands[0]?.plan ?? 'free') as keyof typeof PLAN_LIMITS

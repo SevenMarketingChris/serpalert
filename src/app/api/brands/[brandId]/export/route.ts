@@ -2,8 +2,11 @@ import { auth } from '@clerk/nextjs/server'
 import { getBrandById, getCompetitorSummaryForBrand } from '@/lib/db/queries'
 import { checkIsAdmin, authorizeBrandAccess, checkIsAgencyAdmin } from '@/lib/auth'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function GET(_request: Request, { params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
+  if (!UUID_RE.test(brandId)) return new Response('Not found', { status: 404 })
   const { userId } = await auth()
   if (!userId) {
     return new Response('Unauthorized', { status: 401 })

@@ -33,7 +33,7 @@ export function DeleteBrandLink({ brandId, brandName }: Props) {
   }
 
   return (
-    <>
+    <div>
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -63,6 +63,6 @@ export function DeleteBrandLink({ brandId, brandName }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }

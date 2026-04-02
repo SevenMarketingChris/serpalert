@@ -98,6 +98,8 @@ export async function sendInviteEmail(to: string, brandName: string) {
     subject: sanitizeSubject(`Your brand monitoring is ready — ${brandName}`),
     headers: {
       'X-Entity-Ref-ID': `serpalert-invite-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
@@ -215,6 +217,8 @@ export async function sendPaymentFailedEmail(to: string, brandName: string) {
     replyTo: 'support@serpalert.co.uk',
     headers: {
       'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<mailto:support@serpalert.co.uk?subject=Unsubscribe>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
     subject: sanitizeSubject(`Payment failed for ${escapeHtml(brandName)} — action required`),
     html: `

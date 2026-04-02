@@ -47,6 +47,7 @@ export const brands = pgTable('brands', {
   index('brands_user_id_idx').on(table.userId),
   index('brands_stripe_customer_id_idx').on(table.stripeCustomerId),
   index('brands_stripe_subscription_id_idx').on(table.stripeSubscriptionId),
+  index('brands_agency_id_idx').on(table.agencyId),
 ])
 
 export const serpChecks = pgTable('serp_checks', {

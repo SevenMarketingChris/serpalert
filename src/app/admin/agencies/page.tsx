@@ -12,11 +12,10 @@ export default async function AdminAgenciesPage() {
 
   const agenciesList = await getAllAgencies()
   const agenciesWithCounts = await Promise.all(
-    agenciesList.map(async a => ({
-      ...a,
-      brandCount: await getAgencyBrandCount(a.id),
-      monthlyTotal: calculateAgencyMonthlyTotal(await getAgencyBrandCount(a.id)),
-    }))
+    agenciesList.map(async a => {
+      const brandCount = await getAgencyBrandCount(a.id)
+      return { ...a, brandCount, monthlyTotal: calculateAgencyMonthlyTotal(brandCount) }
+    })
   )
 
   return (
