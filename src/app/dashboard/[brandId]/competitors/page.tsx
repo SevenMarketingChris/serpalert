@@ -27,12 +27,15 @@ export default async function CompetitorsPage({ params }: { params: Promise<{ br
       const topCompetitor = competitors[0]
       const adCopy = await getAdCopyHistory(brandId, topCompetitor.domain)
       const { generateAdCopySuggestion } = await import('@/lib/ai')
-      adCopySuggestion = await generateAdCopySuggestion(
-        brand.name,
-        adCopy.map(a => a.headline).filter(Boolean) as string[],
-        adCopy.map(a => a.description).filter(Boolean) as string[],
-        brand.domain,
-      )
+      adCopySuggestion = await Promise.race([
+        generateAdCopySuggestion(
+          brand.name,
+          adCopy.map(a => a.headline).filter(Boolean) as string[],
+          adCopy.map(a => a.description).filter(Boolean) as string[],
+          brand.domain,
+        ),
+        new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
+      ])
     } catch { /* AI unavailable */ }
   }
 

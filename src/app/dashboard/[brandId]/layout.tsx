@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 import {
@@ -9,6 +10,10 @@ import {
 import { Sidebar } from '@/components/sidebar'
 import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 
+// Deduplicate DB calls shared between layout and page within the same request
+export const getBrandByIdCached = cache(getBrandById)
+export const checkIsAdminCached = cache(checkIsAdmin)
+
 export default async function BrandDashboardLayout({
   children,
   params,
@@ -18,11 +23,11 @@ export default async function BrandDashboardLayout({
 }) {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
-  const isAdmin = await checkIsAdmin()
+  const isAdmin = await checkIsAdminCached()
 
   const { brandId } = await params
 
-  const brand = await getBrandById(brandId)
+  const brand = await getBrandByIdCached(brandId)
   if (!brand) notFound()
   try {
     authorizeBrandAccess(brand, userId, isAdmin)

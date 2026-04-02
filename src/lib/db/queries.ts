@@ -1,5 +1,5 @@
 import { db, brands, serpChecks, competitorAds, auctionInsights } from './index'
-import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, sql } from 'drizzle-orm'
+import { eq, and, gte, lte, desc, inArray, count, countDistinct, isNotNull, isNull, sql } from 'drizzle-orm'
 import type { Brand, SerpCheck, CompetitorAd, AuctionInsight } from './schema'
 
 export const PLAN_LIMITS = {
@@ -33,9 +33,11 @@ export async function getAllActiveBrands(): Promise<Brand[]> {
   )
 }
 
-export async function getRecentSerpChecks(brandId: string, limit = 50): Promise<SerpCheck[]> {
+export async function getRecentSerpChecks(brandId: string, limit = 50, since?: Date): Promise<SerpCheck[]> {
+  const conditions = [eq(serpChecks.brandId, brandId)]
+  if (since) conditions.push(gte(serpChecks.checkedAt, since))
   return db.select().from(serpChecks)
-    .where(eq(serpChecks.brandId, brandId))
+    .where(and(...conditions))
     .orderBy(desc(serpChecks.checkedAt))
     .limit(limit)
 }
@@ -95,31 +97,36 @@ export async function getBrandsForUser(userId: string): Promise<Brand[]> {
 export async function createBrandForUser(
   data: { name: string; keywords: string[]; domain?: string },
   userId: string,
+  brandLimit: number = PLAN_LIMITS.free.brands,
 ): Promise<Brand> {
-  // Enforce brand limit
-  const currentCount = await getUserBrandCount(userId)
-  if (currentCount >= PLAN_LIMITS.free.brands) {
-    throw new Error('You can only create 1 brand on your current plan. Contact us to add more.')
-  }
-  const baseSlug = data.name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-  const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
-  const trialEndsAt = new Date()
-  trialEndsAt.setDate(trialEndsAt.getDate() + 7)
-  const rows = await db.insert(brands).values({
-    name: data.name,
-    slug,
-    keywords: data.keywords,
-    domain: data.domain,
-    plan: 'free',
-    userId,
-    subscriptionStatus: 'trialing',
-    trialEndsAt,
-  }).returning()
-  if (!rows[0]) throw new Error('Failed to create brand')
-  return rows[0]
+  // Atomic check-then-insert inside a transaction to prevent race conditions
+  return db.transaction(async (tx) => {
+    const countRows = await tx.select({ count: count() }).from(brands)
+      .where(and(eq(brands.userId, userId), eq(brands.active, true)))
+    const currentCount = countRows[0]?.count ?? 0
+    if (currentCount >= brandLimit) {
+      throw new Error(`You can only create ${brandLimit} brand(s) on your current plan. Contact us to add more.`)
+    }
+    const baseSlug = data.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+    const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
+    const trialEndsAt = new Date()
+    trialEndsAt.setDate(trialEndsAt.getDate() + 7)
+    const rows = await tx.insert(brands).values({
+      name: data.name,
+      slug,
+      keywords: data.keywords,
+      domain: data.domain,
+      plan: 'free',
+      userId,
+      subscriptionStatus: 'trialing',
+      trialEndsAt,
+    }).returning()
+    if (!rows[0]) throw new Error('Failed to create brand')
+    return rows[0]
+  })
 }
 
 export async function getScreenshotsForBrand(brandId: string, limit = 50): Promise<SerpCheck[]> {
@@ -151,6 +158,7 @@ export async function getScreenshotUrlsOlderThan(days: number): Promise<{ id: st
   const rows = await db.select({ id: serpChecks.id, screenshotUrl: serpChecks.screenshotUrl })
     .from(serpChecks)
     .where(and(lte(serpChecks.checkedAt, cutoff), isNotNull(serpChecks.screenshotUrl)))
+    .limit(200)
   return rows.filter(r => r.screenshotUrl != null) as { id: string; screenshotUrl: string }[]
 }
 
@@ -174,7 +182,7 @@ export async function updateBrand(
     monthlyBrandSpend?: string | null; brandRoas?: string | null
     brandCampaignId?: string | null
     watchlistDomains?: string[]
-    alertConfig?: string | null
+    alertConfig?: { emailAlertsEnabled?: boolean; alertEmail?: string | null; slackWebhookUrl?: string | null; alertThreshold?: number } | null
     active?: boolean
   },
 ): Promise<Brand> {
@@ -323,17 +331,18 @@ export async function getLastCheckForBrand(brandId: string): Promise<SerpCheck |
 export async function getLastChecksForBrands(brandIds: string[]): Promise<Map<string, SerpCheck>> {
   if (brandIds.length === 0) return new Map()
 
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-  const rows = await db.select().from(serpChecks)
-    .where(and(inArray(serpChecks.brandId, brandIds), gte(serpChecks.checkedAt, sevenDaysAgo)))
-    .orderBy(desc(serpChecks.checkedAt))
+  // Use DISTINCT ON to efficiently get latest check per brand in SQL
+  const rows = await db.execute(sql`
+    SELECT DISTINCT ON (brand_id) *
+    FROM serp_checks
+    WHERE brand_id = ANY(${brandIds})
+      AND checked_at >= now() - INTERVAL '7 days'
+    ORDER BY brand_id, checked_at DESC
+  `)
 
   const latestByBrand = new Map<string, SerpCheck>()
-  for (const row of rows) {
-    if (!latestByBrand.has(row.brandId)) {
-      latestByBrand.set(row.brandId, row)
-    }
+  for (const row of rows as unknown as SerpCheck[]) {
+    latestByBrand.set(row.brandId, row)
   }
   return latestByBrand
 }
@@ -353,6 +362,7 @@ export async function createBrand(data: {
   monthlyBrandSpend?: string; brandRoas?: string
   agencyManaged?: boolean; subscriptionStatus?: string
   trialEndsAt?: Date
+  invitedEmail?: string | null
 }): Promise<Brand> {
   const baseSlug = data.slug
     .toLowerCase()
@@ -362,6 +372,17 @@ export async function createBrand(data: {
   const rows = await db.insert(brands).values({ ...data, slug }).returning()
   if (!rows[0]) throw new Error('Failed to create brand')
   return rows[0]
+}
+
+export async function linkInvitedBrands(email: string, userId: string): Promise<void> {
+  await db.update(brands)
+    .set({ userId, updatedAt: new Date() })
+    .where(
+      and(
+        eq(brands.invitedEmail, email.toLowerCase()),
+        isNull(brands.userId)
+      )
+    )
 }
 
 export async function getThreatCountLast7Days(brandId: string): Promise<number> {

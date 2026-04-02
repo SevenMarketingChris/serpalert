@@ -27,7 +27,7 @@ export async function GET(
   const { check, ads } = result
 
   const brand = await getBrandById(check.brandId)
-  const brandName = brand?.name ?? '[Brand Name]'
+  const brandName = sanitise(brand?.name ?? '[Brand Name]')
   const checkDate = new Date(check.checkedAt).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric'
   })
@@ -53,14 +53,14 @@ ${ads.map(ad => `• Domain: ${sanitise(ad.domain)}
   Headline: "${ad.headline ? sanitise(ad.headline) : 'N/A'}"
   Description: "${ad.description ? sanitise(ad.description) : 'N/A'}"
   Ad Position: ${ad.position ?? 'N/A'}
-  Keyword Targeted: "${check.keyword}"
+  Keyword Targeted: "${sanitise(check.keyword)}"
 `).join('\n')}
 
 This conduct constitutes trademark infringement under the Trade Marks Act 1994 (UK) and/or passing off at common law. Your use of our trademark as a Google Ads keyword to trigger your advertisements is likely to cause confusion among consumers and diverts traffic that would otherwise reach our website.
 
 We hereby demand that you:
 
-1. Immediately cease bidding on the keyword "${check.keyword}" and any variations of our trademark "${brandName}" in Google Ads or any other pay-per-click advertising platform.
+1. Immediately cease bidding on the keyword "${sanitise(check.keyword)}" and any variations of our trademark "${brandName}" in Google Ads or any other pay-per-click advertising platform.
 
 2. Confirm in writing within 14 days of receipt of this letter that you have complied with this demand.
 

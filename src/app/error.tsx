@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
 export default function GlobalError({
@@ -10,6 +11,8 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const router = useRouter()
+
   useEffect(() => {
     console.error(error)
   }, [error])
@@ -24,7 +27,7 @@ export default function GlobalError({
             <p className="text-muted-foreground text-sm">An unexpected error occurred. Please try again.</p>
             <div className="flex items-center justify-center gap-3">
               <Button onClick={reset} variant="outline">Reload</Button>
-              <Button onClick={() => window.location.href = '/'} variant="outline">Go Home</Button>
+              <Button onClick={() => router.push('/')} variant="outline">Go Home</Button>
             </div>
           </div>
         </div>

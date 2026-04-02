@@ -46,7 +46,7 @@ export async function createBrand(
   let createdBrandId: string | undefined
 
   try {
-    const createdBrand = await createBrandForUser({ name, domain, keywords }, userId)
+    const createdBrand = await createBrandForUser({ name, domain, keywords }, userId, planLimit)
     createdBrandId = createdBrand.id
 
     const eventPath = '/dashboard/new'

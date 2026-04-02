@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!isAdminRequest(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { ok } = rateLimit('api-brands-post', { limit: 30, windowMs: 60_000 })
+  const { ok } = await rateLimit('api-brands-post', { limit: 30, windowMs: 60_000 })
   if (!ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   let body: unknown
   try {

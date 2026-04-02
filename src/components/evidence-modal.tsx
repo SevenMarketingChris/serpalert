@@ -45,7 +45,7 @@ export function EvidenceModal({ checkId, brandToken, keyword, checkedAt, screens
       <DialogTrigger
         render={
           (props) => (
-            <button {...props} className="action-btn">
+            <button {...props} className="action-btn" aria-label={`View evidence report for "${keyword}"`}>
               📋 Evidence
             </button>
           )

@@ -158,6 +158,7 @@ export function ScreenshotGallery({ screenshots }: { screenshots: Screenshot[] }
                       <div className="absolute inset-0 bg-gray-100 animate-pulse" />
                     )}
                     <Image
+                      key={modalImage.url}
                       src={modalImage.url}
                       alt={`SERP for ${modalImage.keyword}`}
                       width={1200}

@@ -210,7 +210,7 @@ export async function generateWeeklyDigest(
   },
 ): Promise<string> {
   const { text } = await generateText({
-    model: sonnet,
+    model: haiku,
     maxOutputTokens: 300,
     prompt: `You are a brand protection analyst writing a weekly email digest for "${sanitize(brandName)}". Write 3-4 sentences summarising this week's activity in a professional, reassuring tone.
 
@@ -271,12 +271,13 @@ export async function generateCompetitiveLandscape(
     monthName: string
   },
 ): Promise<string> {
-  const competitorDetails = data.competitors.length > 0
-    ? data.competitors.map(c => `${sanitize(c.domain)} (seen ${c.count}x, avg position ${c.avgPosition ?? 'N/A'}${c.type ? `, type: ${sanitize(c.type)}` : ''})`).join('\n')
+  const cappedCompetitors = data.competitors.slice(0, 20)
+  const competitorDetails = cappedCompetitors.length > 0
+    ? cappedCompetitors.map(c => `${sanitize(c.domain)} (seen ${c.count}x, avg position ${c.avgPosition ?? 'N/A'}${c.type ? `, type: ${sanitize(c.type)}` : ''})`).join('\n')
     : 'No competitors detected'
 
   const { text } = await generateText({
-    model: sonnet,
+    model: haiku,
     maxOutputTokens: 500,
     prompt: `You are a senior PPC analyst writing a competitive landscape report for "${sanitize(brandName)}" for ${sanitize(data.monthName)}.
 

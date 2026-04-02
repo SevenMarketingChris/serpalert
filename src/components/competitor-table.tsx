@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
 type Competitor = {
@@ -57,6 +57,16 @@ export function CompetitorTable({
   const [adCopyCache, setAdCopyCache] = useState<Record<string, AdCopy[]>>({})
   const [loading, setLoading] = useState<string | null>(null)
   const [fetchErrors, setFetchErrors] = useState<Record<string, boolean>>({})
+  const [retryDomain, setRetryDomain] = useState<string | null>(null)
+
+  // Retry effect: waits for expandedDomain to clear before re-expanding
+  useEffect(() => {
+    if (retryDomain && expandedDomain === null) {
+      toggleRow(retryDomain)
+      setRetryDomain(null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryDomain, expandedDomain])
   const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>({})
 
   async function toggleRow(domain: string) {
@@ -192,7 +202,7 @@ export function CompetitorTable({
                               setAdCopyCache(prev => { const next = {...prev}; delete next[competitor.domain]; return next })
                               setFetchErrors(prev => ({...prev, [competitor.domain]: false}))
                               setExpandedDomain(null)
-                              setTimeout(() => toggleRow(competitor.domain), 0)
+                              setRetryDomain(competitor.domain)
                             }}
                           >
                             Failed to load. Click to retry.

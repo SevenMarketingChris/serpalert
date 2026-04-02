@@ -27,8 +27,10 @@ export async function GET(request: Request) {
     const urls = old.map(r => r.screenshotUrl)
     const ids = old.map(r => r.id)
 
-    // Delete blobs first
-    await deleteScreenshotFiles(urls)
+    // Delete blobs in chunks of 25 to avoid rate limits and timeouts
+    for (let i = 0; i < urls.length; i += 25) {
+      await deleteScreenshotFiles(urls.slice(i, i + 25))
+    }
     // Only then nullify DB references
     await nullifyScreenshotUrls(ids)
 

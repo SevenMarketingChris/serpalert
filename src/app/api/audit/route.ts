@@ -9,9 +9,10 @@ export async function POST(request: Request) {
   const requestUrl = new URL(request.url)
 
   // Rate limit by IP: 1 per hour
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded?.split(',')[0]?.trim() ?? 'unknown'
-  const { ok } = rateLimit(`audit:${ip}`, { limit: 1, windowMs: 3_600_000 })
+  const ip = request.headers.get('x-real-ip')
+    ?? request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
+    ?? 'unknown'
+  const { ok } = await rateLimit(`audit:${ip}`, { limit: 1, windowMs: 3_600_000 })
 
   if (!ok) {
     return NextResponse.json(

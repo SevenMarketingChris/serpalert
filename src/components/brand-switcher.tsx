@@ -83,14 +83,14 @@ export function BrandSwitcher({ currentBrandId, currentBrandName, brands }: Bran
           )}
 
           {/* Brand list */}
-          <div role="listbox" className="max-h-64 overflow-y-auto py-1">
+          <div role="menu" className="max-h-64 overflow-y-auto py-1">
             {filtered.length === 0 ? (
               <p className="px-3 py-2 text-sm text-gray-400">No brands found</p>
             ) : (
               filtered.map((brand) => (
                 <button
                   key={brand.id}
-                  role="option"
+                  role="menuitem"
                   aria-selected={brand.id === currentBrandId}
                   onClick={() => selectBrand(brand.id)}
                   className={`flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-gray-50 ${

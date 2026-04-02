@@ -7,6 +7,8 @@ import { getBrandById, updateBrand, deleteBrand, PLAN_LIMITS } from '@/lib/db/qu
 import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
 import { z } from 'zod'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export type SettingsState = {
   error?: string
   success?: string
@@ -17,6 +19,7 @@ export async function updateBrandDetails(
   formData: FormData,
   brandId: string,
 ): Promise<SettingsState> {
+  if (!UUID_RE.test(brandId)) return { error: 'Invalid brand ID' }
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   const isAdmin = await checkIsAdmin()
@@ -57,6 +60,7 @@ export async function updateAdminSettings(
   formData: FormData,
   brandId: string,
 ): Promise<SettingsState> {
+  if (!UUID_RE.test(brandId)) return { error: 'Invalid brand ID' }
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   if (!await checkIsAdmin()) return { error: 'Admin access required' }
@@ -103,6 +107,7 @@ export async function updateAlertConfig(
   formData: FormData,
   brandId: string,
 ): Promise<SettingsState> {
+  if (!UUID_RE.test(brandId)) return { error: 'Invalid brand ID' }
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
 
@@ -125,7 +130,7 @@ export async function updateAlertConfig(
     return { error: 'Slack webhook URL must start with https://hooks.slack.com/' }
   }
 
-  const alertConfig = JSON.stringify({ alertThreshold, emailAlertsEnabled, alertEmail })
+  const alertConfig = { alertThreshold, emailAlertsEnabled, alertEmail }
 
   try {
     await updateBrand(brandId, { slackWebhookUrl, alertConfig })
@@ -141,6 +146,7 @@ export async function updateGoogleAds(
   formData: FormData,
   brandId: string,
 ): Promise<SettingsState> {
+  if (!UUID_RE.test(brandId)) return { error: 'Invalid brand ID' }
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
 
@@ -167,6 +173,7 @@ export async function updateGoogleAds(
 }
 
 export async function deleteBrandAction(brandId: string): Promise<{ error?: string } | void> {
+  if (!UUID_RE.test(brandId)) return { error: 'Invalid brand ID' }
   const { userId } = await auth()
   if (!userId) return { error: 'Not authenticated' }
   const isAdmin = await checkIsAdmin()

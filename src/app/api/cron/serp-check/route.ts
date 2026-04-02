@@ -101,19 +101,25 @@ export async function GET(request: Request) {
             if (!recentDomains.includes(ad.domain)) {
               newDomains.push(ad.domain)
 
-              // AI triage for new competitor
+              // AI triage for new competitor (8s timeout)
               let urgency: 'urgent' | 'monitor' | 'ignore' = 'monitor'
               try {
                 const { triageAlert } = await import('@/lib/ai')
-                urgency = await triageAlert(brand.name, ad.domain, ad?.position ?? null, keyword)
+                urgency = await Promise.race([
+                  triageAlert(brand.name, ad.domain, ad?.position ?? null, keyword),
+                  new Promise<'monitor'>(resolve => setTimeout(() => resolve('monitor'), 8000)),
+                ])
               } catch { /* AI unavailable */ }
               urgencyByDomain[ad.domain] = urgency
 
-              // AI competitor intent classification
+              // AI competitor intent classification (8s timeout)
               let competitorType: string | null = null
               try {
                 const { classifyCompetitorIntent } = await import('@/lib/ai')
-                const intent = await classifyCompetitorIntent(brand.name, ad.domain, ad?.headline ?? null, ad?.description ?? null)
+                const intent = await Promise.race([
+                  classifyCompetitorIntent(brand.name, ad.domain, ad?.headline ?? null, ad?.description ?? null),
+                  new Promise<{ type: 'direct_rival' | 'marketplace' | 'unrelated'; confidence: string }>(resolve => setTimeout(() => resolve({ type: 'unrelated', confidence: 'timeout' }), 8000)),
+                ])
                 competitorType = intent.type.replace('_', ' ')
               } catch { /* AI unavailable */ }
               competitorTypeByDomain[ad.domain] = competitorType
@@ -126,15 +132,19 @@ export async function GET(request: Request) {
             }
           }
 
-          // Check if email alerts are enabled for this brand
+          // Check if email alerts are enabled for this brand (safe parse)
           let emailEnabled = false
           let alertEmailAddress: string | null = null
           if (brand.alertConfig) {
             try {
-              const config = JSON.parse(brand.alertConfig)
-              emailEnabled = config.emailAlertsEnabled === true
-              alertEmailAddress = config.alertEmail || null
-            } catch {}
+              const raw = typeof brand.alertConfig === 'string' ? JSON.parse(brand.alertConfig) : brand.alertConfig
+              if (raw && typeof raw === 'object') {
+                emailEnabled = raw.emailAlertsEnabled === true
+                alertEmailAddress = typeof raw.alertEmail === 'string' ? raw.alertEmail : null
+              }
+            } catch (parseErr) {
+              console.error(`Invalid alertConfig for brand ${brand.id}:`, parseErr)
+            }
           }
 
           // Email alert for new competitor (non-blocking) — only send if enabled
@@ -205,7 +215,16 @@ export async function GET(request: Request) {
           console.info(`Auto-enabling brand campaign for ${brand.name} — competitors detected`)
           await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, true)
         } else {
-          console.info(`Auto-pausing brand campaign for ${brand.name} — no competitors`)
+          // Require 3 consecutive zero-competitor checks before pausing
+          // to avoid pausing on transient SerpAPI issues
+          const { getRecentSerpChecks } = await import('@/lib/db/queries')
+          const recentChecks = await getRecentSerpChecks(brand.id, 3)
+          const allRecentZero = recentChecks.length >= 3 && recentChecks.every(c => c.competitorCount === 0)
+          if (!allRecentZero) {
+            console.info(`Skipping campaign pause for ${brand.name} — need 3 consecutive zero-competitor checks (have ${recentChecks.length} recent checks)`)
+            continue
+          }
+          console.info(`Auto-pausing brand campaign for ${brand.name} — 3+ consecutive checks with no competitors`)
           await setCampaignStatus(brand.googleAdsCustomerId, brand.brandCampaignId, false)
         }
       } catch (err) {

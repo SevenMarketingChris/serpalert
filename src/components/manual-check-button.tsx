@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 const COOLDOWN_MS = 4 * 60 * 60 * 1000 // 4 hours
 
@@ -19,6 +20,7 @@ function formatWait(ms: number): string {
 }
 
 export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
+  const router = useRouter()
   const inFlight = useRef(false)
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [result, setResult] = useState<string>('')
@@ -101,8 +103,8 @@ export function ManualCheckButton({ brandId, lastCheckAt }: Props) {
       )
       // Set cooldown from now
       setCooldownEnd(Date.now() + COOLDOWN_MS)
-      // Refresh page after short delay
-      setTimeout(() => window.location.reload(), 2000)
+      // Refresh server data after short delay
+      setTimeout(() => router.refresh(), 2000)
     } catch {
       setStatus('error')
       setResult('Network error')

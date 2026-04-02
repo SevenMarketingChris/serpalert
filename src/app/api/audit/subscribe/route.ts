@@ -6,8 +6,21 @@ import { checkSerpForAds } from '@/lib/serpapi'
 import { and, eq } from 'drizzle-orm'
 import { readAttributionContextFromRequest } from '@/lib/attribution'
 import { emitServerAnalyticsEvent } from '@/lib/analytics/server'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
+  // Rate limit by IP: 5 per hour
+  const ip = request.headers.get('x-real-ip')
+    ?? request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
+    ?? 'unknown'
+  const { ok: rateLimitOk } = await rateLimit(`audit-subscribe:${ip}`, { limit: 5, windowMs: 3_600_000 })
+  if (!rateLimitOk) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      { status: 429 }
+    )
+  }
+
   const attribution = readAttributionContextFromRequest(request)
   const requestUrl = new URL(request.url)
   let email: string

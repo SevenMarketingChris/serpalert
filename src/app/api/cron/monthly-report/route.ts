@@ -33,11 +33,10 @@ export async function GET(request: Request) {
           continue
         }
 
-        // Gather 30-day data
-        const checks = await getRecentSerpChecks(brand.id, 1000)
+        // Gather 30-day data (filter in SQL, not JS)
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-        const recentChecks = checks.filter(c => new Date(c.checkedAt) >= thirtyDaysAgo)
+        const recentChecks = await getRecentSerpChecks(brand.id, 1000, thirtyDaysAgo)
 
         const competitors = await getCompetitorSummaryForBrand(brand.id)
         const screenshots = await getScreenshotsForBrand(brand.id, 10)

@@ -94,6 +94,19 @@ export function NewBrandForm() {
             <Input id="slack" name="slack" placeholder="https://hooks.slack.com/…" />
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="clientEmail">Client Email (optional)</Label>
+            <Input
+              id="clientEmail"
+              name="clientEmail"
+              type="email"
+              placeholder="client@company.com"
+            />
+            <p className="text-[11px] text-gray-400">
+              Enter the client's email to send them an invite. They'll be able to sign in with Google or email/password to access their dashboard.
+            </p>
+          </div>
+
           <div className="flex items-center gap-2">
             <input
               type="checkbox"

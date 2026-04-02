@@ -26,6 +26,7 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
   const spendRaw = ((formData.get('monthlyBrandSpend') as string) ?? '').trim() || undefined
   const roasRaw = ((formData.get('brandRoas') as string) ?? '').trim() || undefined
   const agencyManaged = formData.get('agencyManaged') === 'on'
+  const clientEmail = ((formData.get('clientEmail') as string) ?? '').trim() || null
 
   if (!name) return { error: 'Brand name is required' }
 
@@ -42,7 +43,19 @@ export async function createBrandAction(_prev: CreateBrandState, formData: FormD
       brandRoas: roasRaw,
       agencyManaged,
       subscriptionStatus: agencyManaged ? 'agency' : 'active',
+      invitedEmail: clientEmail,
     })
+
+    // Send invite email
+    if (clientEmail) {
+      try {
+        const { sendInviteEmail } = await import('@/lib/email')
+        await sendInviteEmail(clientEmail, name)
+      } catch (err) {
+        console.error('Invite email failed:', err instanceof Error ? err.message : err)
+      }
+    }
+
     revalidatePath('/admin/brands')
     return { clientToken: brand.clientToken }
   } catch (err) {

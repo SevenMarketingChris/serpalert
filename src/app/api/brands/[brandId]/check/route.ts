@@ -41,7 +41,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
   }
 
   // Per-user rate limit: 10 manual checks per hour across all brands
-  const { ok: userOk } = rateLimit(`serp-check-user-${userId}`, { limit: 10, windowMs: 3600_000 })
+  const { ok: userOk } = await rateLimit(`serp-check-user-${userId}`, { limit: 10, windowMs: 3600_000 })
   if (!userOk) {
     return NextResponse.json({ error: 'Too many checks. Please wait before checking more brands.' }, { status: 429 })
   }

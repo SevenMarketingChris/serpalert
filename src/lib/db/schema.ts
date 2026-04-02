@@ -14,6 +14,7 @@ export const brands = pgTable('brands', {
   monthlyBrandSpend: numeric('monthly_brand_spend'),
   brandRoas: numeric('brand_roas'),
   userId: text('user_id'),
+  invitedEmail: text('invited_email'),
   watchlistDomains: text('watchlist_domains').array().default([]),
   plan: text('plan').notNull().default('free'),
   stripeCustomerId: text('stripe_customer_id'),
@@ -21,7 +22,7 @@ export const brands = pgTable('brands', {
   agencyManaged: boolean('agency_managed').notNull().default(false),
   trialEndsAt: timestamp('trial_ends_at'),
   subscriptionStatus: text('subscription_status').notNull().default('trialing'),
-  alertConfig: text('alert_config'), // JSON string for alert settings
+  alertConfig: jsonb('alert_config').$type<{ emailAlertsEnabled?: boolean; alertEmail?: string | null; slackWebhookUrl?: string | null; alertThreshold?: number }>(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => [
@@ -33,7 +34,7 @@ export const brands = pgTable('brands', {
 
 export const serpChecks = pgTable('serp_checks', {
   id: uuid('id').primaryKey().defaultRandom(),
-  brandId: uuid('brand_id').notNull().references(() => brands.id),
+  brandId: uuid('brand_id').notNull().references(() => brands.id, { onDelete: 'cascade' }),
   keyword: text('keyword').notNull(),
   checkedAt: timestamp('checked_at').notNull().defaultNow(),
   device: text('device').notNull().default('desktop'),
@@ -46,8 +47,8 @@ export const serpChecks = pgTable('serp_checks', {
 
 export const competitorAds = pgTable('competitor_ads', {
   id: uuid('id').primaryKey().defaultRandom(),
-  serpCheckId: uuid('serp_check_id').notNull().references(() => serpChecks.id),
-  brandId: uuid('brand_id').notNull().references(() => brands.id),
+  serpCheckId: uuid('serp_check_id').notNull().references(() => serpChecks.id, { onDelete: 'cascade' }),
+  brandId: uuid('brand_id').notNull().references(() => brands.id, { onDelete: 'cascade' }),
   domain: text('domain').notNull(),
   headline: text('headline'),
   description: text('description'),
@@ -64,7 +65,7 @@ export const competitorAds = pgTable('competitor_ads', {
 
 export const auctionInsights = pgTable('auction_insights', {
   id: uuid('id').primaryKey().defaultRandom(),
-  brandId: uuid('brand_id').notNull().references(() => brands.id),
+  brandId: uuid('brand_id').notNull().references(() => brands.id, { onDelete: 'cascade' }),
   date: date('date').notNull(),
   competitorDomain: text('competitor_domain').notNull(),
   impressionShare: numeric('impression_share'),

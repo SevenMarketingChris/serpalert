@@ -1,8 +1,9 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
-import { getBrandById, getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
-import { checkIsAdmin, authorizeBrandAccess } from '@/lib/auth'
+import { getRecentSerpChecks, getCompetitorAdsForChecks } from '@/lib/db/queries'
+import { authorizeBrandAccess } from '@/lib/auth'
+import { getBrandByIdCached, checkIsAdminCached } from './layout'
 import { ManualCheckButton } from '@/components/manual-check-button'
 import { ActivityFeed } from '@/components/activity-feed'
 import { TrendChart } from '@/components/trend-chart'
@@ -21,8 +22,8 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
   const [isAdmin, brand] = await Promise.all([
-    checkIsAdmin(),
-    getBrandById(brandId),
+    checkIsAdminCached(),
+    getBrandByIdCached(brandId),
   ])
   if (!brand) notFound()
   try {
@@ -63,16 +64,20 @@ export default async function BrandDashboard({ params }: { params: Promise<{ bra
   ).size
 
   // AI recommendation — only show after enough data (at least 4 checks)
+  // 3s timeout to prevent blocking page render if AI is slow
   let aiRecommendation: string | null = null
   if (checks.length >= 4) {
     try {
       const { generateActionRecommendation } = await import('@/lib/ai')
-      aiRecommendation = await generateActionRecommendation(
-        brand.name,
-        activeCompetitors,
-        !!brand.googleAdsCustomerId,
-        !!brand.brandCampaignId,
-      )
+      aiRecommendation = await Promise.race([
+        generateActionRecommendation(
+          brand.name,
+          activeCompetitors,
+          !!brand.googleAdsCustomerId,
+          !!brand.brandCampaignId,
+        ),
+        new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
+      ])
     } catch {
       // AI unavailable — skip recommendation
     }

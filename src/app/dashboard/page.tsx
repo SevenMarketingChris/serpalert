@@ -17,6 +17,19 @@ export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
 
+  // Auto-link invited brands to this user
+  try {
+    const { currentUser } = await import('@clerk/nextjs/server')
+    const user = await currentUser()
+    const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress
+    if (email) {
+      const { linkInvitedBrands } = await import('@/lib/db/queries')
+      await linkInvitedBrands(email.toLowerCase(), userId)
+    }
+  } catch {
+    // Non-critical — skip silently
+  }
+
   const isAdmin = await checkIsAdmin()
   const userBrands: Brand[] = await getBrandsForUser(userId)
   // Admin sees agency brands too

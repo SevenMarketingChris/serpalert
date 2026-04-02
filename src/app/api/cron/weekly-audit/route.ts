@@ -5,6 +5,7 @@ import { auditLeads } from '@/lib/db/schema'
 import { checkSerpForAds } from '@/lib/serpapi'
 import { sendWeeklyAuditEmail, sendAuditMonitoringEndedEmail } from '@/lib/email'
 import { eq, gt, and } from 'drizzle-orm'
+import { acquireLock, releaseLock } from '@/lib/cron-lock'
 
 export const maxDuration = 300
 
@@ -13,8 +14,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  if (!(await acquireLock('weekly-audit'))) {
+    return NextResponse.json({ error: 'Already running' }, { status: 409 })
+  }
+
   try {
-    // Get all active audit leads with remaining checks
+    // Get active audit leads with remaining checks (capped to prevent timeout)
     const leads = await db
       .select()
       .from(auditLeads)
@@ -24,6 +29,7 @@ export async function GET(request: Request) {
           eq(auditLeads.unsubscribed, false)
         )
       )
+      .limit(50)
 
     let processed = 0
     let errors = 0
@@ -71,5 +77,7 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error('Weekly audit cron failed:', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  } finally {
+    await releaseLock('weekly-audit')
   }
 }

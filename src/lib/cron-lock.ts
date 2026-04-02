@@ -3,32 +3,22 @@ import { sql } from 'drizzle-orm'
 
 const LOCK_TIMEOUT_MINUTES = 6
 
-let tableCreated = false
-
 /**
  * Table-based cron lock suitable for serverless environments.
  * Uses a cron_locks table instead of PostgreSQL advisory locks,
  * which are connection-scoped and unreliable on serverless.
- *
- * The table must exist:
- *   CREATE TABLE IF NOT EXISTS cron_locks (
- *     job_name TEXT PRIMARY KEY,
- *     locked_at TIMESTAMP NOT NULL DEFAULT now()
- *   );
  */
 
 export async function acquireLock(jobName: string): Promise<boolean> {
   try {
-    // Ensure the table exists (only on first call)
-    if (!tableCreated) {
-      await db.execute(sql`
-        CREATE TABLE IF NOT EXISTS cron_locks (
-          job_name TEXT PRIMARY KEY,
-          locked_at TIMESTAMP NOT NULL DEFAULT now()
-        )
-      `)
-      tableCreated = true
-    }
+    // Idempotent — safe to run every invocation (no module-level flag,
+    // which is unreliable across serverless cold starts)
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS cron_locks (
+        job_name TEXT PRIMARY KEY,
+        locked_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `)
 
     // Delete stale locks older than the timeout
     const minutes = Math.floor(Math.abs(LOCK_TIMEOUT_MINUTES))

@@ -23,6 +23,8 @@ export async function sendWelcomeEmail(to: string, brandName: string) {
     replyTo: 'support@serpalert.co.uk',
     headers: {
       'X-Entity-Ref-ID': `serpalert-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'List-Unsubscribe': '<https://serpalert.co.uk/dashboard>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
     subject: sanitizeSubject(`Welcome to SerpAlert — ${escapeHtml(brandName)} is now being monitored`),
     html: `
@@ -78,6 +80,45 @@ export async function sendTrialExpiringEmail(to: string, brandName: string, days
           <a href="https://serpalert.co.uk/dashboard" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
             Subscribe Now — £149/mo
           </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 32px;">
+          SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
+        </p>
+      </div>
+    `,
+  })
+}
+
+export async function sendInviteEmail(to: string, brandName: string) {
+  const resend = getResend()
+  await resend.emails.send({
+    from: 'SerpAlert <noreply@serpalert.co.uk>',
+    replyTo: 'support@serpalert.co.uk',
+    to,
+    subject: sanitizeSubject(`Your brand monitoring is ready — ${brandName}`),
+    headers: {
+      'X-Entity-Ref-ID': `serpalert-invite-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    },
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
+        <h1 style="font-size: 20px; color: #111;">Your brand is being protected</h1>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Good news — <strong>${escapeHtml(brandName)}</strong> is now being monitored for competitor ads on Google.
+        </p>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          We check your brand keyword every hour. If a competitor starts bidding on your brand name, you'll be alerted with screenshot evidence.
+        </p>
+        <h2 style="font-size: 16px; color: #111; margin-top: 24px;">Get started</h2>
+        <p style="color: #555; font-size: 14px; line-height: 1.6;">
+          Sign in to view your dashboard, see competitor activity, and configure alerts.
+        </p>
+        <p style="margin-top: 20px;">
+          <a href="https://serpalert.co.uk/sign-up" style="display: inline-block; background: #4f46e5; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            Sign In to Your Dashboard
+          </a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 8px;">
+          You can sign in with Google or create an account with this email address.
         </p>
         <p style="color: #999; font-size: 12px; margin-top: 32px;">
           SerpAlert — Brand keyword monitoring by <a href="https://sevenmarketing.co.uk" style="color: #999;">Seven Marketing</a>
