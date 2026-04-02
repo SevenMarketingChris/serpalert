@@ -17,8 +17,15 @@ export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
 
-  const { isAgency } = await checkIsAgencyAdmin()
-  if (isAgency) redirect('/agency')
+  // Check if user is an agency admin — redirect to agency dashboard
+  let isAgencyUser = false
+  try {
+    const { isAgency } = await checkIsAgencyAdmin()
+    isAgencyUser = isAgency
+  } catch {
+    // Agency check failed — continue as regular user
+  }
+  if (isAgencyUser) redirect('/agency')
 
   // Auto-link invited brands to this user
   try {
